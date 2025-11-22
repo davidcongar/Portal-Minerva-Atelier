@@ -1,0 +1,205 @@
+{% extends 'partials/system/layout1.html' %}
+{% block content %}
+{% include "partials/system/alerts.html" %}
+
+
+<!-- Breadcrumb -->
+{% include 'partials/table/breadcrumbs.html' %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<div class="h-[calc(100vh-366px)] sm:h-[calc(100vh-204px)]">
+    <div class="bg-white dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 p-5 rounded-lg flex items-center justify-between">
+        <div>
+            {% for detail in details %}
+                <h1 class="font-semibold">{{detail}}</h1>
+            {% endfor %}
+        </div>
+        <div class="flex gap-2">
+            <form method="GET" action="{{ url_for('dynamic.table_view_input_confirm', table_name=main_table_name,id=main_record.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit"
+                    class="py-2 px-3 bg-success border border-success rounded-md text-white transition-all duration-300 hover:bg-success/[0.85] hover:border-success/[0.85]">
+                    Confirmar
+                </button>
+            </form>
+        </div>
+    </div>
+    <div class="grid gap-5 pt-5">
+        <div>
+            <div id="table-data" data-table="/dynamic/{{ main_table_name }}/input_table/data/{{ main_record.id }}" data-columns='{{ columns|tojson }}'></div>
+            <div class="flex flex-col">
+                <div class="grid grid-cols-1 gap-5">
+                    <div class="sticky top-0 bg-white dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 p-5 rounded-lg" x-data="tabla" x-init="initData(); $watch('searchInput', value => { search(value) })" >
+                        <div class="flex justify-between items-center gap-3">
+                            <div>
+                                <h2 class="text-base font-semibold">{{ table_title }}</h2>
+                            </div>
+                            <div class="flex items-center gap-5">
+                                <input id="search" x-model="searchInput" type="text" class="form-input" placeholder="Buscar...">
+                            </div>
+                        </div>
+                        <div class="overflow-auto"  style="max-height: calc(100vh - 440px);">
+                            <table class="min-w-[640px] w-full table-hover">
+                                <thead class="bg-white dark:bg-dark sticky top-0 z-10">
+                                    <tr>
+                                        {% for column in columns %}
+                                        <th data-column="{{ column }}">
+                                            <div class="flex items-center justify-between gap-2">
+                                                <p class="font-semibold">{{ column|title_format }}</p>
+                                                <div class="flex flex-col">
+                                                    <!-- Icono para ordenar ascendente -->
+                                                    <svg @click="sort('{{ column }}', sorted.rule === 'asc' ? 'desc' : 'asc')"
+                                                        fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"
+                                                        viewBox="0 0 24 24" stroke="currentColor"
+                                                        class="h-3 w-3 cursor-pointer text-muted"
+                                                        x-bind:class="{'!text-black': sorted.field === '{{ column }}' && sorted.rule === 'asc'}">
+                                                        <path d="M5 15l7-7 7 7"></path>
+                                                    </svg>
+                                                    <!-- Icono para ordenar descendente -->
+                                                    <svg @click="sort('{{ column }}', sorted.rule === 'desc' ? 'asc' : 'desc')"
+                                                        fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"
+                                                        viewBox="0 0 24 24" stroke="currentColor"
+                                                        class="h-3 w-3 cursor-pointer text-muted"
+                                                        x-bind:class="{'!text-black': sorted.field === '{{ column }}' && sorted.rule === 'desc'}">
+                                                        <path d="M19 9l-7 7-7-7"></path>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        </th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template x-for="record in items" :key="record.id">
+                                        <tr class="cursor-pointer hover:bg-gray-100">
+                                            <template x-for="(col, i) in {{ columns }}" :key="i">
+                                                <td >  
+                                                    <template x-if="{{ edit_fields }}.includes(col) && ['cantidad_recibida'].includes(col)">
+                                                        <form method="POST">
+                                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                            <input type="number" x-model="record[col]"
+                                                                class="form-input rounded-lg w-32 h-12 text-xl" 
+                                                                @blur="update_record(record,col)" />
+                                                        </form>
+                                                    </template>
+                                                    <template x-if="{{ edit_fields }}.includes(col) && String(col).includes('fecha')">
+                                                        <form method="POST">
+                                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                            <input type="date" x-model="record[col]"
+                                                                class="form-input rounded-lg" style="width:150px"
+                                                                @blur="update_record(record,col)"></textarea>
+                                                        </form>
+                                                    </template>
+                                                    <template x-if="{{ edit_fields }}.includes(col) && ['notas','descripcion','sugerencias'].includes(col)">
+                                                        <form method="POST">
+                                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                            <textarea rows='3'  x-model="record[col]"
+                                                                class="form-textarea rounded-lg w-30 h-20" 
+                                                                @blur="update_record(record,col)"></textarea>
+                                                        </form>
+                                                    </template>
+                                                    <template x-if="{{ edit_fields }}.includes(col) && ['id_producto'].includes(col)">
+                                                        <form method="POST">
+                                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                            <select :id="col + '_' + record.id"  :name="col" class="searchable-select" x-model="record[col]" x-init="$nextTick(() => {$el._select2 = $($el).select2({ width: '100%' }).on('change', () => { record[col] = $el.value; update_record(record,col); });})">
+                                                                {% for option in foreign_options['id_producto'] %}
+                                                                    <option value="{{ option.id }}" >
+                                                                        {{ option.nombre or option.nombre_completo or option.nombre_empresa or option.id_visualizacion }}
+                                                                    </option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </form>
+                                                    </template>
+                                                    <!-- Mostrar otras columnas normalmente -->
+                                                    <template x-if="!{{ edit_fields }}.includes(col) && !String(col).includes('fecha')">
+                                                        <td style="word-wrap: break-word;word-break: break-word;white-space: normal;overflow: hidden;text-overflow: ellipsis">
+                                                            <span 
+                                                                x-text="record[col] 
+                                                                ? (['cantidad_recibida'].includes(col) 
+                                                                    ? money_format(record[col]) 
+                                                                    : record[col]) 
+                                                                : '-'">
+                                                            </span>
+                                                        </td>
+                                                    </template>
+                                                </td>
+                                            </template>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/system/data-search.js"></script>
+<script src="/static/js/system/data_table.js"></script>
+<script src="/static/js/system/loader.js"></script>
+<script src="/static/js/system/dynamic_table_init.js"></script>
+<script src="/static/js/system/format_functions.js"></script>
+<script src="/static/js/system/update_record_validation.js"></script>
+<script>
+    function initSelect2() {
+        $('.searchable-select').select2({ width: '100%' });
+    }
+
+    document.addEventListener('DOMContentLoaded', initSelect2);
+
+    // Also re-run after Alpine reloads data
+    document.addEventListener('alpine:init', () => {
+    Alpine.effect(() => {
+        initSelect2();
+    });
+    });
+
+    initSelect2();
+
+    const table_name={{ table_name|tojson }};
+
+    function update_record(record,column) {
+        fetch(`/dynamic/${table_name}/double_table/update/${column}/${record.id}/${record[column]}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message !== "" && data.status==='warning') {
+                window.dispatchEvent(new CustomEvent('show-warning', {
+                    detail: data.message   // the message from your AJAX or backend
+                }));
+                warningAlert.style.display = 'flex';  // Show the warning message
+                warningAlert.style.opacity = '1';  // Set opacity to 1 for showing
+                setTimeout(function() {
+                    warningAlert.style.opacity = '0';  // Start fading out
+                    // After the fade-out animation is complete, hide the element
+                    setTimeout(function() {
+                        warningAlert.style.display = 'none';
+                    }, 1000);  // Match this delay with the CSS transition time (1s)
+                }, 3000);
+                if (data.value!=''){
+                    record[column] = data.value;  
+                    const input = document.querySelector(
+                        `[data-record-id="${record.id}"][data-column="${column}"]`
+                    );
+                    if (input) {
+                        input.value = data.value;
+                    }
+                }
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    }
+</script>
+
+
+{% include "partials/system/loader.html" %}
+
+{% endblock content %}

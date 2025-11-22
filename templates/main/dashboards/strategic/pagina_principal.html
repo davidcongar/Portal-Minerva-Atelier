@@ -1,0 +1,56 @@
+<!-- templates/main/dashboard.html -->
+{% extends './partials/system/layout1.html' %}
+{% block content %}
+<script src="/static/js/system/apexcharts.js"></script>
+<script src="/static/js/charts/general.js"></script>
+<script src="/static/js/charts/waterfall.js"></script>
+<script src="/static/js/system/data_table.js"></script>
+<script src="/static/js/system/loader.js"></script>
+<script src="/static/js/system/dynamic_table_init.js"></script>
+<script src="/static/js/system/format_functions.js"></script>
+<script src="/static/js/system/funciones_generales.js"></script>
+
+<div id="main" class=" pt-5">
+    <div class="flex flex-col gap-5 overflow-y-auto" style="max-height: calc(100vh - 171px);">
+        <div class="flex items-center gap-2 sticky top-0 bg-lesswhite dark:bg-dark z-20 shadow-md">
+            <h2 class="font-semibold">Tablero estratégico</h2>
+        </div>
+        <h2 class="font-semibold">Utilidades</h2>
+        <h2 class="font-semibold">Ventas</h2>
+
+        <h2 class="font-semibold">Compras</h2>
+
+        <h2 class="font-semibold">Gastos</h2>
+
+        <h2 class="font-semibold">Inventario</h2>
+
+        <h2 class="font-semibold">Indicadores</h2>
+    </div>
+</div>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.searchable-select').select2({
+        width: '100%'
+        });
+    });
+    //function updateAll(){
+    //    updateUtilidad();
+    //    updateVentasDiarias();
+    //    updateVentasMen();
+    //    updateComprasMensuales();
+    //    updategastosMensuales();
+    //    const id_sucursal = document.getElementById('id_sucursal').value;
+    //    generar_grafica(
+    //        '#grafica_dias_de_inventario',
+    //        'bar',
+    //        'producto',
+    //        'dias_de_inventario',
+    //        `/dashboard_queries/strategic/dias_de_inventario?id_sucursal=${id_sucursal}`,{'valueType':'normal'}
+    //    );
+    //    obtener_valor('#valor_inventario','valor_inventario',`/dashboard_queries/strategic/valor_inventario?id_sucursal=${id_sucursal}`,'currency');
+    //}
+</script>
+{% endblock content %}

@@ -1,0 +1,229 @@
+<nav class="sidebar fixed z-50 flex-none w-[226px] border-r-2 border-lightgray/[8%] dark:border-gray/20 transition-all duration-300">
+    <div class="bg-white dark:bg-dark h-full">
+        <div class="p-3.5 mt-3">
+            <a href="/" class="main-logo w-full">
+                <img src="/static/images/app-logo-light.png" class="mx-auto dark-logo h-10 logo dark:hidden" alt="logo" />
+                <img src="/static/images/app-logo-dark.png" class="mx-auto light-logo h-10 logo hidden dark:block" alt="logo" />
+                <img src="/static/images/logo-light-icon.png" class="logo-icon h-8 mx-auto hidden" alt="logo">
+            </a>
+        </div>
+        <div class="flex items-center gap-2.5 py-2.5 pe-2.5">
+            <div class="h-[2px] bg-lightgray/10 dark:bg-gray/50 block flex-1"></div>
+            <button type="button" class="shrink-0 btn-toggle hover:text-primary duration-300"
+                @click="$store.app.toggleSidebar()">
+                <svg class="w-3.5" viewBox="0 0 13 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path opacity="0.2"
+                        d="M5.46133 6.00002L11.1623 12L12.4613 10.633L8.05922 6.00002L12.4613 1.36702L11.1623 0L5.46133 6.00002Z"
+                        fill="currentColor" />
+                    <path d="M0 6.00002L5.70101 12L7 10.633L2.59782 6.00002L7 1.36702L5.70101 0L0 6.00002Z"
+                        fill="currentColor" />
+                </svg>
+            </button>
+        </div>
+        <div class="h-[calc(100vh-93px)] overflow-y-auto overflow-x-hidden space-y-16 px-4 pt-2 pb-4">
+            <ul class="relative flex flex-col gap-1 text-sm" x-data="{ activeMenu: '{{activeMenu}}', activeSubMenu: '{{activeSubMenu}}', activeItem: '{{activeItem}}'  }">
+                {% if can_access('/dashboards/operative_dashboard') %}
+                <li class="menu nav-item">
+                    <a href="/dashboards/operative_dashboard" class="nav-link group" :class="{'active' : activeMenu === 'inicio'}">
+                        <div class="flex items-center">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M2 12.2039C2 9.91549 2 8.77128 2.5192 7.82274C3.0384 6.87421 3.98695 6.28551 5.88403 5.10813L7.88403 3.86687C9.88939 2.62229 10.8921 2 12 2C13.1079 2 14.1106 2.62229 16.116 3.86687L18.116 5.10812C20.0131 6.28551 20.9616 6.87421 21.4808 7.82274C22 8.77128 22 9.91549 22 12.2039V13.725C22 17.6258 22 19.5763 20.8284 20.7881C19.6569 22 17.7712 22 14 22H10C6.22876 22 4.34315 22 3.17157 20.7881C2 19.5763 2 17.6258 2 13.725V12.2039Z"
+                                    stroke="currentColor" stroke-width="1.5" />
+                                <path d="M9 16C9.85038 16.6303 10.8846 17 12 17C13.1154 17 14.1496 16.6303 15 16"
+                                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                            </svg>
+                            <span class="pl-1.5">Inicio</span>
+                        </div>
+                    </a>
+                </li>
+                {% endif %}
+                {% if can_access('/dashboards/reportes/view') %}
+                <li class="menu nav-item">
+                    <a href="/dynamic/reportes/view" class="nav-link group" :class="{'active' : activeMenu === 'reportes'}">
+                        <div class="flex items-center">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20.3116 12.6473L20.8293 10.7154C21.4335 8.46034 21.7356 7.3328 21.5081 6.35703C21.3285 5.58657 20.9244 4.88668 20.347 4.34587C19.6157 3.66095 18.4881 3.35883 16.2331 2.75458C13.978 2.15033 12.8504 1.84821 11.8747 2.07573C11.1042 2.25537 10.4043 2.65945 9.86351 3.23687C9.27709 3.86298 8.97128 4.77957 8.51621 6.44561C8.43979 6.7254 8.35915 7.02633 8.27227 7.35057L8.27222 7.35077L7.75458 9.28263C7.15033 11.5377 6.84821 12.6652 7.07573 13.641C7.25537 14.4115 7.65945 15.1114 8.23687 15.6522C8.96815 16.3371 10.0957 16.6392 12.3508 17.2435L12.3508 17.2435C14.3834 17.7881 15.4999 18.0873 16.415 17.9744C16.5152 17.9621 16.6129 17.9448 16.7092 17.9223C17.4796 17.7427 18.1795 17.3386 18.7203 16.7612C19.4052 16.0299 19.7074 14.9024 20.3116 12.6473Z" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M16.415 17.9741C16.2065 18.6126 15.8399 19.1902 15.347 19.6519C14.6157 20.3368 13.4881 20.6389 11.2331 21.2432C8.97798 21.8474 7.85044 22.1495 6.87466 21.922C6.10421 21.7424 5.40432 21.3383 4.86351 20.7609C4.17859 20.0296 3.87647 18.9021 3.27222 16.647L2.75458 14.7151C2.15033 12.46 1.84821 11.3325 2.07573 10.3567C2.25537 9.58627 2.65945 8.88638 3.23687 8.34557C3.96815 7.66065 5.09569 7.35853 7.35077 6.75428C7.77741 6.63996 8.16368 6.53646 8.51621 6.44531" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M11.7769 10L16.6065 11.2941" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                <path d="M11 12.8975L13.8978 13.6739" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                            <span class="pl-1.5">Reportes</span>
+                        </div>
+                    </a>
+                </li>
+                {% endif %}  
+                {% if can_access('/dashboards/clientes/view') %}
+                <li class="menu nav-item">
+                    <a href="/dynamic/clientes/view" class="nav-link group" :class="{'active' : activeMenu === 'clientes'}">
+                        <div class="flex items-center">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="6" r="4" stroke="currentColor" stroke-width="1.5"/>
+                            <path opacity="0.5" d="M18 9C19.6569 9 21 7.88071 21 6.5C21 5.11929 19.6569 4 18 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <path opacity="0.5" d="M6 9C4.34315 9 3 7.88071 3 6.5C3 5.11929 4.34315 4 6 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <ellipse cx="12" cy="17" rx="6" ry="4" stroke="currentColor" stroke-width="1.5"/>
+                            <path opacity="0.5" d="M20 19C21.7542 18.6153 23 17.6411 23 16.5C23 15.3589 21.7542 14.3847 20 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <path opacity="0.5" d="M4 19C2.24575 18.6153 1 17.6411 1 16.5C1 15.3589 2.24575 14.3847 4 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                            <span class="pl-1.5">Clientes</span>
+                        </div>
+                    </a>
+                </li>
+                {% endif %}                  
+                {% if can_access('/dashboards/interacciones/view') %}
+                <li class="menu nav-item">
+                    <a href="/dynamic/interacciones/view" class="nav-link group" :class="{'active' : activeMenu === 'interacciones'}">
+                        <div class="flex items-center">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 2C14 2 16.2 2.2 19 5C21.8 7.8 22 10 22 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M14.207 5.53564C14.207 5.53564 15.197 5.81849 16.6819 7.30341C18.1668 8.78834 18.4497 9.77829 18.4497 9.77829" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <path opacity="0.5" d="M10.0376 5.31617L10.6866 6.4791C11.2723 7.52858 11.0372 8.90533 10.1147 9.8278C10.1147 9.8278 8.99578 10.9467 11.0245 12.9755C13.0532 15.0042 14.1722 13.8853 14.1722 13.8853C15.0947 12.9628 16.4714 12.7277 17.5209 13.3134L18.6838 13.9624C20.2686 14.8468 20.4557 17.0692 19.0628 18.4622C18.2258 19.2992 17.2004 19.9505 16.0669 19.9934C14.1588 20.0658 10.9183 19.5829 7.6677 16.3323C4.41713 13.0817 3.93421 9.84122 4.00655 7.93309C4.04952 6.7996 4.7008 5.77423 5.53781 4.93723C6.93076 3.54428 9.15317 3.73144 10.0376 5.31617Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+
+
+                            <span class="pl-1.5">Interacciones</span>
+                        </div>
+                    </a>
+                </li>
+                {% endif %}
+                {% if can_access('/dynamic/empresas/view') or can_access('/dynamic/integrantes/view') or can_access('/dynamic/puestos/view') or can_access('/dynamic/sectores/view')%}
+                <li class="menu nav-item">
+                    <a href="javascript:;" class="nav-link group items-center justify-between"
+                        :class="{'active' : activeMenu === 'catalogos'}"
+                        @click="activeMenu === 'catalogos' ? activeMenu = null : activeMenu = 'catalogos'">
+                        <div class="flex items-center">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 8C3 5.17157 3 3.75736 3.87868 2.87868C4.75736 2 6.17157 2 9 2H15C17.8284 2 19.2426 2 20.1213 2.87868C21 3.75736 21 5.17157 21 8V16C21 18.8284 21 20.2426 20.1213 21.1213C19.2426 22 17.8284 22 15 22H9C6.17157 22 4.75736 22 3.87868 21.1213C3 20.2426 3 18.8284 3 16V8Z" stroke="currentColor" stroke-width="1.5"/>
+                            <path opacity="0.5" d="M8 2.5V22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <path opacity="0.5" d="M2 12H4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <path opacity="0.5" d="M2 16H4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <path opacity="0.5" d="M2 8H4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M11.5 6.5H16.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M11.5 10H16.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+
+                            <span class="pl-1.5">Catálogos</span>
+                        </div>
+                        <div class="w-4 h-4 flex items-center justify-center dropdown-icon"
+                            :class="{'!rotate-180' : activeMenu === 'catalogos'}">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6">
+                                <path
+                                    d="M11.9997 13.1714L16.9495 8.22168L18.3637 9.63589L11.9997 15.9999L5.63574 9.63589L7.04996 8.22168L11.9997 13.1714Z"
+                                    fill="currentColor"></path>
+                            </svg>
+                        </div>
+                    </a>
+                    <ul x-cloak x-show="activeMenu === 'catalogos'" x-collapse class="sub-menu flex flex-col gap-1">
+                        <li>
+                            {% if can_access('/dynamic/empresas/view') %}                                
+                            <a :class="{'active': activeItem === 'empresas'}" href="/dynamic/empresas/view">Empresas</a>
+                            {% endif %}                            
+                            {% if can_access('/dynamic/integrantes/view') %}                            
+                            <a :class="{'active': activeItem === 'integrantes'}" href="/dynamic/integrantes/view">Integrantes</a>
+                            {% endif %}                            
+                            {% if can_access('/dynamic/puestos/view') %}                            
+                            <a :class="{'active': activeItem === 'puestos'}" href="/dynamic/puestos/view">Puestos</a>
+                            {% endif %}
+                            {% if can_access('/dynamic/sectores/view') %}                                
+                            <a :class="{'active': activeItem === 'sectores'}" href="/dynamic/sectores/view">Sectores</a>
+                            {% endif %}            
+                            {% if can_access('/dynamic/categorias_de_clientes/view') %}                                
+                            <a :class="{'active': activeItem === 'categorias_de_clientes'}" href="/dynamic/categorias_de_clientes/view">Categorías de clientes</a>
+                            {% endif %}       
+                            {% if can_access('/dynamic/categorias_de_interacciones/view') %}                                
+                            <a :class="{'active': activeItem === 'categorias_de_interacciones'}" href="/dynamic/categorias_de_interacciones/view">Categorías de interacciones</a>
+                            {% endif %}     
+                            {% if can_access('/dynamic/tipos_de_interacciones/view') %}                                
+                            <a :class="{'active': activeItem === 'tipos_de_interacciones'}" href="/dynamic/tipos_de_interacciones/view">Tipos de interacciones</a>
+                            {% endif %}                                                                                                                   
+                        </li>
+                    </ul>
+                </li>
+                {% endif %}
+                {% if can_access('/dynamic/usuarios/view') or can_access('/dynamic/roles/view')%}
+                <li class="menu nav-item">
+                    <a href="javascript:;" class="nav-link group items-center justify-between"
+                        :class="{'active' : activeMenu === 'permisos'}"
+                        @click="activeMenu === 'permisos' ? activeMenu = null : activeMenu = 'permisos'">
+                        <div class="flex items-center">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="9" r="2" stroke="currentColor" stroke-width="1.5" />
+                                <path d="M16 15C16 16.1046 16 17 12 17C8 17 8 16.1046 8 15C8 13.8954 9.79086 13 12 13C14.2091 13 16 13.8954 16 15Z" stroke="currentColor" stroke-width="1.5" />
+                                <path d="M3 10.4167C3 7.21907 3 5.62028 3.37752 5.08241C3.75503 4.54454 5.25832 4.02996 8.26491 3.00079L8.83772 2.80472C10.405 2.26824 11.1886 2 12 2C12.8114 2 13.595 2.26824 15.1623 2.80472L15.7351 3.00079C18.7417 4.02996 20.245 4.54454 20.6225 5.08241C21 5.62028 21 7.21907 21 10.4167C21 10.8996 21 11.4234 21 11.9914C21 14.4963 20.1632 16.4284 19 17.9041M3.19284 14C4.05026 18.2984 7.57641 20.5129 9.89856 21.5273C10.62 21.8424 10.9807 22 12 22C13.0193 22 13.38 21.8424 14.1014 21.5273C14.6796 21.2747 15.3324 20.9478 16 20.5328" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                            </svg>
+                            <span class="pl-1.5">Permisos</span>
+                        </div>
+                        <div class="w-4 h-4 flex items-center justify-center dropdown-icon"
+                            :class="{'!rotate-180' : activeMenu === 'permisos'}">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6">
+                                <path d="M11.9997 13.1714L16.9495 8.22168L18.3637 9.63589L11.9997 15.9999L5.63574 9.63589L7.04996 8.22168L11.9997 13.1714Z" fill="currentColor"></path>
+                            </svg>
+                        </div>
+                    </a>
+                    <ul x-cloak x-show="activeMenu === 'permisos'" x-collapse class="sub-menu flex flex-col gap-1">
+                        <li>
+                            {% if can_access('/dynamic/usuarios/view') %}                            
+                            <a :class="{'active': activeItem === 'usuarios'}" href="/dynamic/usuarios/view">Usuarios</a>
+                            {% endif %}               
+                            {% if can_access('/dynamic/roles/view') %}                            
+                            <a :class="{'active': activeItem === 'roles'}" href="/dynamic/roles/view">Roles</a>                            
+                            {% endif %}                                                      
+                        </li>
+                    </ul>
+                </li>
+                {% endif %}
+                {% if '/dynamic/logs_auditoria/view' in session['accessible_routes'] %}
+                    <li class="menu nav-item">
+                        <a href="/dynamic/logs_auditoria/view" class="nav-link group" :class="{'active' : activeMenu === 'auditoria'}">
+                            <div class="flex items-center">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M16 4.00195C18.175 4.01406 19.3529 4.11051 20.1213 4.87889C21 5.75757 21 7.17179 21 10.0002V16.0002C21 18.8286 21 20.2429 20.1213 21.1215C19.2426 22.0002 17.8284 22.0002 15 22.0002H9C6.17157 22.0002 4.75736 22.0002 3.87868 21.1215C3 20.2429 3 18.8286 3 16.0002V10.0002C3 7.17179 3 5.75757 3.87868 4.87889C4.64706 4.11051 5.82497 4.01406 8 4.00195" stroke="currentColor" stroke-width="1.5"/>
+                                    <path d="M10.5 14L17 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                    <path d="M7 14H7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                    <path d="M7 10.5H7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                    <path d="M7 17.5H7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                    <path d="M10.5 10.5H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                    <path d="M10.5 17.5H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                    <path d="M8 3.5C8 2.67157 8.67157 2 9.5 2H14.5C15.3284 2 16 2.67157 16 3.5V4.5C16 5.32843 15.3284 6 14.5 6H9.5C8.67157 6 8 5.32843 8 4.5V3.5Z" stroke="currentColor" stroke-width="1.5"/>
+                                </svg>
+                                <span class="pl-1.5">Auditoría</span>
+                            </div>
+                        </a>
+                    </li>
+                {% endif %}
+                <li class="menu nav-item">
+                    <a href="javascript:;" class="nav-link group items-center justify-between"
+                        :class="{'active' : activeMenu === 'bases_de_datos'}"
+                        @click="activeMenu === 'bases_de_datos' ? activeMenu = null : activeMenu = 'bases_de_datos'">
+                        <div class="flex items-center">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4 18V6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                <path d="M20 6V18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                                <path d="M12 10C16.4183 10 20 8.20914 20 6C20 3.79086 16.4183 2 12 2C7.58172 2 4 3.79086 4 6C4 8.20914 7.58172 10 12 10Z" stroke="currentColor" stroke-width="1.5" />
+                                <path d="M20 12C20 14.2091 16.4183 16 12 16C7.58172 16 4 14.2091 4 12" stroke="currentColor" stroke-width="1.5" />
+                                <path d="M20 18C20 20.2091 16.4183 22 12 22C7.58172 22 4 20.2091 4 18" stroke="currentColor" stroke-width="1.5" />
+                            </svg>
+                            <span class="pl-1.5">Bases de datos</span>
+                        </div>
+                        <div class="w-4 h-4 flex items-center justify-center dropdown-icon"
+                            :class="{'!rotate-180' : activeMenu === 'bases_de_datos'}">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6">
+                                <path d="M11.9997 13.1714L16.9495 8.22168L18.3637 9.63589L11.9997 15.9999L5.63574 9.63589L7.04996 8.22168L11.9997 13.1714Z" fill="currentColor"></path>
+                            </svg>
+                        </div>
+                    </a>
+                    <ul x-cloak x-show="activeMenu === 'bases_de_datos'" x-collapse class="sub-menu flex flex-col gap-1">
+                        {% for original_name, formatted_name in table_names.items() %}
+                                <li>
+                                    <a :class="{'active': activeItem === '{{ formatted_name|lower|replace(' ', '_') }}'}" href="/dynamic/{{ original_name }}/view">{{ formatted_name }}</a>
+                                </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

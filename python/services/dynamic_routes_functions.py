@@ -1,0 +1,497 @@
+from python.models.modelos import *
+from sqlalchemy import func
+from python.services.system.helper_functions import *
+from flask import  jsonify
+from datetime import timedelta
+from python.services.update_record_table_functions import *
+
+def get_joins():
+    joins = {
+        "id_usuario": (Usuarios, Usuarios.id, Usuarios.nombre),
+        "id_rol": (Roles, Roles.id, Roles.nombre),
+        "id_categoria_de_reporte":(CategoriasDeReportes, CategoriasDeReportes.id, CategoriasDeReportes.nombre),        
+        # Finanzas / Gastos
+        "id_categoria_de_gasto": (CategoriasDeGastos, CategoriasDeGastos.id, CategoriasDeGastos.nombre),
+        "id_proveedor": (Proveedores, Proveedores.id, Proveedores.nombre),
+        "id_pago": (Pagos, Pagos.id, Pagos.id),
+        "id_gasto": (Gastos, Gastos.id, Gastos.id),
+        "id_cuenta_de_banco": (CuentasDeBanco, CuentasDeBanco.id, CuentasDeBanco.nombre),
+        "id_cuenta_de_banco_salida": (CuentasDeBanco, CuentasDeBanco.id, CuentasDeBanco.nombre),
+        "id_cuenta_de_banco_entrada": (CuentasDeBanco, CuentasDeBanco.id, CuentasDeBanco.nombre),
+
+        # Recursos Humanos
+        "id_puesto": (Puestos, Puestos.id, Puestos.nombre),
+        
+        # CRM / Clientes / Proveedores
+        "id_cliente": (Clientes, Clientes.id, Clientes.nombre),
+        "id_categoria_de_proyecto": (CategoriasDeProyectos, CategoriasDeProyectos.id, CategoriasDeProyectos.nombre),
+        "id_categoria_de_gasto": (CategoriasDeGastos, CategoriasDeGastos.id, CategoriasDeGastos.nombre),
+        "id_contacto_de_cliente": (ContactosDeClientes, ContactosDeClientes.id, ContactosDeClientes.nombre),
+        "id_categoria_de_actividad": (CategoriasDeActividades, CategoriasDeActividades.id, CategoriasDeActividades.nombre),
+
+        # Proyectos / Facturación
+        "id_proyecto": (Proyectos, Proyectos.id, Proyectos.id),
+        "id_factura": (Facturas, Facturas.id, Facturas.folio_fiscal_uuid),
+        "id_ingreso": (Ingresos, Ingresos.id, Ingresos.id),
+        "id_factura_en_ingreso": (FacturasEnIngresos, FacturasEnIngresos.id, FacturasEnIngresos.id),
+        "id_servicio": (Servicios, Servicios.id, Servicios.id),
+        
+        # Vinculaciones entre entidades
+        "id_pago": (Pagos, Pagos.id, Pagos.id),
+        "id_gasto": (Gastos, Gastos.id, Gastos.id),
+        "id_ingreso": (Ingresos, Ingresos.id, Ingresos.id),
+        "id_factura": (Facturas, Facturas.id, Facturas.folio_fiscal_uuid),
+    }
+    return joins
+
+def get_foreign_options():
+    foreign_options = {
+        "id_rol": Roles.query.filter_by(estatus="Activo"),
+        "id_categoria_de_reporte":CategoriasDeReportes.query.filter_by(estatus="Activo"),
+
+        # --- Finanzas / Gastos / Pagos ---
+        "id_categoria_de_gasto": CategoriasDeGastos.query.filter_by(estatus="Activo"),
+        "id_proveedor": Proveedores.query.filter_by(estatus="Activo"),
+        "id_cuenta_de_banco": CuentasDeBanco.query.filter_by(estatus="Activo"),
+        "id_cuenta_de_banco_salida": CuentasDeBanco.query.filter_by(estatus="Activo"),
+        "id_cuenta_de_banco_entrada": CuentasDeBanco.query.filter_by(estatus="Activo"),
+
+        # --- Recursos Humanos ---
+        "id_puesto": Puestos.query.filter_by(estatus="Activo"),
+        "id_integrante": Integrantes.query.filter_by(estatus="Activo"),
+
+        # --- CRM / Clientes y Proveedores ---
+        "id_cliente": Clientes.query.filter(Clientes.estatus.in_(["Contacto inicial", "En proceso", "Activo"])),
+        "id_contacto_de_cliente": ContactosDeClientes.query.filter_by(estatus="Activo"),
+        "id_categoria_de_proyecto": CategoriasDeProyectos.query.filter_by(estatus="Activo"),
+        "id_categoria_de_gasto": CategoriasDeGastos.query.filter_by(estatus="Activo"),
+        "id_categoria_de_actividad": CategoriasDeActividades.query.filter_by(estatus="Activo"),
+
+        # --- Proyectos / Facturación ---
+        "id_proyecto": Proyectos.query.filter(Proyectos.estatus.in_(["En proceso"])),
+        "id_factura": Facturas.query.filter(Facturas.estatus.in_(["En revisión", "Finalizado", "Cancelado"])),
+        "id_servicio": Servicios.query.filter_by(estatus="Activo"),
+
+        # --- Campos con opciones fijas ---
+        "regimen_fiscal":['601 - General de Ley Personas Morales','603 - Personas Morales con Fines no Lucrativos','605 - Sueldos y Salarios e Ingresos Asimilados a Salarios','606 - Arrendamiento','607 - Régimen de Enajenación o Adquisición de Bienes','608 - Demás ingresos','610 - Residentes en el Extranjero sin Establecimiento Permanente en México','611 - Ingresos por Dividendos (socios y accionistas)','612 - Personas Físicas con Actividades Empresariales y Profesionales','614 - Ingresos por intereses','615 - Régimen de los ingresos por obtención de premios','616 - Sin obligaciones fiscales','620 - Sociedades Cooperativas de Producción que optan por diferir sus ingresos','621 - Incorporación Fiscal (ya derogado, solo histórico)','622 - Actividades Agrícolas, Ganaderas, Silvícolas y Pesqueras (Personas Morales)','623 - Opcional para Grupos de Sociedades','624 - Coordinados','625 - Régimen de las Actividades Empresariales con ingresos a través de Plataformas Tecnológicas','626 - Régimen Simplificado de Confianza (RESICO)',],
+        "forma_de_pago":['01 - Efectivo','02 - Cheque nominativo','03 - Transferencia electrónica de fondos','04 - Tarjeta de crédito','05 - Monedero electrónico','06 - Dinero electrónico','08 - Vales de despensa','12 - Dación en pago','13 - Pago por subrogación','14 - Pago por consignación','15 - Condonación','17 - Compensación','23 - Novación','24 - Confusión','25 - Remisión de deuda','26 - Prescripción o caducidad','27 - A satisfacción del acreedor','28 - Tarjeta de débito','29 - Tarjeta de servicios','30 - Aplicación de anticipos','31 - Intermediario de pagos','99 - Por definir'],
+        "metodo_de_pago":['PUE','PPD'],
+        "uso_de_cfdi":['G01 Adquisición de mercancías','G02 Devolución, descuentos o bonificaciones','G03 Gastos en general','I01 Construcciones','I02 Mobiliario y equipo de oficina por inversiones','I03 Equipo de transporte','I04 Equipo de cómputo y accesorios','I05 Dados, troqueles, moldes, matrices y herramental','I06 Comunicaciones telefónicas','I07 Comunicaciones satelitales','I08 Otra maquinaria y equipo','D01 Honorarios médicos, dentales y gastos hospitalarios','D02 Gastos médicos por incapacidad o discapacidad','D03 Gastos funerales','D04 Donativos','D05 Intereses reales efectivamente pagados por créditos hipotecarios (casa habitación)','D06 Aportaciones voluntarias al SAR','D07 Primas por seguros de gastos médicos','D08 Gastos de transportación escolar obligatoria','D09 Depósitos en cuentas para el ahorro, primas que tengan como base planes de pensiones','D10 Pagos por servicios educativos (colegiaturas)','S01 Sin efectos fiscales','CP01 Pagos','CN01 Nómina'],
+        "tipo_de_ajuste": ["Entrada", "Salida"],
+        "estado_civil": ["Soltero/a", "Casado/a"],
+        "genero": ["Masculino", "Femenino"],
+        "tipo_de_cuenta":["Efectivo","Débito","Crédito"],
+        "prioridad":["P0","P1","P2","P3"],
+    }
+    return foreign_options
+
+
+# specific filters for forms
+def get_form_options(table_name):
+    options = {
+        #"integr": {"id_producto": Productos.query.filter(Productos.estatus == "Activo",Productos.categoria.has(CategoriasDeProductos.nombre.in_(["Producto terminado", "Producto intermedio"])))},
+    }
+    options=options.get(table_name,{})
+    return options
+
+def get_multiple_choice_data():
+    multiple_choice_data = {}
+    options = {
+        "ejemplo": ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+    }      
+    for i in options:
+        multiple_choice_data[i] = {
+            "selected": options[i],
+            "options": options[i]
+        }
+    return multiple_choice_data
+
+def get_columns(table_name,section):
+    columns={
+        "logs_auditoria": {
+            "main_page": ["tabla", "id_registro","usuario","accion","datos_anteriores","datos_nuevos","fecha"],
+            "modal": ["tabla", "id_registro","usuario","accion","datos_anteriores","datos_nuevos","fecha"],
+            "pdf": []
+        },
+        "rutas": {
+            "main_page": ["categoria", "nombre","ruta"],
+            "modal": ["id", "categoria","nombre","ruta", "fecha_de_creacion", "fecha_de_actualizacion"],
+            "pdf": []
+        },
+        "roles": {
+            "main_page": ["id_visualizacion", "nombre", "estatus"],
+            "modal": ["id", "id_visualizacion", "nombre", "estatus", "estatus", "fecha_de_creacion", "fecha_de_actualizacion"],
+            "pdf": []
+        },
+        "usuarios": {
+            "main_page": ["id_visualizacion", "nombre", "correo_electronico","intentos_de_inicio_de_sesion","ultima_sesion","ultimo_cambio_de_contrasena", "estatus"],
+            "modal": ["id", "id_visualizacion", "nombre", "correo_electronico", "contrasena_api", "estatus", "fecha_de_creacion", "fecha_de_actualizacion"],
+            "pdf": []
+        },
+        "categorias_de_reportes": {
+            "main_page": ["id_visualizacion", "nombre", "estatus"],
+            "modal": ["id", "id_visualizacion", "nombre", "estatus"],
+            "pdf": []
+        },
+        "reportes": {
+            "main_page": ["id_categoria_de_reporte_nombre", "nombre", "descripcion"],
+            "modal": ["id", "id_categoria_de_reporte_nombre", "nombre", "descripcion"],
+            "pdf": []
+        },
+        "archivos": {
+            "main_page": ["tabla_origen", "nombre"],
+            "modal": ["id", "tabla_origen", "nombre", "ruta_s3", "en_servidor", "fecha_de_creacion"],
+            "pdf": []
+        },
+        # --- Finanzas ---
+        "gastos": {
+            "main_page": ["id_visualizacion", "id_categoria_de_gasto_nombre", "id_proveedor_nombre", "importe", "importe_pagado", "fecha_de_gasto", "estatus"],
+            "modal": ["id", "id_visualizacion", "id_categoria_de_gasto_nombre", "id_proveedor_nombre", "importe", "importe_pagado", "fecha_de_gasto", "folio_fiscal_uuid", "fecha_de_comprobante", "notas", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"],
+            "pdf": ["id_visualizacion", "id_categoria_de_gasto_nombre", "id_proveedor_nombre", "importe", "importe_pagado", "fecha_de_gasto", "folio_fiscal_uuid", "fecha_de_comprobante", "notas", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"]
+        },
+        "pagos": {
+            "main_page": ["id_visualizacion", "id_proveedor_nombre", "id_cuenta_de_banco_nombre", "fecha_pago", "importe", "estatus"],
+            "modal": ["id", "id_visualizacion", "id_proveedor_nombre", "id_cuenta_de_banco_nombre", "fecha_pago", "importe", "notas", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"],
+            "pdf": ["id_visualizacion", "id_proveedor_nombre", "id_cuenta_de_banco_nombre", "fecha_pago", "importe", "notas", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"]
+        },
+        "gastos_en_pagos": {
+            "main_page": ["id_pago_id_visualizacion", "id_gasto_id_visualizacion",'id_pago_proveedor', "importe", "notas"],
+            "modal": ["id", "id_pago_id_visualizacion", "id_gasto_id_visualizacion", "importe", "notas", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"],
+            "pdf": ["id_pago_id_visualizacion", "id_gasto_id_visualizacion", "importe", "notas", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"]
+        },
+        "transferencias_de_dinero": {
+            "main_page": ["id_visualizacion", "id_cuenta_de_banco_salida_nombre", "id_cuenta_de_banco_entrada_nombre", "fecha_de_transferencia", "importe", "estatus"],
+            "modal": ["id", "id_visualizacion", "id_cuenta_de_banco_salida_nombre", "id_cuenta_de_banco_entrada_nombre", "fecha_de_transferencia", "importe", "notas", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"],
+            "pdf": ["id_visualizacion", "id_cuenta_de_banco_salida_nombre", "id_cuenta_de_banco_entrada_nombre", "fecha_de_transferencia", "importe", "notas", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"]
+        },
+        "ajustes_de_dinero": {
+            "main_page": ["id_visualizacion", "id_cuenta_de_banco_nombre", "fecha_de_ajuste", "tipo_de_ajuste", "importe", "estatus"],
+            "modal": ["id", "id_visualizacion", "id_cuenta_de_banco_nombre", "fecha_de_ajuste", "tipo_de_ajuste", "importe", "notas", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"],
+            "pdf": ["id_visualizacion", "id_cuenta_de_banco_nombre", "fecha_de_ajuste", "tipo_de_ajuste", "importe", "notas", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"]
+        },
+        "cuentas_de_banco": {
+            "main_page": ["id_visualizacion", "banco", "tipo_de_cuenta", "nombre", "balance", "estatus"],
+            "modal": ["id", "id_visualizacion", "banco", "tipo_de_cuenta", "nombre", "numero_de_cuenta", "clabe", "balance", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"],
+            "pdf": ["id_visualizacion", "banco", "tipo_de_cuenta", "nombre", "numero_de_cuenta", "clabe", "balance", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"]
+        },
+
+        # --- CRM / Recursos Humanos ---
+        "puestos": {
+            "main_page": ["id_visualizacion", "nombre", "descripcion", "estatus"],
+            "modal": ["id", "id_visualizacion", "nombre", "descripcion", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"],
+            "pdf": ["id_visualizacion", "nombre", "descripcion", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"]
+        },
+        "integrantes": {
+            "main_page": ["id_visualizacion", "id_puesto_nombre", "nombre_completo", "correo_electronico", "telefono", "estatus"],
+            "modal": ["id", "id_visualizacion", "id_puesto_nombre", "nombre_completo", "fecha_nacimiento", "genero", "estado_civil", "direccion", "codigo_postal", "telefono", "correo_electronico", "fecha_contratacion", "fecha_terminacion", "numero_seguridad_social", "rfc", "curp", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"],
+            "pdf": ["id_visualizacion", "id_puesto_nombre", "nombre_completo", "fecha_nacimiento", "genero", "estado_civil", "direccion", "codigo_postal", "telefono", "correo_electronico", "fecha_contratacion", "fecha_terminacion", "numero_seguridad_social", "rfc", "curp", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"]
+        },
+        "proveedores": {
+            "main_page": ["id_visualizacion", "nombre", "razon_social", "telefono", "correo_electronico", "estatus"],
+            "modal": ["id", "id_visualizacion", "nombre", "razon_social", "rfc", "direccion", "codigo_postal", "telefono", "correo_electronico", "persona_contacto", "telefono_contacto", "correo_electronico_contacto", "condiciones_pago", "sitio_web", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"],
+            "pdf": ["id_visualizacion", "nombre", "razon_social", "rfc", "direccion", "codigo_postal", "telefono", "correo_electronico", "persona_contacto", "telefono_contacto", "correo_electronico_contacto", "condiciones_pago", "sitio_web", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"]
+        },
+        "categorias_de_gastos": {
+            "main_page": ["id_visualizacion", "nombre", "descripcion", "estatus"],
+            "modal": ["id", "id_visualizacion", "nombre", "descripcion", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"],
+            "pdf": ["id_visualizacion", "nombre", "descripcion", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"]
+        },
+        "categorias_de_proyectos": {
+            "main_page": ["id_visualizacion", "nombre", "descripcion", "estatus"],
+            "modal": ["id", "id_visualizacion", "nombre", "descripcion", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"],
+            "pdf": ["id_visualizacion", "nombre", "descripcion", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"]
+        },
+        "clientes": {
+            "main_page": ["id_visualizacion", "nombre", "region", "razon_social", "telefono", "estatus"],
+            "modal": ["id", "id_visualizacion", "nombre", "region", "fecha_de_apertura", "razon_social", "rfc", "regimen_fiscal", "domicilio_fiscal", "codigo_postal", "telefono", "correo_electronico", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"],
+            "pdf": ["id_visualizacion", "nombre", "region", "razon_social", "telefono", "correo_electronico", "estatus", "fecha_de_apertura", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"]
+        },
+        "contactos_de_clientes": {
+            "main_page": ["id_visualizacion", "id_cliente_nombre", "nombre", "telefono", "correo_electronico", "estatus"],
+            "modal": ["id", "id_visualizacion", "id_cliente_nombre", "nombre", "telefono", "correo_electronico", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"],
+            "pdf": ["id_visualizacion", "id_cliente_nombre", "nombre", "telefono", "correo_electronico", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"]
+        },
+
+        # --- Proyectos / Facturación ---
+        "proyectos": {
+            "main_page": ["id_visualizacion", "id_categoria_de_proyecto_nombre", "id_cliente_nombre","nombre", "importe", "importe_cobrado", "fecha_inicio", "estatus"],
+            "modal": ["id", "id_visualizacion", "id_categoria_de_proyecto_nombre", "id_cliente_nombre","nombre", "importe", "importe_cobrado", "fecha_inicio", "fecha_fin", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"],
+            "pdf": ["id_visualizacion", "id_categoria_de_proyecto_nombre", "id_cliente_nombre","nombre", "importe", "importe_cobrado", "fecha_inicio", "fecha_fin", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"]
+        },
+        "facturas": {
+            "main_page": ["id_visualizacion", "id_cliente_nombre", "id_proyecto_nombre","forma_de_pago","metodo_de_pago","uso_de_cfdi", "folio_fiscal_uuid", "fecha_de_expedicion","subtotal","impuestos", "importe_total","importe_cobrado", "estatus"],
+            "modal": ["id", "id_visualizacion", "id_cliente_nombre", "id_proyecto_nombre","forma_de_pago","metodo_de_pago","uso_de_cfdi", "folio_fiscal_uuid", "fecha_de_expedicion","subtotal","impuestos", "importe_total","importe_cobrado", "notas", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"],
+            "pdf": ["id_visualizacion", "id_cliente_nombre", "id_proyecto_nombre","forma_de_pago","metodo_de_pago","uso_de_cfdi", "folio_fiscal_uuid" "fecha_de_expedicion","subtotal","impuestos", "importe_total","importe_cobrado", "notas", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"]
+        },
+        "servicios_en_facturas": {
+            "main_page": [ "id_servicio_nombre","id_servicio_descripcion", "cantidad", "valor_unitario", "impuesto", "importe", "notas"],
+            "modal": ["id", "id_servicio_nombre","id_servicio_descripcion", "cantidad", "valor_unitario","impuesto", "importe", "notas", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"],
+            "pdf": [ "id_servicio_nombre","id_servicio_descripcion", "cantidad", "valor_unitario","impuesto", "importe", "notas", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"]
+        },
+        "ingresos": {
+            "main_page": ["id_visualizacion", "id_cliente_nombre", "id_cuenta_de_banco_nombre","forma_de_pago","folio_fiscal_uuid","fecha_de_expedicion", "importe","estatus"],
+            "modal": ["id", "id_visualizacion", "id_cliente_nombre", "id_cuenta_de_banco_nombre","forma_de_pago","folio_fiscal_uuid","fecha_de_expedicion", "importe", "notas","estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"],
+            "pdf": ["id_visualizacion", "id_cliente_nombre", "id_cuenta_de_banco_nombre","forma_de_pago","folio_fiscal_uuid","fecha_de_expedicion", "importe", "notas","estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"]
+        },
+        "facturas_en_ingresos": {
+            "main_page": [ "id_ingreso_id_visualizacion", "id_factura_folio_fiscal_uuid", "importe",'id_ingreso_estatus'],
+            "modal": ["id", "id_ingreso_id_visualizacion", "id_factura_folio_fiscal_uuid", "importe", "notas", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"],
+            "pdf": [ "id_ingreso_id_visualizacion", "id_factura_folio_fiscal_uuid", "importe", "notas", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"]
+        }, 
+        "servicios": {
+            "main_page": ["id_visualizacion", "nombre", "descripcion", "estatus"],
+            "modal": ["id", "id_visualizacion", "nombre", "descripcion", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"],
+            "pdf": ["id_visualizacion","nombre", "descripcion", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"]
+        }, 
+        "categorias_de_actividades": {
+            "main_page": ["id_visualizacion", "nombre", "descripcion", "estatus"],
+            "modal": ["id", "id_visualizacion", "nombre", "descripcion", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"],
+            "pdf": ["id_visualizacion", "nombre", "descripcion", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"]
+        },   
+        "actividades": {
+            "main_page": ["id_visualizacion", "id_cliente_nombre", "id_proyecto_nombre","id_integrante_nombre", "id_categoria_de_actividad_nombre", "prioridad","fecha_solicitud","horas","actividad", "estatus"],
+            "modal": ["id", "id_visualizacion","id_cliente_nombre", "id_proyecto_nombre","id_integrante_nombre", "id_categoria_de_actividad_nombre", "prioridad","fecha_solicitud","fecha_realizado","fecha_cierre","horas","actividad","comentarios","notas_cierre","notas_cambios", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"],
+            "pdf": ["id_visualizacion","id_cliente_nombre", "id_proyecto_nombre","id_integrante_nombre", "id_categoria_de_actividad_nombre", "prioridad","fecha","horas","notas", "estatus", "id_usuario_correo_electronico", "fecha_de_creacion", "fecha_de_actualizacion"]
+        },                         
+    }
+    columns=columns.get(table_name).get(section)
+    return columns
+
+def get_table_buttons():
+    buttons = {
+        "reportes":1,
+    }
+    return buttons
+
+def get_estatus_options(table_name):
+    options = {
+        'clientes': ["En proceso","Activo","Inactivo","Perdido"],
+        'proyectos': ['En revisión','En proceso','Finalizado','Cancelado'],
+        'pagos': ["En revisión","Aprobado","Pagado"],
+        'gastos': ["En revisión","Aprobado","Pagado parcial","Pagado","Cancelado"],
+        'transferencias_de_dinero': ["En revisión","Aprobada","Realizada","Cancelada"], 
+        'ajustes_de_dinero': ["En revisión","Realizado","Cancelado"],
+        'facturas': ["En revisión","Aprobada","Facturada","Cobrada parcial","Cobrada",'Cancelada'],
+        'ingresos': ["En revisión","Aprobado","Facturado",'Cancelado'],
+        'actividades': ["Pendiente","En proceso","Realizada","Con cambios","Cerrada",'Cancelada'],
+
+    }
+    options=options.get(table_name, ["Activo", "Inactivo"])
+    return options
+
+def get_open_status(table_name):
+    status={
+        "clientes": ['En proceso','Activo'],
+        'proyectos': ['En revisión','En proceso'],
+        'pagos': ["En revisión","Aprobado"],
+        'gastos': ["En revisión","Aprobado","Pagado parcial"],
+        'transferencias_de_dinero': ["En revisión","Aprobada"], 
+        'ajustes_de_dinero': ["En revisión"],
+        'facturas': ["En revisión","Aprobada","Facturada","Cobrada parcial"],
+        'ingresos': ["En revisión","Aprobado"],
+        'actividades': ["Pendiente","En proceso","Realizada","Con cambios"],
+
+    }
+    status=status.get(table_name,{})
+    return status
+
+def get_breadcrumbs(table_name):
+    # [modulo,active_menu]
+    breadcrumbs={
+        "usuarios":['Permisos','permisos'],
+        "roles":['Permisos','permisos'],
+        "logs_auditoria":['Auditoría','auditoria'],
+        "reportes":['Reportes','reportes'],
+        "archivos":[session['tabla_origen'].capitalize(),session['tabla_origen']],
+
+        "proyectos":['Proyectos','proyectos'],
+        "categorias_de_proyectos":['Proyectos','proyectos'],
+        "clientes":['Proyectos','proyectos'],
+        "categorias_de_actividades":['Proyectos','proyectos'],
+        "actividades":['Proyectos','proyectos'],
+
+        "gastos":['Administración','administracion'],
+        "categorias_de_gastos":['Administración','administracion'],
+        "facturas":['Administración','administracion'],
+        "proveedores":['Administración','administracion'],
+        "servicios":['Administración','administracion'],
+        "servicios_en_facturas":['Administración','administracion'],
+
+        "cuentas_de_banco":['Banca','banca'],
+        "ingresos":['Banca','banca'],
+        "pagos":['Banca','banca'],
+        "transferencias_de_dinero":['Banca','banca'],
+        "ajustes_de_dinero":['Banca','banca'],
+
+        "integrantes":['Recursos humanos','recursos_humanos'],
+        "puestos":['Recursos humanos','recursos_humanos'],
+
+    }
+    breadcrumbs=breadcrumbs.get(table_name,['Bases de datos','bases_de_datos'])
+    return breadcrumbs[0],breadcrumbs[1]
+
+def get_ignored_columns(table_name):
+    columnas_generales = {'fecha_de_creacion', 'estatus', 'id_usuario', 'id_visualizacion', 'fecha_de_actualizacion'}
+    columns = {
+        "usuarios":{'codigo_unico','id_rol','contrasena','contrasena_api','intentos_de_inicio_de_sesion','ultima_sesion','ultimo_cambio_de_contrasena','codigo_unico_expira'},
+        "archivos":{'tabla_origen','id_registro','nombre','ruta_s3'},
+        "proyectos":{'importe_cobrado','fecha_fin'},
+        "gastos": {'importe_pagado'},
+        "pagos": {'importe'},  
+        "cuentas_de_banco": {'balance'},
+        "facturas": {'importe_total','impuestos','subtotal','importe_cobrado'},
+        "integrantes": {'fecha_terminacion'},
+        "actividades": {'notas_cierre','notas_cambios','fecha_realizado','fecha_cerrado','horas'},
+    }
+    columns=columns.get(table_name,columnas_generales) | columnas_generales
+    return columns
+
+def get_ignored_columns_edit(table_name,estatus):
+    columnas_generales = {'default':{'fecha_de_creacion', 'estatus', 'id_usuario', 'id_visualizacion', 'fecha_de_actualizacion'}}
+    tables = {
+        "usuarios":{'default':{'codigo_unico','id_rol','contrasena','contrasena_api','intentos_de_inicio_de_sesion','ultima_sesion','ultimo_cambio_de_contrasena','codigo_unico_expira'}},
+        "archivos":{'default':{'tabla_origen','id_registro','nombre','ruta_s3'}},
+        "proyectos":{'default':{'importe_cobrado','fecha_fin'}},   
+        "gastos": {'default':{'importe_pagado','folio_fiscal_uuid','fecha_de_comprobante'}},
+        "pagos": {'default':{'importe'}},
+        "cuentas_de_banco": {'default':{'balance'}},
+        "ingresos": {'default':{''},'Aprobado':{'id_cliente','importe','id_cuenta_de_banco','forma_de_pago','notas'}},
+        "facturas": {'default':{'importe_total','impuestos','subtotal','importe_cobrado'},'Aprobada':{'id_cliente','id_proyecto','importe_total','impuestos','subtotal','importe_cobrado'}},
+        "actividades": {'default':{''},
+                        'En proceso':{'id_cliente','notas_cambios','id_proyecto','id_integrante','actividad','id_categoria_de_actividad','fecha_solicitud','fecha_realizado','fecha_cerrado'},                        
+                        'Con cambios':{'id_cliente','notas_cambios','prioridad','comentarios','id_proyecto','id_integrante','actividad','id_categoria_de_actividad','fecha_solicitud','fecha_realizado','fecha_cerrado'},
+                        'Realizada':{'id_cliente','notas_cierre','prioridad','horas','comentarios','id_proyecto','id_integrante','actividad','id_categoria_de_actividad','fecha_solicitud','fecha_realizado','fecha_cerrado'}},
+    }
+    table_dict = tables.get(table_name, columnas_generales)
+    if not estatus or estatus not in table_dict:
+        estatus = 'default'    
+    columns = table_dict.get(estatus, set()) | columnas_generales['default']
+    if table_name in ('ejemplo'):
+        columns=columns-{'estatus'}
+    return columns
+
+def get_non_mandatory_columns(table_name):
+    columnas_generales = {'descripcion','notas'}
+    columns = {
+        "roles":{'id_empresa'} ,
+        "clientes": {'telefono','correo_electronico','direccion','codigo_postal','persona_contacto','telefono_contacto','correo_electronico_contacto','condiciones_de_pago','rfc','razon_social','sitio_web','condiciones_pago'} ,
+        "proveedores": {'telefono','correo_electronico','direccion','codigo_postal','pais','persona_contacto','telefono_contacto','correo_electronico_contacto','condiciones_de_pago','rfc','razon_social','sitio_web','condiciones_pago'} ,
+        "gastos": {'folio_fiscal_uuid','fecha_de_comprobante'} ,
+        "cuentas_de_banco": {'clabe','numero_de_cuenta'} ,
+        "facturas": {'folio_fiscal_uuid','fecha_de_expedicion'} ,
+        "ingresos": {'folio_fiscal_uuid','fecha_de_expedicion'} ,
+        "actividades": {'comentarios'},
+        "integrantes":{'rfc','curp','numero_seguridad_social'},
+    }
+    columns=columns.get(table_name,{''}) | columnas_generales
+    return columns
+
+def get_table_relationships(table_name):
+    relationships={
+        "roles":["usuarios"],
+        "pagos":["gastos_en_pagos"],
+        "proyectos":["facturas","actividades"],
+        "facturas":["servicios_en_facturas",'facturas_en_ingresos'],
+        "ingresos":["facturas_en_ingresos"],
+        "clientes":['contactos_de_clientes'],
+    }
+    relationships=relationships.get(table_name,'')
+    return relationships
+
+def get_default_variable_values(table_name):
+    current_time = datetime.today() - timedelta(hours=6)
+    default_values = {
+        "proyectos": {"fecha_inicio": current_time.strftime("%Y-%m-%d")},
+        "gastos": {"fecha_de_gasto": current_time.strftime("%Y-%m-%d")},
+        "ajustes_de_dinero": {"fecha_de_ajuste": current_time.strftime("%Y-%m-%d")},
+        "pagos": {"fecha_pago": current_time.strftime("%Y-%m-%d")},
+        "transferencias_de_dinero": {'fecha_de_transferencia': current_time.strftime("%Y-%m-%d")},
+        "actividades": {"fecha_solicitud": current_time.strftime("%Y-%m-%d")},
+
+    }
+    default_values=default_values.get(table_name,{})
+    return default_values
+
+def get_url_after_add(table_name):
+    columns = {
+        "facturas": "dynamic.double_table_view",
+        "ingresos": "dynamic.double_table_view",
+        "pagos": "dynamic.double_table_view",
+    }
+    columns=columns.get(table_name,'dynamic.table_view')
+    return columns
+
+def get_calendar_date_variable(table_name):
+    date_variable={
+        "interacciones":"fecha_hora",
+    }
+    date_variable=date_variable.get(table_name,'')
+    return date_variable
+
+def get_variable_tabs(table_name):
+    tabs = {
+        "ejemplo": "estatus"
+    }
+    tabs=tabs.get(table_name,'estatus')
+    return tabs
+
+def get_data_tabs(table_name,parent_table,id_parent_record):
+    column_tabs=get_variable_tabs(table_name)
+    tabs=get_estatus_options(table_name)
+    model = get_model_by_name(table_name)
+    column = getattr(model, column_tabs, None)
+    count_col = func.count().label("count")
+    query = db.session.query(column, count_col).group_by(column)
+    if parent_table and id_parent_record:
+        for rel in model.__mapper__.relationships.values():
+            related_table_name = rel.mapper.class_.__tablename__
+            if related_table_name == parent_table:
+                fk_column = list(rel.local_columns)[0]
+                query = query.filter(fk_column == id_parent_record)
+                break
+    query = query.order_by(count_col.desc())
+    results = dict(query.all())
+    results = [
+        {
+            'tab': estatus if estatus else 'Sin estatus',
+            'count': results.get(estatus, 0) if estatus in get_open_status(table_name) else ''
+        }
+        for estatus in tabs
+    ]
+    return results
+
+def get_date_fields():
+    date_fields=["fecha_venta", "fecha_orden", "fecha_de_gasto", "fecha_de_transferencia","fecha","fecha_hora"]
+    return date_fields
+
+def get_non_edit_status(table_name):
+    general_status = {'Cancelado','Cancelada','Recibida','Facturada','Finalizada','Entregada','Realizada','Realizado','Pagado','Pagado parcial','Aprobada','Aprobado','Recibida parcial','Pagado parcial','En proceso'}
+    status_to_remove = {
+        "facturas": {'Aprobada'},
+        "actividades": {'En proceso','Realizada'},
+        "ingresos": {'Aprobado'},
+
+    }
+    status=general_status-status_to_remove.get(table_name,{''})
+    return status
+
+def get_no_edit_access():
+    tables=['servicios_en_facturas','gastos_en_pagos','facturas_en_ingresos']
+    return tables
+
+def get_form_filters(table_name):
+    filters={
+        "facturas": {'id_proyecto':'id_cliente'},
+        "actividades": {'id_proyecto':'id_cliente'},
+    }
+    filters=filters.get(table_name,'')
+    return filters
+
+def get_parent_record(table_name):
+    parent_record={
+        "contactos_de_clientes":'id_cliente',
+        "interacciones":'id_cliente',
+        "intereses_de_clientes":['id_cliente','id_interaccion'],
+    }
+    parent_record=parent_record.get(table_name,'')
+    return parent_record

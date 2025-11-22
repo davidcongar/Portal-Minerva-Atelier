@@ -1,0 +1,213 @@
+<!-- templates/main/dashboard.htmla -->
+{% extends './partials/system/layout1.html' %}
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="/static/js/charts/general.js"></script>
+<script src="/static/js/charts/waterfall.js"></script>
+<script src="/static/js/system/data_table.js"></script>
+<script src="/static/js/system/loader.js"></script>
+<script src="/static/js/system/dynamic_table_init.js"></script>
+<script src="/static/js/system/format_functions.js"></script>
+<script src="/static/js/system/funciones_generales.js"></script>
+
+<div id="main" class=" pt-5">
+    <div class="flex flex-col gap-5 overflow-y-auto" style="max-height: calc(100vh - 171px);">
+        <div class="flex items-center gap-2 sticky top-0 bg-lesswhite dark:bg-dark z-20 shadow-md">
+            <h2 class="font-semibold">Tablero Operativo</h2>
+            <!-- Fecha pushed to the right -->
+            <div class="ml-auto flex items-center gap-2">
+                <label for="fecha">Fecha</label>
+                <input id="dateRange" type="text" class="form-input w-[226px]" placeholder="Rango de fechas..." value="{{date_range}}" onchange="updateDashboardDebounced()">
+            </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div class="bg-white dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 p-5 rounded-lg space-y-6">
+                <div class="flex items-center gap-2.5 justify-center">
+                    <span>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 2C14 2 16.2 2.2 19 5C21.8 7.8 22 10 22 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M14.207 5.53564C14.207 5.53564 15.197 5.81849 16.6819 7.30341C18.1668 8.78834 18.4497 9.77829 18.4497 9.77829" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        <path opacity="0.5" d="M10.0376 5.31617L10.6866 6.4791C11.2723 7.52858 11.0372 8.90533 10.1147 9.8278C10.1147 9.8278 8.99578 10.9467 11.0245 12.9755C13.0532 15.0042 14.1722 13.8853 14.1722 13.8853C15.0947 12.9628 16.4714 12.7277 17.5209 13.3134L18.6838 13.9624C20.2686 14.8468 20.4557 17.0692 19.0628 18.4622C18.2258 19.2992 17.2004 19.9505 16.0669 19.9934C14.1588 20.0658 10.9183 19.5829 7.6677 16.3323C4.41713 13.0817 3.93421 9.84122 4.00655 7.93309C4.04952 6.7996 4.7008 5.77423 5.53781 4.93723C6.93076 3.54428 9.15317 3.73144 10.0376 5.31617Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+
+                    </span>
+                    <p class="font-semibold"># Interacciones Totales</p>
+                </div>
+                <div class="flex gap-2.5 xl:gap-[30px] flex-wrap grid-cols-2 justify-center">
+                    <span id="interacciones_totales" class="text-lg font-bold"></span>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 p-5 rounded-lg space-y-6">
+                <div class="flex items-center gap-2.5 justify-center">
+                    <span>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22 22H2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        <path opacity="0.5" d="M21 22V14.5C21 13.6716 20.3284 13 19.5 13H16.5C15.6716 13 15 13.6716 15 14.5V22" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M15 22V5C15 3.58579 15 2.87868 14.5607 2.43934C14.1213 2 13.4142 2 12 2C10.5858 2 9.87868 2 9.43934 2.43934C9 2.87868 9 3.58579 9 5V22" stroke="currentColor" stroke-width="1.5"/>
+                        <path opacity="0.5" d="M9 22V9.5C9 8.67157 8.32843 8 7.5 8H4.5C3.67157 8 3 8.67157 3 9.5V22" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                    </span>
+                    <p class="font-semibold"># Interacciones promedio</p>
+                </div>
+                <div class="flex gap-2.5 xl:gap-[30px] flex-wrap grid-cols-2 justify-center">
+                    <span class="text-lg font-bold" id="interacciones_promedio"></span>
+                </div>
+            </div>
+        </div>
+        <h2>Mayor # de interacciones</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <div class="bg-white dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 p-5 rounded-lg space-y-6">
+                <div class="flex items-center gap-2.5 justify-center">
+                    <span>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path opacity="0.5" d="M11.1459 7.02251C11.5259 6.34084 11.7159 6 12 6C12.2841 6 12.4741 6.34084 12.8541 7.02251L12.9524 7.19887C13.0603 7.39258 13.1143 7.48944 13.1985 7.55334C13.2827 7.61725 13.3875 7.64097 13.5972 7.68841L13.7881 7.73161C14.526 7.89857 14.895 7.98205 14.9828 8.26432C15.0706 8.54659 14.819 8.84072 14.316 9.42898L14.1858 9.58117C14.0429 9.74833 13.9714 9.83191 13.9392 9.93531C13.9071 10.0387 13.9179 10.1502 13.9395 10.3733L13.9592 10.5763C14.0352 11.3612 14.0733 11.7536 13.8435 11.9281C13.6136 12.1025 13.2682 11.9435 12.5773 11.6254L12.3986 11.5431C12.2022 11.4527 12.1041 11.4075 12 11.4075C11.8959 11.4075 11.7978 11.4527 11.6014 11.5431L11.4227 11.6254C10.7318 11.9435 10.3864 12.1025 10.1565 11.9281C9.92674 11.7536 9.96476 11.3612 10.0408 10.5763L10.0605 10.3733C10.0821 10.1502 10.0929 10.0387 10.0608 9.93531C10.0286 9.83191 9.95713 9.74833 9.81418 9.58117L9.68403 9.42898C9.18097 8.84072 8.92945 8.54659 9.01723 8.26432C9.10501 7.98205 9.47396 7.89857 10.2119 7.73161L10.4028 7.68841C10.6125 7.64097 10.7173 7.61725 10.8015 7.55334C10.8857 7.48944 10.9397 7.39258 11.0476 7.19887L11.1459 7.02251Z" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M19 9C19 12.866 15.866 16 12 16C8.13401 16 5 12.866 5 9C5 5.13401 8.13401 2 12 2C15.866 2 19 5.13401 19 9Z" stroke="currentColor" stroke-width="1.5"/>
+                        <path opacity="0.5" d="M7.35111 15L6.71424 17.323C6.0859 19.6148 5.77173 20.7607 6.19097 21.3881C6.3379 21.6079 6.535 21.7844 6.76372 21.9008C7.41635 22.2331 8.42401 21.7081 10.4393 20.658C11.1099 20.3086 11.4452 20.1339 11.8014 20.0959C11.9335 20.0818 12.0665 20.0818 12.1986 20.0959C12.5548 20.1339 12.8901 20.3086 13.5607 20.658C15.576 21.7081 16.5837 22.2331 17.2363 21.9008C17.465 21.7844 17.6621 21.6079 17.809 21.3881C18.2283 20.7607 17.9141 19.6148 17.2858 17.323L16.6489 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                    <p class="font-semibold">Empresa</p>
+                </div>
+                <div class="flex items-center gap-2.5 justify-center">
+                    <span class="text-lg font-bold" id="empresa_interacciones"></span>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 p-5 rounded-lg space-y-6">
+                <div class="flex items-center gap-2.5 justify-center">
+                    <span>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="10" cy="6" r="4" stroke="currentColor" stroke-width="1.5"/>
+                        <path opacity="0.5" d="M18 17.5C18 19.9853 18 22 10 22C2 22 2 19.9853 2 17.5C2 15.0147 5.58172 13 10 13C14.4183 13 18 15.0147 18 17.5Z" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M19 2C19 2 21 3.2 21 6C21 8.8 19 10 19 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M17 4C17 4 18 4.6 18 6C18 7.4 17 8 17 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                    <p class="font-semibold">Integrante</p>
+                </div>
+                <div class="flex gap-2.5 xl:gap-[30px] flex-wrap grid-cols-2 justify-center">
+                    <span class="text-lg font-bold" id="integrante_interacciones"></span>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 p-5 rounded-lg space-y-6">
+                <div class="flex items-center gap-2.5 justify-center">
+                    <span>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="10" cy="6" r="4" stroke="currentColor" stroke-width="1.5"/>
+                        <path opacity="0.5" d="M18 17.5C18 19.9853 18 22 10 22C2 22 2 19.9853 2 17.5C2 15.0147 5.58172 13 10 13C14.4183 13 18 15.0147 18 17.5Z" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M19 8.69135L18.4813 9.23307C18.7713 9.51077 19.2287 9.51077 19.5187 9.23307L19 8.69135ZM19.9571 12.3656L19.5135 11.7609L19.9571 12.3656ZM18.4865 11.7609C18.0686 11.4542 17.6081 11.0712 17.2595 10.6681C16.8912 10.2423 16.75 9.91131 16.75 9.69673H15.25C15.25 10.4666 15.6912 11.1479 16.1249 11.6493C16.5782 12.1735 17.1391 12.6327 17.5992 12.9703L18.4865 11.7609ZM16.75 9.69673C16.75 9.12068 17.0126 8.87002 17.2419 8.78964C17.4922 8.70189 17.9558 8.72986 18.4813 9.23307L19.5187 8.14963C18.6943 7.36028 17.6579 7.05432 16.7457 7.3741C15.8125 7.70123 15.25 8.59955 15.25 9.69673H16.75ZM20.4008 12.9703C20.8609 12.6327 21.4218 12.1735 21.8751 11.6493C22.3088 11.1479 22.75 10.4666 22.75 9.69672H21.25C21.25 9.91132 21.1088 10.2424 20.7405 10.6681C20.3919 11.0713 19.9314 11.4542 19.5135 11.7609L20.4008 12.9703ZM22.75 9.69672C22.75 8.59954 22.1875 7.70123 21.2543 7.37409C20.3421 7.05432 19.3057 7.36028 18.4813 8.14963L19.5187 9.23307C20.0442 8.72986 20.5078 8.70189 20.7581 8.78964C20.9874 8.87002 21.25 9.12068 21.25 9.69672H22.75ZM17.5992 12.9703C17.9678 13.2407 18.3816 13.5776 19 13.5776L19 12.0776C18.9756 12.0776 18.9605 12.0775 18.9061 12.0488C18.8202 12.0034 18.7128 11.9269 18.4865 11.7609L17.5992 12.9703ZM19.5135 11.7609C19.2872 11.9269 19.1798 12.0034 19.0939 12.0488C19.0395 12.0775 19.0244 12.0776 19 12.0776L19 13.5776C19.6184 13.5776 20.0322 13.2407 20.4008 12.9703L19.5135 11.7609Z" fill="currentColor"/>
+                        </svg>
+
+                    </span>
+                    <p class="font-semibold">Cliente</p>
+                </div>
+                <div class="flex gap-2.5 xl:gap-[30px] flex-wrap grid-cols-2 justify-center">
+                    <span class="text-lg font-bold" id="cliente_interacciones"></span>
+                </div>
+            </div>
+        </div>
+        <div class="xl:col-span-2 sm:w-full lg:w-[80%] bg-white dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 p-5 rounded-lg">
+            <div class="flex justify-between items-center gap-3">
+                <div class="flex flex-col">
+                    <h2 class="font-semibold">Interacciones semanales por sector</h2>
+                    <span class="text-lightgray text-sm"># de interacciones</span>
+                </div>
+            </div>
+            <div id="grafica_interacciones_sector"></div>
+        </div>
+        <div class="xl:col-span-2 sm:w-full lg:w-[80%] bg-white dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 p-5 rounded-lg">
+            <div class="flex justify-between items-center gap-3">
+                <div class="flex flex-col">
+                    <h2 class="font-semibold">Interacciones por cliente</h2>
+                    <span class="text-lightgray text-sm"># de interacciones</span>
+                </div>
+            </div>
+            <div id="grafica_interacciones_cliente"></div>
+        </div>        
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-5">
+            <div class="xl:col-span-2 sm:w-full lg:w-[80%] bg-white dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 p-5 rounded-lg">
+                <div class="flex justify-between items-center gap-3">
+                    <div class="flex flex-col">
+                        <h2 class="font-semibold">Interacciones por integrante</h2>
+                        <span class="text-lightgray text-sm"># de interacciones</span>
+                    </div>
+                </div>
+                <div id="grafica_interacciones_integrante"></div>
+            </div>
+            <div class="xl:col-span-2 sm:w-full lg:w-[80%] bg-white dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 p-5 rounded-lg">
+                <div class="flex justify-between items-center gap-3">
+                    <div class="flex flex-col">
+                        <h2 class="font-semibold">Interacciones por empresa</h2>
+                        <span class="text-lightgray text-sm"># de interacciones</span>
+                    </div>
+                </div>
+                <div id="grafica_interacciones_empresa"></div>
+            </div>
+        </div>
+    </div>
+    {% include "./partials/system/loader.html" %}
+</div>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>  
+<script>
+    function updateDashboard() {
+        const dateRange = document.getElementById('dateRange').value.trim();
+        let start_date, end_date;
+        if (dateRange.includes(' to ')) {
+            [start_date, end_date] = dateRange.split(' to ').map(d => d.trim());
+        } else {
+            start_date = end_date = dateRange;
+        }
+
+        obtener_valor('#interacciones_totales','valor',`/dashboard_queries/operative/interacciones_totales?start_date=${start_date}&end_date=${end_date}`);
+        obtener_valor('#interacciones_promedio','valor',`/dashboard_queries/operative/interacciones_promedio?start_date=${start_date}&end_date=${end_date}`);
+        obtener_valor('#empresa_interacciones','empresa_nombre',`/dashboard_queries/operative/empresa_interacciones?start_date=${start_date}&end_date=${end_date}`);
+        obtener_valor('#integrante_interacciones','integrante_nombre',`/dashboard_queries/operative/integrante_interacciones?start_date=${start_date}&end_date=${end_date}`);
+        obtener_valor('#cliente_interacciones','cliente_nombre',`/dashboard_queries/operative/cliente_interacciones?start_date=${start_date}&end_date=${end_date}`);
+        generar_grafica_categorias('#grafica_interacciones_sector','line','semana','total_interacciones','sector',`/dashboard_queries/operative/grafica_interacciones_sector?start_date=${start_date}&end_date=${end_date}`);
+        generar_grafica('#grafica_interacciones_cliente','bar','cliente','total_interacciones',`/dashboard_queries/operative/grafica_interacciones_cliente?start_date=${start_date}&end_date=${end_date}`);
+        generar_grafica('#grafica_interacciones_integrante','bar','integrante','total_interacciones',`/dashboard_queries/operative/grafica_interacciones_integrante?start_date=${start_date}&end_date=${end_date}`);
+        generar_grafica('#grafica_interacciones_empresa','bar','empresa','total_interacciones',`/dashboard_queries/operative/grafica_interacciones_empresa?start_date=${start_date}&end_date=${end_date}`);
+    }
+    updateDashboard();    
+</script>
+<script>
+    flatpickr("#dateRange", {
+        mode: "range",
+        dateFormat: "Y-m-d"
+    });    
+    async function updateDashboard() {
+        showLoader();
+        await destroyAllApexCharts(); // 🧹 Clean before creating new ones
+
+        const dateRange = document.getElementById('dateRange').value.trim();
+        let start_date, end_date;
+        if (dateRange.includes(' to ')) {
+            [start_date, end_date] = dateRange.split(' to ').map(d => d.trim());
+        } else {
+            start_date = end_date = dateRange;
+        }
+        obtener_valor('#interacciones_totales','valor',`/dashboard_queries/operative/interacciones_totales?start_date=${start_date}&end_date=${end_date}`);
+        obtener_valor('#interacciones_promedio','valor',`/dashboard_queries/operative/interacciones_promedio?start_date=${start_date}&end_date=${end_date}`);
+        obtener_valor('#empresa_interacciones','empresa_nombre',`/dashboard_queries/operative/empresa_interacciones?start_date=${start_date}&end_date=${end_date}`);
+        obtener_valor('#integrante_interacciones','integrante_nombre',`/dashboard_queries/operative/integrante_interacciones?start_date=${start_date}&end_date=${end_date}`);
+        obtener_valor('#cliente_interacciones','cliente_nombre',`/dashboard_queries/operative/cliente_interacciones?start_date=${start_date}&end_date=${end_date}`);
+        generar_grafica_categorias('#grafica_interacciones_sector','line','semana','total_interacciones','sector',`/dashboard_queries/operative/grafica_interacciones_sector?start_date=${start_date}&end_date=${end_date}`);
+        generar_grafica('#grafica_interacciones_cliente','bar','cliente','total_interacciones',`/dashboard_queries/operative/grafica_interacciones_cliente?start_date=${start_date}&end_date=${end_date}`);
+        generar_grafica('#grafica_interacciones_integrante','bar','integrante','total_interacciones',`/dashboard_queries/operative/grafica_interacciones_integrante?start_date=${start_date}&end_date=${end_date}`);
+        generar_grafica('#grafica_interacciones_empresa','bar','empresa','total_interacciones',`/dashboard_queries/operative/grafica_interacciones_empresa?start_date=${start_date}&end_date=${end_date}`);
+        await new Promise(res => setTimeout(res, 1500));
+        hideLoader();
+    }
+    let updateTimeout;
+    function updateDashboardDebounced() {
+        clearTimeout(updateTimeout);
+        updateTimeout = setTimeout(updateDashboard, 300);
+    }
+    updateDashboard();
+</script>
+
+{% endblock content %}

@@ -1,0 +1,35 @@
+{% extends './partials/system/layout1.html' %}
+
+{% block content %}
+{% include "./partials/system/alerts.html" %}
+{% include 'partials/table/breadcrumbs.html' %}
+<div class="flex flex-col gap-5 min-h-[calc(100vh-188px)] sm:min-h-[calc(100vh-204px)]">
+    <div class="grid grid-cols-1 gap-4 flex-1">
+        <div class="flex gap-5 items-stretch relative overflow-hidden" x-data="{activeTab:'inicio'}">
+            <div class="bg-white dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 rounded-lg p-5 w-[200px] z-20 flex-none -left-[410px] xl:static overflow-y-auto h-[calc(100vh-188px)] sm:h-[calc(100vh-204px)]">
+                <div class="flex flex-col space-y-5">
+                    <button @click="activeTab = 'inicio'" :class="activeTab === 'inicio' ? 'bg-primary text-white' : 'bg-gray/[8%] text-gray hover:bg-primary hover:text-white'" class="flex duration-300 p-3 text-sm/none font-semibold items-center gap-3 rounded-lg">
+                        Inicio
+                    </button>                    
+                    <button @click="activeTab = 'ejemplo'" :class="activeTab === 'ejemplo' ? 'bg-primary text-white' : 'bg-gray/[8%] text-gray hover:bg-primary hover:text-white'" class="flex duration-300 p-3 text-sm/none font-semibold items-center gap-3 rounded-lg">
+                        ejemplo
+                    </button>                                                               
+                </div>
+            </div>
+            <div class="bg-transparent lg:hidden z-[5] w-full h-full absolute hidden" :class="isShowChatMenu && '!block xl:!hidden'" @click="isShowChatMenu = !isShowChatMenu"></div>
+                {% include '/system/user_guide/inicio.html' %}
+                {% include '/system/user_guide/ejemplo.html' %}
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("alpine:init", () => {
+        Alpine.data("email", () => ({
+            isShowChatMenu: false,
+            selectMail: false,
+        }));
+    });
+</script>
+
+{% endblock content %}

@@ -1,0 +1,46 @@
+<!-- Paginación -->
+ <div id="pagination">
+<ul class="inline-flex items-center gap-1">
+    <li>
+        <button type="button" @click.prevent="changePage(1)" class="flex justify-center items-center rounded transition hover:border-gray/60">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2 12C2 7.28595 2 4.92893 3.46447 3.46447C4.92893 2 7.28595 2 12 2C16.714 2 19.0711 2 20.5355 3.46447C22 4.92893 22 7.28595 22 12C22 16.714 22 19.0711 20.5355 20.5355C19.0711 22 16.714 22 12 22C7.28595 22 4.92893 22 3.46447 20.5355C2 19.0711 2 16.714 2 12Z" stroke="currentColor" stroke-width="1"/>
+                <path d="M15.5 9L12.5 12L15.5 15" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M11.5 9L8.5 12L11.5 15" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+    </li>
+    <li>
+        <button type="button" @click="changePage(pagination.currentPage - 1)" class="flex justify-center items-center rounded transition hover:border-gray/60">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M13.5 9L10.5 12L13.5 15" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12C2 7.28595 2 4.92893 3.46447 3.46447C4.92893 2 7.28595 2 12 2C16.714 2 19.0711 2 20.5355 3.46447C22 4.92893 22 7.28595 22 12C22 16.714 22 19.0711 20.5355 20.5355C19.0711 22 16.714 22 12 22C7.28595 22 4.92893 22 3.46447 20.5355C2 19.0711 2 16.714 2 12Z" stroke="currentColor" stroke-width="1"/>
+            </svg>    
+        </button>
+    </li>
+    <template x-for="item in pages" :key="item">
+        <li>
+            <button @click="changePage(item)" type="button" class="flex justify-center h-7 w-7 items-center rounded transition border border-gray/20 hover:border-gray/60" :class="{ 'border-primary text-primary': pagination.currentPage === item }">
+                <span x-text="item"></span>
+            </button>
+        </li>
+    </template>
+    <li>
+        <button @click="changePage(pagination.currentPage + 1)" type="button" class="flex justify-center items-center rounded transition hover:border-gray/60">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10.5 9L13.5 12L10.5 15" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12C2 7.28595 2 4.92893 3.46447 3.46447C4.92893 2 7.28595 2 12 2C16.714 2 19.0711 2 20.5355 3.46447C22 4.92893 22 7.28595 22 12C22 16.714 22 19.0711 20.5355 20.5355C19.0711 22 16.714 22 12 22C7.28595 22 4.92893 22 3.46447 20.5355C2 19.0711 2 16.714 2 12Z" stroke="currentColor" stroke-width="1"/>
+            </svg>
+        </button>
+    </li>
+    <li>
+        <button @click.prevent="changePage(pagination.lastPage)" type="button" class="flex justify-center items-center rounded transition hover:border-gray/60">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2 12C2 7.28595 2 4.92893 3.46447 3.46447C4.92893 2 7.28595 2 12 2C16.714 2 19.0711 2 20.5355 3.46447C22 4.92893 22 7.28595 22 12C22 16.714 22 19.0711 20.5355 20.5355C19.0711 22 16.714 22 12 22C7.28595 22 4.92893 22 3.46447 20.5355C2 19.0711 2 16.714 2 12Z" stroke="currentColor" stroke-width="1"/>
+                <path d="M8.5 9L11.5 12L8.5 15" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12.5 9L15.5 12L12.5 15" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+    </li>
+</ul>
+ </div>

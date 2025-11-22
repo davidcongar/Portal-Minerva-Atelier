@@ -1,0 +1,9 @@
+<div class="flex justify-end items-center gap-2" x-data x-show="true">
+    <template x-if="$store.modalData.record.estatus === 'Activo'">
+        <button type="submit"
+            @click.stop.prevent="window.location.href = `/dynamic/integrantes/double_table/view/${encodeURIComponent($store.modalData.record.id)}`"
+            class="btn border text-primary border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-primary bg-primary/10">
+            Empresas
+        </button>
+    </template>
+</div>
