@@ -19,10 +19,10 @@ def home():
     return redirect(url_for("dashboards.operative_dashboard"))
 
 
-@home_bp.route("/generate-presigned-url", methods=["POST"])
+@home_bp.route("/generate-presigned-url/<string:type>", methods=["POST"])
 @csrf.exempt
 @login_required
-def generate_presigned_url():
+def generate_presigned_url(type):
     """
     Genera y retorna una URL firmada para descargar un archivo de S3.
     """
@@ -31,7 +31,7 @@ def generate_presigned_url():
         filepath=Archivos.query.get(id).ruta_s3
         if not filepath:
             return jsonify({"error": "El campo 'filepath' es obligatorio"}), 400
-        presigned_url = s3_service.generate_presigned_url(filepath)
+        presigned_url = s3_service.generate_presigned_url(filepath,type)
         return jsonify({"presigned_url": presigned_url}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500

@@ -27,7 +27,7 @@
                     <br>
                     <table class="overflow-auto w-full table-striped" id="modal_content"></table>
                     <br>
-                    {% if relationships!='' %}
+                    {% if relationships!='' and table_name not in ('reportes','archivos') %}
                         <h5 class="font-semibold text-lg">Información de registros asociados con registro</h5>
                         <br>
                         <table class="overflow-auto w-full table-striped" id="modal_content_relationship"></table>
@@ -71,6 +71,7 @@
                             </svg>
                         </button>
                     {% endif %}
+                    {% if table_name not in ('reportes','archivos') and not parent_table %}
                     <div class="flex justify-end items-center gap-2" x-data x-show="true">
                         <template x-if="!['Cancelada'].includes($store.modalData.record.estatus)">
                             <button type="submit"
@@ -79,7 +80,8 @@
                                 Archivos
                             </button>
                         </template>   
-                    </div>                 
+                    </div>         
+                    {% endif %}
                 </div>                  
             </div>
         </div>

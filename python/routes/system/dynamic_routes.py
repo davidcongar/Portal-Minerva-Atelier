@@ -874,6 +874,8 @@ def table_view_files(table_name,id):
     return render_template(
         "system/dynamic_table.html",
         buttons_modal_exits=buttons_modal_exits,
+        table_buttons=True,
+        number_buttons=1,
         columns=columns,
         id_registro_padre=record.id,
         table_name='archivos',

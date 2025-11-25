@@ -7,6 +7,7 @@ import boto3
 from botocore.exceptions import ClientError
 
 from python.models.modelos import *
+import mimetypes
 
 class S3Service:
     def __init__(self, use_local_profile=False, profile_name="default"):
@@ -45,7 +46,7 @@ class S3Service:
             db.session.rollback()
             raise Exception(f"Error al subir el archivo: {e}")
 
-    def generate_presigned_url(self, filepath, expiration=3600):
+    def generate_presigned_url(self, filepath,type, expiration=3600):
         """
         Genera una URL firmada para acceder al archivo de S3.
 
@@ -54,11 +55,19 @@ class S3Service:
         :return: URL firmada.
         """
         try:
-            response = self.s3_client.generate_presigned_url(
-                "get_object",
-                Params={"Bucket": self.bucket_name, "Key": filepath},
-                ExpiresIn=expiration,
-            )
+            if type=='view':
+                mime_type = mimetypes.guess_type(filepath)[0] or "application/octet-stream"
+                response = self.s3_client.generate_presigned_url(
+                    "get_object",
+                    Params={"Bucket": self.bucket_name, "Key": filepath,"ResponseContentDisposition": "inline","ResponseContentType": mime_type},
+                    ExpiresIn=expiration,
+                )
+            elif type=='download':
+                response = self.s3_client.generate_presigned_url(
+                    "get_object",
+                    Params={"Bucket": self.bucket_name, "Key": filepath},
+                    ExpiresIn=expiration,
+                )                
             return response
         except ClientError as e:
             raise Exception(f"Error al generar la URL firmada: {e}")

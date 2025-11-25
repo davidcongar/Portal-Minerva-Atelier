@@ -12,6 +12,7 @@ function redirectActions(url) {
             }
         } else if (url.includes("download_pdf")) {
             // Para descargar PDF se utiliza fetch y se procesa la descarga
+            console.log(url);
             fetch(url, { 
                     method: "POST",
                     headers: {
@@ -52,7 +53,7 @@ function formatNumber(value) {
 }
 function titleFormat(value) {
   const replacements = {
-        "visualizacion": "visualización",
+        "id_visualizacion": "ID",
         "creacion": "creación",
         "descripcion": "descripción",
         "informacion": "información",
@@ -169,7 +170,7 @@ async function get_record(form, recordId) {
                     document.getElementById('id_registro').textContent=value;
                 }
 
-                if (/(importe|monto|precio|subtotal|descuentos|propina|comisiones|otros_costos|costo_de_envio)/i.test(key) && !isNaN(value)) {
+                if (/(importe|monto|precio|subtotal|descuentos|propina|comisiones|otros_costos|costo_de_envio|impuestos)/i.test(key) && !isNaN(value)) {
                     value = formatCurrency(value);
                 } else if (!isNaN(value)) {
                     value = formatNumber(value);
@@ -187,7 +188,7 @@ async function get_record(form, recordId) {
                         </button>
                     </td>`;
                     tbody_modal_content_relationship.appendChild(tr);
-                }else if(key!=='id'){
+                } else if (!['id', 'id_proveedor', 'id_categoria_de_gasto', 'id_cuenta_de_banco'].includes(key)) {
                     tr.innerHTML = `<td style="border-right: 1px solid #ccc; padding: 8px; ">${titleFormat(key)}</td><td style="word-break: break-word; white-space: normal; overflow-wrap: anywhere; max-width: 300px;">${value}</td>`;
                     tbody_modal_content.appendChild(tr);
                 }
@@ -201,3 +202,10 @@ async function get_record(form, recordId) {
             return null; 
         }
 }
+
+document.addEventListener('keydown', function (event) {
+    // If ESC key is pressed
+    if (event.key === "Escape") {
+        closeActions();
+    }
+});
