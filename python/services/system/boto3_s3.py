@@ -38,7 +38,7 @@ class S3Service:
         """
         try:
             filename = file.filename
-            filepath = f"gbm/crm/{tabla_origen}/{file_uuid}_{filename}"
+            filepath = f"{tabla_origen}/{file_uuid}_{filename}"
             # Subir a S3
             self.s3_client.upload_fileobj(file, self.bucket_name, filepath)
             return filename

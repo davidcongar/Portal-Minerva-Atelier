@@ -392,7 +392,7 @@ def add(table_name):
         if table_name=='archivos':
             archivo = request.files.get("archivo")
             s3_service.upload_file(archivo, new_record.id,session['tabla_origen'])
-            new_record.ruta_s3=f"gbm/crm/{session['tabla_origen']}/{ new_record.id}_{archivo.filename}"
+            new_record.ruta_s3=f"{session['tabla_origen']}/{ new_record.id}_{archivo.filename}"
             new_record.nombre=archivo.filename
         # Process many-to-many relationships
         for key, value in relationship_data.items():

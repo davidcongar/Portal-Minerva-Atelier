@@ -2,4 +2,4 @@
 
 from python.models.sistema import *
 from python.models.catalogos import *
-from python.models.crm import *
+from python.models.portal_clientes import *
