@@ -50,7 +50,7 @@
                     </a>
                 </li>
                 {% endif %}  
-                {% if can_access('/dynamic/almacenes/view') or can_access('/dynamic/categorias_de_productos/view') or can_access('/dynamic/productos/view') or can_access('/dynamic/inventario/view') or can_access('/dynamic/recepciones_de_compra/view') or can_access('/dynamic/ajustes_de_inventario/view') or can_access('/dynamic/transferencias_de_inventario/view') or can_access('/dynamic/envios/view') %}
+                {% if can_access('/dynamic/almacenes/view') or can_access('/dynamic/categorias_de_productos/view') or can_access('/dynamic/productos/view') or can_access('/dynamic/inventario/view') or can_access('/dynamic/recepciones_de_compras/view') or can_access('/dynamic/ajustes_de_inventario/view') or can_access('/dynamic/transferencias_de_inventario/view') or can_access('/dynamic/envios/view') %}
                     <li class="menu nav-item">
                         <a href="javascript:;" class="nav-link group items-center justify-between"
                             :class="{'active' : activeMenu === 'almacen'}"
@@ -80,7 +80,7 @@
                                     <a :class="{'active': activeItem === 'almacenes'}" href="/dynamic/almacenes/view">almacenes</a>
                                 {% endif %}
                                 {% if can_access('/dynamic/categorias_de_productos/view') %}                                
-                                    <a :class="{'active': activeItem === 'categorias_de_productos'}" href="/dynamic/categorias_de_productos/view">categorias de productos</a>
+                                    <a :class="{'active': activeItem === 'categorias_de_productos'}" href="/dynamic/categorias_de_productos/view">categorías de productos</a>
                                 {% endif %}
                                 {% if can_access('/dynamic/productos/view') %}                                
                                     <a :class="{'active': activeItem === 'productos'}" href="/dynamic/productos/view">productos</a>
@@ -88,8 +88,8 @@
                                 {% if can_access('/dynamic/inventario/view') %}                                
                                     <a :class="{'active': activeItem === 'inventario'}" href="/dynamic/inventario/view">inventario</a>
                                 {% endif %}
-                                {% if can_access('/dynamic/recepciones_de_compra/view') %}                                
-                                    <a :class="{'active': activeItem === 'recepciones_de_compra'}" href="/dynamic/recepciones_de_compra/view">recepciones de compra</a>
+                                {% if can_access('/dynamic/recepciones_de_compras/view') %}                                
+                                    <a :class="{'active': activeItem === 'recepciones_de_compras'}" href="/dynamic/recepciones_de_compras/view">recepciones de compras</a>
                                 {% endif %}
                                 {% if can_access('/dynamic/ajustes_de_inventario/view') %}                                
                                     <a :class="{'active': activeItem === 'ajustes_de_inventario'}" href="/dynamic/ajustes_de_inventario/view">ajustes de inventario</a>
@@ -98,7 +98,7 @@
                                     <a :class="{'active': activeItem === 'transferencias_de_inventario'}" href="/dynamic/transferencias_de_inventario/view">transferencias de inventario</a>
                                 {% endif %}
                                 {% if can_access('/dynamic/envios/view') %}                                
-                                    <a :class="{'active': activeItem === 'envios'}" href="/dynamic/envios/view">envios</a>
+                                    <a :class="{'active': activeItem === 'envios'}" href="/dynamic/envios/view">envíos</a>
                                 {% endif %}
                             </li>
                         </ul>
@@ -177,7 +177,7 @@
                                     <a :class="{'active': activeItem === 'proveedores'}" href="/dynamic/proveedores/view">proveedores</a>
                                 {% endif %}
                                 {% if can_access('/dynamic/categorias_de_gastos/view') %}                                
-                                    <a :class="{'active': activeItem === 'categorias_de_gastos'}" href="/dynamic/categorias_de_gastos/view">categorias de gastos</a>
+                                    <a :class="{'active': activeItem === 'categorias_de_gastos'}" href="/dynamic/categorias_de_gastos/view">categorías de gastos</a>
                                 {% endif %}
                                 {% if can_access('/dynamic/gastos/view') %}                                
                                     <a :class="{'active': activeItem === 'gastos'}" href="/dynamic/gastos/view">gastos</a>
@@ -288,7 +288,7 @@
                                     <a :class="{'active': activeItem === 'puestos'}" href="/dynamic/puestos/view">puestos</a>
                                 {% endif %}
                                 {% if can_access('/dynamic/integrantes/view') %}                                
-                                    <a :class="{'active': activeItem === 'integrantes'}" href="/dynamic/integrantes/view">pagos administrativos</a>
+                                    <a :class="{'active': activeItem === 'integrantes'}" href="/dynamic/integrantes/view">integrantes</a>
                                 {% endif %}
                                 {% if can_access('/dynamic/sueldos_de_integrantes/view') %}                                
                                     <a :class="{'active': activeItem === 'sueldos_de_integrantes'}" href="/dynamic/sueldos_de_integrantes/view">sueldos de integrantes</a>

@@ -455,6 +455,7 @@ async function deleteRecord(tableName, modelSecondTable, mainId, recordId, csrfT
         })
         .then(response => response.json())
         .then(data => {
+            console.log(data.message)
             if (data.message !== "" && data.status==='warning') {
                 window.dispatchEvent(new CustomEvent('show-warning', {
                     detail: data.message   // the message from your AJAX or backend
@@ -468,7 +469,20 @@ async function deleteRecord(tableName, modelSecondTable, mainId, recordId, csrfT
                         warningAlert.style.display = 'none';
                     }, 1000);  // Match this delay with the CSS transition time (1s)
                 }, 3000);
+                reload_tables();
             }else{
+                window.dispatchEvent(new CustomEvent('show-success', {
+                    detail: data.message   // the message from your AJAX or backend
+                }));
+                successAlert.style.display = 'flex';  // Show the warning message
+                successAlert.style.opacity = '1';  // Set opacity to 1 for showing
+                setTimeout(function() {
+                    successAlert.style.opacity = '0';  // Start fading out
+                    // After the fade-out animation is complete, hide the element
+                    setTimeout(function() {
+                        successAlert.style.display = 'none';
+                    }, 1000);  // Match this delay with the CSS transition time (1s)
+                }, 3000);                
                 reload_tables();
             }
         })

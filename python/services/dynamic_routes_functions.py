@@ -62,6 +62,9 @@ def get_foreign_options():
         "id_categoria_de_gasto":CategoriasDeGastos.query.filter_by(estatus="Activo"),
         "id_proveedor":Proveedores.query.filter_by(estatus="Activo"),
         "id_almacen":Almacenes.query.filter_by(estatus="Activo"),
+        "id_categoria_de_producto": CategoriasDeProductos.query.filter_by(estatus="Activo"),
+        "id_producto": Productos.query.filter_by(estatus="Activo"),
+        "id_compra": Compras.query.filter(Compras.estatus.in_(["Aprobada", "Recibida parcial"])),
 
         # --- Campos con opciones fijas ---
         "regimen_fiscal":['601 - General de Ley Personas Morales','603 - Personas Morales con Fines no Lucrativos','605 - Sueldos y Salarios e Ingresos Asimilados a Salarios','606 - Arrendamiento','607 - Régimen de Enajenación o Adquisición de Bienes','608 - Demás ingresos','610 - Residentes en el Extranjero sin Establecimiento Permanente en México','611 - Ingresos por Dividendos (socios y accionistas)','612 - Personas Físicas con Actividades Empresariales y Profesionales','614 - Ingresos por intereses','615 - Régimen de los ingresos por obtención de premios','616 - Sin obligaciones fiscales','620 - Sociedades Cooperativas de Producción que optan por diferir sus ingresos','621 - Incorporación Fiscal (ya derogado, solo histórico)','622 - Actividades Agrícolas, Ganaderas, Silvícolas y Pesqueras (Personas Morales)','623 - Opcional para Grupos de Sociedades','624 - Coordinados','625 - Régimen de las Actividades Empresariales con ingresos a través de Plataformas Tecnológicas','626 - Régimen Simplificado de Confianza (RESICO)',],
@@ -73,6 +76,8 @@ def get_foreign_options():
         "genero": ["Masculino", "Femenino"],
         "tipo_de_cuenta":["Efectivo","Débito","Crédito"],
         "prioridad":["P0","P1","P2","P3"],
+        "inventariable":["Si","No"],
+        "unidad_de_medida":["Pieza","Caja"],
     }
     return foreign_options
 
@@ -175,9 +180,9 @@ def get_columns(table_name,section):
             "pdf": ["id_visualizacion","nombre","razon_social","rfc","direccion","codigo_postal","telefono","correo_electronico","persona_contacto","telefono_contacto","correo_electronico_contacto","condiciones_pago","sitio_web","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "precios_de_proveedores": {
-            "main_page": ["id_visualizacion","id_proveedor_nombre","id_producto_nombre","precio_unitario","estatus"],
-            "modal": ["id","id_visualizacion","id_proveedor_nombre","id_producto_nombre","precio_unitario","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
-            "pdf": ["id_visualizacion","id_proveedor_nombre","id_producto_nombre","precio_unitario","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
+            "main_page": ["id_visualizacion","id_proveedor_nombre","id_producto_nombre","id_producto_unidad_de_medida","precio_unitario","estatus"],
+            "modal": ["id","id_visualizacion","id_proveedor_nombre","id_producto_nombre","id_producto_unidad_de_medida","precio_unitario","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "pdf": ["id_visualizacion","id_proveedor_nombre","id_producto_nombre","id_producto_unidad_de_medida","precio_unitario","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "categorias_de_gastos": {
             "main_page": ["id_visualizacion","nombre","estatus"],
@@ -191,13 +196,13 @@ def get_columns(table_name,section):
         },
         "compras": {
             "main_page": ["id_visualizacion","id_almacen_nombre","id_proveedor_nombre","fecha_orden","fecha_entrega_estimada","importe_total","estatus","estatus_de_pago"],
-            "modal": ["id","id_visualizacion","id_almacen_nombre","id_proveedor_nombre","fecha_orden","fecha_entrega_estimada","subtotal","descuentos","importe_total","notas","estatus","estatus_de_pago","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
-            "pdf": ["id_visualizacion","id_almacen_nombre","id_proveedor_nombre","fecha_orden","fecha_entrega_estimada","subtotal","descuentos","importe_total","notas","estatus","estatus_de_pago","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
+            "modal": ["id","id_visualizacion","id_almacen_nombre","id_proveedor_nombre","fecha_orden","fecha_entrega_estimada","subtotal","costos_adicionales","descuentos","importe_total","notas","estatus","estatus_de_pago","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "pdf": ["id_visualizacion","id_almacen_nombre","id_proveedor_nombre","fecha_orden","fecha_entrega_estimada","subtotal","costos_adicionales","descuentos","importe_total","notas","estatus","estatus_de_pago","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "productos_en_compras": {
-            "main_page": ["id_visualizacion","id_compra_id_visualizacion","id_producto_nombre","cantidad_ordenada","cantidad_recibida","precio_unitario","importe_total","estatus"],
-            "modal": ["id","id_visualizacion","id_compra_id_visualizacion","id_producto_nombre","cantidad_ordenada","cantidad_recibida","precio_unitario","subtotal","descuento_porcentaje","importe_total","fecha_entrega_estimada","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
-            "pdf": ["id_visualizacion","id_compra_id_visualizacion","id_producto_nombre","cantidad_ordenada","cantidad_recibida","precio_unitario","importe_total","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
+            "main_page": ["id_compra_id_visualizacion","id_producto_nombre","cantidad_ordenada","cantidad_recibida","precio_unitario","importe_total","estatus"],
+            "modal": ["id","id_compra_id_visualizacion","id_producto_nombre","cantidad_ordenada","cantidad_recibida","precio_unitario","subtotal","descuento_porcentaje","importe_total","fecha_entrega_estimada","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "pdf": ["id_compra_id_visualizacion","id_producto_nombre","cantidad_ordenada","cantidad_recibida","precio_unitario","importe_total","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "servicios": {
             "main_page": ["id_visualizacion","nombre","estatus"],
@@ -230,19 +235,19 @@ def get_columns(table_name,section):
             "pdf": ["id_visualizacion","id_categoria_de_producto_nombre","nombre","inventariable","unidad_de_medida","descripcion","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "inventario": {
-            "main_page": ["id_visualizacion","id_almacen_nombre","id_producto_nombre","cantidad","cantidad_en_transito"],
-            "modal": ["id","id_visualizacion","id_almacen_nombre","id_producto_nombre","cantidad","cantidad_en_transito","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
-            "pdf": ["id_visualizacion","id_almacen_nombre","id_producto_nombre","cantidad","cantidad_en_transito","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
+            "main_page": ["id_almacen_nombre","id_producto_nombre","cantidad","cantidad_en_transito"],
+            "modal": ["id","id_almacen_nombre","id_producto_nombre","cantidad","cantidad_en_transito","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "pdf": ["id_almacen_nombre","id_producto_nombre","cantidad","cantidad_en_transito","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "recepciones_de_compras": {
-            "main_page": ["id_visualizacion","id_almacen_nombre","id_compra_visualizacion","fecha_entrega","estatus"],
-            "modal": ["id","id_visualizacion","id_almacen_nombre","id_compra_visualizacion","fecha_entrega","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
-            "pdf": ["id_visualizacion","id_almacen_nombre","id_compra_visualizacion","fecha_entrega","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
+            "main_page": ["id_visualizacion","id_almacen_nombre","id_compra_id_visualizacion","fecha_entrega","estatus"],
+            "modal": ["id","id_visualizacion","id_almacen_nombre","id_compra_id_visualizacion","fecha_entrega","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "pdf": ["id_visualizacion","id_almacen_nombre","id_compra_id_visualizacion","fecha_entrega","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "productos_en_recepciones_de_compras": {
-            "main_page": ["id_visualizacion","id_recepcion_de_compra_id_visualizacion","id_producto_nombre","cantidad"],
-            "modal": ["id","id_visualizacion","id_recepcion_de_compra_id_visualizacion","id_producto_nombre","cantidad","notas","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
-            "pdf": ["id_visualizacion","id_recepcion_de_compra_id_visualizacion","id_producto_nombre","cantidad","notas","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
+            "main_page": ["id_recepcion_de_compra_id_visualizacion","id_producto_nombre","cantidad"],
+            "modal": ["id","id_recepcion_de_compra_id_visualizacion","id_producto_nombre","cantidad","notas","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "pdf": ["id_recepcion_de_compra_id_visualizacion","id_producto_nombre","cantidad","notas","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "ajustes_de_inventario": {
             "main_page": ["id_visualizacion","id_almacen_nombre","id_producto_nombre","fecha_de_ajuste","tipo_de_ajuste","cantidad","estatus"],
@@ -399,7 +404,9 @@ def get_estatus_options(table_name):
         'transferencias_de_dinero': ["En revisión","Aprobada","Realizada","Cancelada"], 
         'ajustes_de_dinero': ["En revisión","Realizado","Cancelado"],
         'facturas': ["En revisión","Aprobada","Facturada","Cobrada parcial","Cobrada",'Cancelada'],
-        'ingresos': ["En revisión","Aprobado","Facturado",'Cancelado'],
+        'compras': ['En revisión','Aprobada','Recibida parcial','Recibida','Cancelada'],
+        'productos_en_compras': ['Pendiente','Recibido','Recibido parcial','Cancelado'],
+        'recepciones_de_compras': ['En revisión','Aprobada','Finalizada','Cancelada'],
         'actividades': ["Pendiente","En proceso","Realizada","Con cambios","Cerrada",'Cancelada'],
 
     }
@@ -414,9 +421,9 @@ def get_open_status(table_name):
         'gastos': ["En revisión","Aprobado","Pagado parcial"],
         'transferencias_de_dinero': ["En revisión","Aprobada"], 
         'ajustes_de_dinero': ["En revisión"],
-        'facturas': ["En revisión","Aprobada","Facturada","Cobrada parcial"],
-        'ingresos': ["En revisión","Aprobado"],
-        'actividades': ["Pendiente","En proceso","Realizada","Con cambios"],
+        'compras': ['En revisión','Aprobada','Recibida parcial'],
+        'recepciones_de_compras': ['En revisión','Aprobada'],
+        'productos_en_compras': ['Pendiente','Recibido','Recibido parcial'],
     }
     status=status.get(table_name,['Activo'])
     return status
@@ -434,7 +441,7 @@ def get_breadcrumbs(table_name):
         "categorias_de_productos":['Almacén','almacen'],
         "productos":['Almacén','almacen'],
         "inventario":['Almacén','almacen'],
-        "recepciones_de_compra":['Almacén','almacen'],
+        "recepciones_de_compras":['Almacén','almacen'],
         "ajustes_de_inventario":['Almacén','almacen'],
         "transferencias_de_inventario":['Almacén','almacen'],
         "envios":['Almacén','almacen'],
@@ -463,8 +470,8 @@ def get_breadcrumbs(table_name):
         "preguntas_de_encuesta_de_satisfaccion":['Proyectos','proyectos'],
 
         "puestos":['Recursos Humanos','recursos_humanos'],
-        "integrantes":['Administración','administracion'],
-        "sueldos_de_integrantes":['Administración','administracion'],
+        "integrantes":['Recursos Humanos','recursos_humanos'],
+        "sueldos_de_integrantes":['Recursos Humanos','recursos_humanos'],
 
         "servicios":['Ventas','ventas'],
         "ventas":['Ventas','ventas'],
@@ -500,8 +507,8 @@ def get_ignored_columns_edit(table_name,estatus):
         "proyectos":{'default':{'importe_cobrado','fecha_fin'}},   
         "gastos": {'default':{'importe_pagado'}},
         "pagos": {'default':{'importe'}},
+        "compras": {'default':{'importe_total','subtotal','descuentos','estatus_de_pago'}},
         "cuentas_de_banco": {'default':{'balance'}},
-        "ingresos": {'default':{''},'Aprobado':{'id_cliente','importe','id_cuenta_de_banco','forma_de_pago','notas'}},
         "facturas": {'default':{'importe_total','impuestos','subtotal','importe_cobrado'},'Aprobada':{'id_cliente','id_proyecto','importe_total','impuestos','subtotal','importe_cobrado'}},
         "actividades": {'default':{''},
                         'En proceso':{'id_cliente','notas_cambios','id_proyecto','id_integrante','actividad','id_categoria_de_actividad','fecha_solicitud','fecha_realizado','fecha_cerrado'},                        
@@ -536,6 +543,8 @@ def get_table_relationships(table_name):
         "roles":["usuarios"],
         "briefs":["preguntas_de_briefs"],
         "pagos_administrativos":["gastos_y_compras_en_pagos"],
+        "compras":["productos_en_compras"],
+        "recepciones_de_compras":["productos_en_recepciones_de_compras"],
 
     }
     relationships=relationships.get(table_name,'')
@@ -550,7 +559,8 @@ def get_default_variable_values(table_name):
         "pagos": {"fecha_pago": current_time.strftime("%Y-%m-%d")},
         "transferencias_de_dinero": {'fecha_de_transferencia': current_time.strftime("%Y-%m-%d")},
         "actividades": {"fecha_solicitud": current_time.strftime("%Y-%m-%d")},
-        "compras": {"fecha_orden": current_time.strftime("%Y-%m-%d")},
+        "compras": {"fecha_orden": current_time.strftime("%Y-%m-%d"),"costos_adicionales":0},
+        "recepciones_de_compras": {"fecha_entrega": current_time.strftime("%Y-%m-%d")},
 
     }
     default_values=default_values.get(table_name,{})
@@ -559,8 +569,9 @@ def get_default_variable_values(table_name):
 def get_url_after_add(table_name):
     columns = {
         "facturas": "dynamic.double_table_view",
-        "ingresos": "dynamic.double_table_view",
         "pagos": "dynamic.double_table_view",
+        "compras": "dynamic.double_table_view",
+        "recepciones_de_compras": "dynamic.double_table_view",
     }
     columns=columns.get(table_name,'dynamic.table_view')
     return columns
@@ -613,7 +624,6 @@ def get_non_edit_status(table_name):
     status_to_remove = {
         "facturas": {'Aprobada'},
         "actividades": {'En proceso','Realizada'},
-        "ingresos": {'Aprobado'},
 
     }
     status=general_status-status_to_remove.get(table_name,{''})
@@ -627,6 +637,7 @@ def get_form_filters(table_name):
     filters={
         "facturas": {'id_proyecto':'id_cliente'},
         "actividades": {'id_proyecto':'id_cliente'},
+        "recepciones_de_compras": {'id_compra':'id_almacen'},
     }
     filters=filters.get(table_name,'')
     return filters

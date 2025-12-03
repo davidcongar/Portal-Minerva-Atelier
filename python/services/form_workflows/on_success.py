@@ -7,6 +7,7 @@ import re
 import json
 from datetime import date, datetime
 from decimal import Decimal
+from python.services.general_functions import *
 
 #####
 # funciones de formulariosa
@@ -26,7 +27,8 @@ def on_success(table_name, id):
     if not handler:
         return
     return handler(id)
-'''
-@handler_on_success('ejemplo')
-def os_ejemplo(id):
-'''
+
+@handler_on_success('compras')
+def os_compras(id):
+    record=Compras.query.get(id)
+    actualizar_compra(record)

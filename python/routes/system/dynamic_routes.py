@@ -173,7 +173,7 @@ def data(table_name):
         query = query.filter(getattr(model, status_field) == status)
     else:
         open_status=get_open_status(table_name)
-        if open_status:
+        if open_status and hasattr(model, status_field):
             query = query.filter(getattr(model, status_field).in_(open_status))
     
 
@@ -234,6 +234,7 @@ def data(table_name):
 
     # Aplicar paginación
     query = query.offset((page - 1) * view).limit(view)
+
     records = query.all()
     items = [query_to_dict(record,model) for record in records]
     return jsonify(
@@ -321,7 +322,7 @@ def form(table_name):
         "activeMenu": active_menu,
         "activeItem": table_name,
         "foreign_options": foreign_options,
-        "breadcrumbs": [{"name":modulo,"url":""},{"name":table_name.replace('_', ' ').capitalize(),"url":url_for("dynamic.table_view", table_name=table_name)},{"name":accion,"url":""}]
+        "breadcrumbs": [{"name":modulo.replace('_', ' '),"url":""},{"name":table_name.replace('_', ' ').capitalize(),"url":url_for("dynamic.table_view", table_name=table_name)},{"name":accion,"url":""}]
     }
     form_filters=get_form_filters(table_name)
     parent_record=get_parent_record(table_name)
@@ -684,6 +685,7 @@ def double_table_add(main_table_name,first_table,second_table,id_main_record,id_
             on_add_double_table(main_table_name,id_main_record)
             db.session.commit()
         except Exception as e:
+            print(e)
             db.session.rollback()
             flash(f"Error al agregar el registro: {str(e)}", "danger")
     return redirect(url_for("dynamic.double_table_view",table_name=main_table_name,id=id_main_record))
@@ -726,6 +728,7 @@ def double_table_update(table_name,column,id,value=0):
             message='El valor se ha actualizado correctamente.'
             status='success'
     except Exception as e:
+        print(e)
         db.session.rollback()
         flash(f"Error al actualizar el valor: {str(e)}", "danger")
     return jsonify({"status": status, "message": message,"value":value_warning})

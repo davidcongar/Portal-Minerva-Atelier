@@ -141,6 +141,10 @@ from python.routes.transferencias_de_dinero import transferencias_de_dinero_bp
 app.register_blueprint(transferencias_de_dinero_bp)
 from python.routes.gastos import gastos_bp
 app.register_blueprint(gastos_bp)
+from python.routes.compras import compras_bp
+app.register_blueprint(compras_bp)
+from python.routes.recepciones_de_compras import recepciones_de_compras_bp
+app.register_blueprint(recepciones_de_compras_bp)
 
 
 

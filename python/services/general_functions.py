@@ -4,7 +4,6 @@ from sqlalchemy import String, Text, or_,func,Integer, Float, Numeric
 from sqlalchemy.sql import case
 from flask import session,flash,request
 from datetime import date, datetime,timedelta
-from decimal import Decimal
 
 #####
 # funciones auxiliares
@@ -32,21 +31,22 @@ def cuadrar_balance(id_cuenta):
 
     cuenta.balance=ingresos+transferencia_entrada+ajustes_entrada-pagos-transferencia_salida-ajustes_salida
 
-def calcular_importe_pago(record):
-    record.importe=(db.session.query(func.sum(GastosEnPagos.importe)).filter(GastosEnPagos.id_pago == record.id).scalar() or 0)
-    gastos=Gastos.query.filter(Gastos.id_proveedor==record.id_proveedor,Gastos.estatus!='Pagado',Gastos.estatus!='Cancelado').all()
-    for gasto in gastos:
-        gasto.importe_pagado=(db.session.query(func.sum(GastosEnPagos.importe)).join(Pagos, GastosEnPagos.id_pago == Pagos.id).filter(GastosEnPagos.id_gasto == gasto.id).filter(Pagos.estatus != "Cancelado").scalar()) or 0
 
-
-def calcular_importe_factura(record):
-    record.subtotal=(db.session.query(func.sum(ServiciosEnFacturas.importe)).filter(ServiciosEnFacturas.id_factura == record.id).scalar() or 0)    
-    record.impuestos=(db.session.query(func.sum(ServiciosEnFacturas.impuesto)).filter(ServiciosEnFacturas.id_factura == record.id).scalar() or 0)    
-    record.importe_total=record.subtotal+record.impuestos
-
-def calcular_importe_ingreso(record):
-    facturas=Facturas.query.filter(Facturas.id_cliente==record.id_cliente,Facturas.estatus!='Cobrada',Facturas.estatus!='Cancelada').all()
-    for factura in facturas:
-        factura.importe_cobrado=(db.session.query(func.sum(FacturasEnIngresos.importe)).join(Ingresos, FacturasEnIngresos.id_ingreso == Ingresos.id).filter(FacturasEnIngresos.id_factura == factura.id).filter(Ingresos.estatus != "Cancelado").scalar()) or 0
-
-           
+def actualizar_compra(record):
+    productos=ProductosEnCompras.query.filter_by(id_compra=record.id)
+    subtotal = 0
+    descuento = 0
+    for prod in productos:
+        if record.estatus in ('En revisión', 'Aprobada', 'Recibida parcial'):
+            cantidad = float(str(prod.cantidad_ordenada))
+        else:
+            cantidad = float(str(prod.cantidad_recibida))
+        precio_unitario = float(str(prod.precio_unitario))
+        descuento_porcentaje = float(str(prod.descuento_porcentaje))
+        prod.subtotal = cantidad * precio_unitario
+        descuento += prod.subtotal * descuento_porcentaje / float("100")
+        prod.importe_total = prod.subtotal * (float("1") - descuento_porcentaje / float("100"))
+        subtotal += prod.subtotal
+    record.subtotal=float(subtotal)
+    record.descuentos=float(descuento)
+    record.importe_total=record.subtotal+float(record.costos_adicionales)-record.descuentos

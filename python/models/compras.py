@@ -98,6 +98,7 @@ class Compras(db.Model,BaseMixin,AuditMixin):
     fecha_entrega_estimada = db.Column(db.Date) 
 
     subtotal = db.Column(db.Float, nullable=False, default=0.00)
+    costos_adicionales = db.Column(db.Float, default=0.00)
     descuentos = db.Column(db.Float, default=0.00)
     importe_total = db.Column(db.Float, nullable=False, default=0.00)
     notas = db.Column(db.Text)
@@ -123,5 +124,5 @@ class ProductosEnCompras(db.Model,BaseMixin,AuditMixin):
     notas = db.Column(db.Text) 
     estatus = db.Column(db.String(255),default="Pendiente") # e.g., Pendiente, Recibido,Cancelado
 
-    orden_de_compra = db.relationship("Compras", backref="productos_en_ordenes_de_compra", lazy=True)
-    producto = db.relationship("Productos", backref="productos_en_ordenes_de_compra", lazy=True)
+    compra = db.relationship("Compras", backref="productos_en_compras", lazy=True)
+    producto = db.relationship("Productos", backref="productos_en_compras", lazy=True)
