@@ -32,3 +32,12 @@ def on_success(table_name, id):
 def os_compras(id):
     record=Compras.query.get(id)
     actualizar_compra(record)
+
+@handler_on_success('ajustes_de_inventario')
+def os_ajustes_de_inventario(id):
+    record=AjustesDeInventario.query.get(id)
+    if record.tipo_de_ajuste=='Salida':
+        inventario_salida=Inventario.query.filter_by(id_almacen=record.id_almacen,id_producto=record.id_producto).first()
+        inventario_salida.cantidad=inventario_salida.cantidad-float(record.cantidad)
+        inventario_salida.cantidad_en_transito=inventario_salida.cantidad_en_transito+float(record.cantidad)
+    

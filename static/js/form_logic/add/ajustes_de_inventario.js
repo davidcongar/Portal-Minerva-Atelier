@@ -3,12 +3,12 @@ cantidad.addEventListener("change", function() {
     let tipo_de_ajuste = document.getElementById("tipo_de_ajuste").value;
     if(tipo_de_ajuste==='Salida'){
         let cantidad_ingresada = document.getElementById("cantidad").value;
-        let id_sucursal = document.getElementById("id_sucursal").value;
+        let id_almacen = document.getElementById("id_almacen").value;
         let id_producto = document.getElementById("id_producto").value;
-        if(id_sucursal==='' || id_producto==='') {
+        if(id_almacen==='' || id_producto==='') {
             cantidad.value=null;
             window.dispatchEvent(new CustomEvent('show-warning', {
-                detail: 'Favor de ingresar la Sucursal y el producto.'
+                detail: 'Favor de ingresar el almacen y el producto'
             }));
             warningAlert.style.display = 'flex';
             warningAlert.style.opacity = '1'; 
@@ -19,7 +19,7 @@ cantidad.addEventListener("change", function() {
                 }, 1000);  
             }, 3000);
         }else{
-            fetch(`/ajustes_de_inventario/revision_salida/${id_sucursal}/${id_producto}/${cantidad_ingresada}`, {
+            fetch(`/ajustes_de_inventario/revision_salida/${id_almacen}/${id_producto}/${cantidad_ingresada}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -41,12 +41,13 @@ cantidad.addEventListener("change", function() {
                             warningAlert.style.display = 'none';
                         }, 1000);  
                     }, 3000);
+                }else{
+                    caducidad.value=data.fecha_de_caducidad;
+                    caducidad.disabled=true;
+
                 } 
             })
             .catch(error => console.error("Error:", error));
             }
         }
-
-
-
 });

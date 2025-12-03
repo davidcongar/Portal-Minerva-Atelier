@@ -65,6 +65,8 @@ def get_foreign_options():
         "id_categoria_de_producto": CategoriasDeProductos.query.filter_by(estatus="Activo"),
         "id_producto": Productos.query.filter_by(estatus="Activo"),
         "id_compra": Compras.query.filter(Compras.estatus.in_(["Aprobada", "Recibida parcial"])),
+        "id_almacen_salida":Almacenes.query.filter_by(estatus="Activo"),
+        "id_almacen_entrada":Almacenes.query.filter_by(estatus="Activo"),
 
         # --- Campos con opciones fijas ---
         "regimen_fiscal":['601 - General de Ley Personas Morales','603 - Personas Morales con Fines no Lucrativos','605 - Sueldos y Salarios e Ingresos Asimilados a Salarios','606 - Arrendamiento','607 - Régimen de Enajenación o Adquisición de Bienes','608 - Demás ingresos','610 - Residentes en el Extranjero sin Establecimiento Permanente en México','611 - Ingresos por Dividendos (socios y accionistas)','612 - Personas Físicas con Actividades Empresariales y Profesionales','614 - Ingresos por intereses','615 - Régimen de los ingresos por obtención de premios','616 - Sin obligaciones fiscales','620 - Sociedades Cooperativas de Producción que optan por diferir sus ingresos','621 - Incorporación Fiscal (ya derogado, solo histórico)','622 - Actividades Agrícolas, Ganaderas, Silvícolas y Pesqueras (Personas Morales)','623 - Opcional para Grupos de Sociedades','624 - Coordinados','625 - Régimen de las Actividades Empresariales con ingresos a través de Plataformas Tecnológicas','626 - Régimen Simplificado de Confianza (RESICO)',],
@@ -195,9 +197,9 @@ def get_columns(table_name,section):
             "pdf": ["id_visualizacion","nombre","descripcion","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "compras": {
-            "main_page": ["id_visualizacion","id_almacen_nombre","id_proveedor_nombre","fecha_orden","fecha_entrega_estimada","importe_total","estatus","estatus_de_pago"],
-            "modal": ["id","id_visualizacion","id_almacen_nombre","id_proveedor_nombre","fecha_orden","fecha_entrega_estimada","subtotal","costos_adicionales","descuentos","importe_total","notas","estatus","estatus_de_pago","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
-            "pdf": ["id_visualizacion","id_almacen_nombre","id_proveedor_nombre","fecha_orden","fecha_entrega_estimada","subtotal","costos_adicionales","descuentos","importe_total","notas","estatus","estatus_de_pago","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
+            "main_page": ["id_visualizacion","id_almacen_nombre","id_proveedor_nombre","fecha_orden","fecha_entrega_estimada","importe_total","importe_pagado","estatus","estatus_de_pago"],
+            "modal": ["id","id_visualizacion","id_almacen_nombre","id_proveedor_nombre","fecha_orden","fecha_entrega_estimada","subtotal","costos_adicionales","descuentos","importe_total","importe_pagado","notas","estatus","estatus_de_pago","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "pdf": ["id_visualizacion","id_almacen_nombre","id_proveedor_nombre","fecha_orden","fecha_entrega_estimada","subtotal","costos_adicionales","descuentos","importe_total","importe_pagado","notas","estatus","estatus_de_pago","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "productos_en_compras": {
             "main_page": ["id_compra_id_visualizacion","id_producto_nombre","cantidad_ordenada","cantidad_recibida","precio_unitario","importe_total","estatus"],
@@ -408,7 +410,8 @@ def get_estatus_options(table_name):
         'productos_en_compras': ['Pendiente','Recibido','Recibido parcial','Cancelado'],
         'recepciones_de_compras': ['En revisión','Aprobada','Finalizada','Cancelada'],
         'actividades': ["Pendiente","En proceso","Realizada","Con cambios","Cerrada",'Cancelada'],
-
+        'ajustes_de_inventario': ["En revisión","Aprobado","Finalizado","Cancelado"],
+        'transferencias_de_inventario': ["En revisión","Aprobada","Finalizada","Cancelado"],
     }
     options=options.get(table_name, ["Activo", "Inactivo"])
     return options
@@ -424,6 +427,8 @@ def get_open_status(table_name):
         'compras': ['En revisión','Aprobada','Recibida parcial'],
         'recepciones_de_compras': ['En revisión','Aprobada'],
         'productos_en_compras': ['Pendiente','Recibido','Recibido parcial'],
+        'ajustes_de_inventario': ['En revisión','Aprobado'],
+        'transferencias_de_inventario': ['En revisión','Aprobada'],
     }
     status=status.get(table_name,['Activo'])
     return status
@@ -495,6 +500,7 @@ def get_ignored_columns(table_name):
         "facturas": {'importe_total','impuestos','subtotal','importe_cobrado'},
         "integrantes": {'fecha_terminacion'},
         "actividades": {'notas_cierre','notas_cambios','fecha_realizado','fecha_cerrado','horas'},
+        "pagos_administrativos":{'importe'}
     }
     columns=columns.get(table_name,columnas_generales) | columnas_generales
     return columns
@@ -508,6 +514,9 @@ def get_ignored_columns_edit(table_name,estatus):
         "gastos": {'default':{'importe_pagado'}},
         "pagos": {'default':{'importe'}},
         "compras": {'default':{'importe_total','subtotal','descuentos','estatus_de_pago'}},
+        "ajustes_de_inventario": {'default':{'cantidad','tipo_de_ajuste','id_almacen','id_producto'}},
+        "transferencias_de_inventario": {'default':{'id_almacen_salida','id_almacen_entrada'}},
+        "pagos_administrativos":{'default':{'importe'}},
         "cuentas_de_banco": {'default':{'balance'}},
         "facturas": {'default':{'importe_total','impuestos','subtotal','importe_cobrado'},'Aprobada':{'id_cliente','id_proyecto','importe_total','impuestos','subtotal','importe_cobrado'}},
         "actividades": {'default':{''},
@@ -561,7 +570,9 @@ def get_default_variable_values(table_name):
         "actividades": {"fecha_solicitud": current_time.strftime("%Y-%m-%d")},
         "compras": {"fecha_orden": current_time.strftime("%Y-%m-%d"),"costos_adicionales":0},
         "recepciones_de_compras": {"fecha_entrega": current_time.strftime("%Y-%m-%d")},
-
+        "ajustes_de_inventario": {"fecha_de_ajuste": current_time.strftime("%Y-%m-%d")},
+        "transferencias_de_inventario": {"fecha_de_transferencia": current_time.strftime("%Y-%m-%d")},
+        "pagos_administrativos": {"fecha_pago": current_time.strftime("%Y-%m-%d")},
     }
     default_values=default_values.get(table_name,{})
     return default_values
@@ -569,9 +580,10 @@ def get_default_variable_values(table_name):
 def get_url_after_add(table_name):
     columns = {
         "facturas": "dynamic.double_table_view",
-        "pagos": "dynamic.double_table_view",
+        "pagos_administrativos": "dynamic.double_table_view",
         "compras": "dynamic.double_table_view",
         "recepciones_de_compras": "dynamic.double_table_view",
+        "transferencias_de_inventario": "dynamic.double_table_view",
     }
     columns=columns.get(table_name,'dynamic.table_view')
     return columns

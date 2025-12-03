@@ -101,6 +101,7 @@ class Compras(db.Model,BaseMixin,AuditMixin):
     costos_adicionales = db.Column(db.Float, default=0.00)
     descuentos = db.Column(db.Float, default=0.00)
     importe_total = db.Column(db.Float, nullable=False, default=0.00)
+    importe_pagado = db.Column(db.Float, nullable=True, default=0.00)
     notas = db.Column(db.Text)
 
     estatus = db.Column(db.String(255),default="En revisión") # e.g., En revisión, Aprobada, Recibida,Cancelada

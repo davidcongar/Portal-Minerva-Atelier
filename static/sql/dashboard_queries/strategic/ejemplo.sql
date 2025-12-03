@@ -8,7 +8,7 @@ FROM (
         SUM(prod.importe_total) AS importe
     FROM productos_en_ordenes_de_compra AS prod
     LEFT JOIN ordenes_de_compra AS orden
-        ON prod.id_orden_de_compra = orden.id
+        ON prod.id_compra = orden.id
     LEFT JOIN productos
         ON prod.id_producto = productos.id
     LEFT JOIN categorias_de_productos AS cat

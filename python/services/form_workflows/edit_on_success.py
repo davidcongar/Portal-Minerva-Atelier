@@ -29,6 +29,6 @@ def edit_on_success(table_name, id):
     return handler(id)
 
 @handler_edit_on_success('compras')
-def eos_compras(id):
+def compras(id):
     record=Compras.query.get(id)
     actualizar_compra(record)

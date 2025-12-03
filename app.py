@@ -145,6 +145,12 @@ from python.routes.compras import compras_bp
 app.register_blueprint(compras_bp)
 from python.routes.recepciones_de_compras import recepciones_de_compras_bp
 app.register_blueprint(recepciones_de_compras_bp)
+from python.routes.ajustes_de_inventario import ajustes_de_inventario_bp
+app.register_blueprint(ajustes_de_inventario_bp)
+from python.routes.transferencias_de_inventario import transferencias_de_inventario_bp
+app.register_blueprint(transferencias_de_inventario_bp)
+from python.routes.pagos_administrativos import pagos_administrativos_bp
+app.register_blueprint(pagos_administrativos_bp)
 
 
 

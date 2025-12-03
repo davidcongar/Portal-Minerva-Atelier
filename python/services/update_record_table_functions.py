@@ -29,7 +29,31 @@ def get_variables_double_table_view(table_name):
             "model_second_table":"productos_en_recepciones_de_compras",
             "edit_fields":['cantidad','lote','fecha_de_caducidad'],
             "details":["id_visualizacion"]
-        },         
+        },  
+        "transferencias_de_inventario": {
+            "columns_first_table":["almacen","producto","cantidad_disponible"],
+            "columns_second_table":["producto","cantidad","cantidad_disponible"],
+            "title_first_table":"Inventario disponible",
+            "title_second_table":"Productos a transferir",
+            "query_first_table":"inventario_disponible",
+            "query_second_table":"productos_en_transferencia_de_inventario",
+            "model_first_table":"inventario",
+            "model_second_table":"productos_en_transferencias_de_inventario",
+            "details":["id_visualizacion","almacen_entrada","almacen_salida"],
+            "edit_fields":['cantidad',"id_posicion_de_sub_almacen_entrada"],
+        },    
+        "pagos_administrativos": {
+            "columns_first_table":["id_","tipo","proveedor","notas", "importe_total","importe_pagado","importe_restante"],
+            "columns_second_table":["tipo","proveedor","importe","importe_restante","notas"],
+            "title_first_table":"Compras y Gastos de Proveedor",
+            "title_second_table":"Compras y Gastos en Pago",
+            "query_first_table":"compras_gastos_proveedor",
+            "query_second_table":"compras_gastos_pago",
+            "model_first_table":"gastos",
+            "model_second_table":"gastos_y_compras_en_pagos",
+            "details":["id_visualizacion","proveedor","importe"],
+            "edit_fields":['notas','importe']
+        },                   
     }
     columns=columns.get(table_name,'')
     return columns
@@ -58,6 +82,30 @@ def add_record_double_table(main_table_name,second_table,id_main_record,id_recor
             cantidad=0,
             id_usuario=session['id_usuario']
         )
+    elif main_table_name=='transferencias_de_inventario':
+        inventario=Inventario.query.get(id_record)
+        new_record=model(
+            id_transferencia_de_inventario=id_main_record,
+            id_producto=inventario.id_producto,
+            cantidad=0,
+            id_usuario=session['id_usuario']
+        )   
+    elif main_table_name=='pagos_administrativos':
+        new_record=model(
+            id_pago=id_main_record,
+            importe=0,
+            id_usuario=session['id_usuario']
+        )
+        compra=Compras.query.get(id_record)
+        if compra:
+            new_record.id_compra=compra.id
+            new_record.importe=compra.importe_total-compra.importe_pagado
+            compra.importe_pagado=new_record.importe
+        else:
+            gasto=Gastos.query.get(id_record)
+            new_record.id_gasto=gasto.id
+            new_record.importe=gasto.importe-gasto.importe_pagado
+            gasto.importe_pagado=new_record.importe             
     return new_record
 
 def get_update_validation(table_name,record,column,value):
@@ -84,7 +132,48 @@ def get_update_validation(table_name,record,column,value):
         else:
             prod_oc.cantidad_recibida=cantidad_global
             validation['status']=1
-            db.session.flush()        
+            db.session.flush()
+    elif table_name=='productos_en_transferencias_de_inventario':
+        if column=='cantidad':
+            inventario=Inventario.query.filter_by(id_almacen=record.transferencia_de_inventario.id_almacen_salida,id_producto=record.id_producto).first()
+            cantidad_disponible=inventario.cantidad+record.cantidad
+            if float(value)>cantidad_disponible:
+                validation['status']=0
+                validation['value_warning']=record.cantidad         
+                validation['message']="La cantidad a transferir no puede ser mayor a la cantidad disponible en inventario."
+            else:
+                # agregar a no disponible
+                inventario.cantidad=inventario.cantidad+record.cantidad-float(value)
+                inventario.cantidad_en_transito=inventario.cantidad_en_transito-record.cantidad+float(value)
+                validation['status']=1
+    elif table_name=='gastos_y_compras_en_pagos':
+        if record.id_gasto:
+            main_record=Gastos.query.get(record.id_gasto)
+            importe_pagado=(
+                    db.session.query(func.sum(GastosYComprasEnPagos.importe))
+                    .join(PagosAdministrativos, GastosYComprasEnPagos.id_pago == PagosAdministrativos.id)
+                    .filter(GastosYComprasEnPagos.id_gasto == record.id_gasto,GastosYComprasEnPagos.id!=record.id)
+                    .filter(PagosAdministrativos.estatus != "Cancelado")
+                    .scalar()
+                ) or 0
+            importe_restante=main_record.importe-importe_pagado
+        else:
+            main_record=Compras.query.get(record.id_compra)
+            importe_pagado=(
+                    db.session.query(func.sum(GastosYComprasEnPagos.importe))
+                    .join(PagosAdministrativos, GastosYComprasEnPagos.id_pago == PagosAdministrativos.id)
+                    .filter(GastosYComprasEnPagos.id_compra == record.id_compra,GastosYComprasEnPagos.id!=record.id)
+                    .filter(PagosAdministrativos.estatus != "Cancelado")
+                    .scalar()
+                ) or 0
+            importe_restante=main_record.importe_total-importe_pagado    
+        if float(value)>importe_restante:
+            validation['status']=0
+            validation['message']="El importe no puede ser mayor al importe restante."
+            validation['value_warning']=importe_restante
+        else:
+            main_record.importe_pagado=main_record.importe_pagado-record.importe+float(value)
+            validation['status']=1                                       
     else:
         validation['status']=1
     return validation
@@ -109,12 +198,19 @@ def on_add_double_table(table_name,id):
     if table_name=='compras':
         record=Compras.query.get(id)
         actualizar_compra(record)
+    elif table_name=='pagos_administrativos':
+        record=PagosAdministrativos.query.get(id)
+        calcular_importe_pago(record)
 
 def on_update_double_table(table_name,id):
     if table_name=='productos_en_compras':
         record=ProductosEnCompras.query.get(id)
         record=Compras.query.get(record.id_compra)
         actualizar_compra(record)
+    elif table_name=='gastos_y_compras_en_pagos':
+        record=GastosYComprasEnPagos.query.get(id)
+        record=PagosAdministrativos.query.get(record.id_pago)
+        calcular_importe_pago(record) 
 
 def on_delete_double_table(table_name,id):
     if table_name=='compras':
@@ -126,3 +222,11 @@ def on_delete_double_table(table_name,id):
         oc=Compras.query.get(recepcion.id_compra)
         prod_oc=ProductosEnCompras.query.filter_by(id_compra=oc.id,id_producto=record.id_producto).first()
         prod_oc.cantidad_recibida=prod_oc.cantidad_recibida-record.cantidad
+    elif table_name=='productos_en_transferencias_de_inventario':
+        record=ProductosEnTransferenciasDeInventario.query.get(id)
+        inventario=Inventario.query.filter_by(id_almacen=record.transferencia_de_inventario.id_almacen_salida,id_producto=record.id_producto).first()
+        inventario.cantidad=inventario.cantidad+record.cantidad
+        inventario.cantidad_en_transito=inventario.cantidad_en_transito-record.cantidad
+    elif table_name=='pagos_administrativos':
+        pago=PagosAdministrativos.query.get(id)
+        calcular_importe_pago(pago)        

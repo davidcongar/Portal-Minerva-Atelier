@@ -50,3 +50,31 @@ def actualizar_compra(record):
     record.subtotal=float(subtotal)
     record.descuentos=float(descuento)
     record.importe_total=record.subtotal+float(record.costos_adicionales)-record.descuentos
+
+def calcular_importe_pago(record):
+    record.importe=(
+                    db.session.query(
+                        func.sum(GastosYComprasEnPagos.importe)
+                    )
+                    .filter(GastosYComprasEnPagos.id_pago == record.id)
+                    .scalar()
+                    or 0  
+                    )
+    gastos=Gastos.query.filter(Gastos.id_proveedor==record.id_proveedor,Gastos.estatus!='Pagado',Gastos.estatus!='Cancelado')
+    for record in gastos:
+        record.importe_pagado=(
+                db.session.query(func.sum(GastosYComprasEnPagos.importe))
+                .join(PagosAdministrativos, GastosYComprasEnPagos.id_pago == PagosAdministrativos.id)
+                .filter(GastosYComprasEnPagos.id_gasto == record.id)
+                .filter(PagosAdministrativos.estatus != "Cancelado")
+                .scalar()
+            ) or 0
+    compras=Compras.query.filter(Compras.id_proveedor==record.id_proveedor,Compras.estatus_de_pago!='Pagado',Compras.estatus!='Cancelada')
+    for record in compras:
+        record.importe_pagado=(
+                db.session.query(func.sum(GastosYComprasEnPagos.importe))
+                .join(PagosAdministrativos, GastosYComprasEnPagos.id_pago == PagosAdministrativos.id)
+                .filter(GastosYComprasEnPagos.id_compra == record.id)
+                .filter(PagosAdministrativos.estatus != "Cancelado")
+                .scalar()
+            ) or 0

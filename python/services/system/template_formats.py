@@ -12,6 +12,7 @@ def commafy(value):
 def title_format(value):
     replacements = {
         "visualizacion": "visualización",
+        "almacenes":"almacenes",
         "almacen": "almacén",
         "creacion": "creación",
         "descripcion": "descripción",

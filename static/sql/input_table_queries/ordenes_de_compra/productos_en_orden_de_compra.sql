@@ -6,7 +6,7 @@ with cantidad_anterior as (
     left join productos_en_ordenes_de_compra as prod
         on entrega.id_producto_en_orden_de_compra=prod.id
     where
-        prod.id_orden_de_compra = :id_main_record
+        prod.id_compra = :id_main_record
     group by 
         entrega.id_producto_en_orden_de_compra
 )
@@ -24,6 +24,6 @@ left join productos
 left join cantidad_anterior
     on cantidad_anterior.id_producto_en_orden_de_compra=productos_en_ordenes_de_compra.id 
 where
-    id_orden_de_compra = :id_main_record
+    id_compra = :id_main_record
     and  coalesce(cantidad_ordenada-cantidad_recibida_anteriormente,cantidad_ordenada)>0
 order by nombre

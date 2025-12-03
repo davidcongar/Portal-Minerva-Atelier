@@ -189,7 +189,7 @@ async function get_record(form, recordId) {
                     document.getElementById('id_registro').textContent=value;
                 }
 
-                if (/(importe|monto|precio|subtotal|descuentos|propina|comisiones|otros_costos|costo_de_envio|impuestos)/i.test(key) && !isNaN(value)) {
+                if (/(importe|monto|precio|subtotal|descuentos|propina|comisiones|costos_adicionales|otros_costos|costo_de_envio|impuestos)/i.test(key) && !isNaN(value)) {
                     value = formatCurrency(value);
                 } else if (!isNaN(value)) {
                     value = formatNumber(value);

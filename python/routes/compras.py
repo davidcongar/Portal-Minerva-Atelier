@@ -40,7 +40,7 @@ def cancelar(id):
         record=Compras.query.get(id)
         if record.estatus in ('En revisión','Aprobada') and record.estatus_pago=='Sin pagar':
             record.estatus="Cancelada"
-            productos=ProductosEnCompras.query.filter_by(id_orden_de_compra=id)
+            productos=ProductosEnCompras.query.filter_by(id_compra=id)
             for prod in productos:
                 prod.estatus="Cancelado"
             record.subtotal=0
