@@ -74,7 +74,7 @@ class CalidadDeServicioDeProyectos(db.Model,BaseMixin,AuditMixin):
 
     estatus = db.Column(db.String(255),default="En revisión")
 
-    pregunta_de_calidad_de_servicio = db.relationship('PreguntasDeCalidadDeServicio', backref='calidad_de_servicio_de_proyectos',lazy=True)
+    cliente = db.relationship('Clientes', backref='calidad_de_servicio_de_proyectos',lazy=True)
     proyecto = db.relationship('Proyectos', backref='calidad_de_servicio_de_proyectos',lazy=True)
 
 
@@ -110,7 +110,7 @@ class EncuestaDeSatisfaccionDeProyectos(db.Model,BaseMixin,AuditMixin):
 
     estatus = db.Column(db.String(255),default="En revisión")
 
-    pregunta_de_encuesta_de_satisfaccion = db.relationship('PreguntasDeEncuestaDeSatisfaccion', backref='encuesta_de_satisfaccion_de_proyectos',lazy=True)
+    cliente = db.relationship('Clientes', backref='encuesta_de_satisfaccion_de_proyectos',lazy=True)
     proyecto = db.relationship('Proyectos', backref='encuesta_de_satisfaccion_de_proyectos',lazy=True)
 
 
@@ -121,5 +121,5 @@ class RespuestasEncuestaDeSatisfaccion(db.Model,BaseMixin,AuditMixin):
 
     respuesta = db.Column(db.Text)
 
-    encuesta_de_satisfaccion_de_proyecto = db.relationship('EncuestaDeSatisfaccionDeProyectos', backref='encuesta_de_satisfaccion_de_proyectos',lazy=True)
-    pregunta_de_encuesta_de_satisfaccion = db.relationship('PreguntasDeEncuestaDeSatisfaccion', backref='encuesta_de_satisfaccion_de_proyectos',lazy=True)
+    encuesta_de_satisfaccion_de_proyecto = db.relationship('EncuestaDeSatisfaccionDeProyectos', backref='respuestas_encuesta_de_satisfaccion_de_proyectos',lazy=True)
+    pregunta_de_encuesta_de_satisfaccion = db.relationship('PreguntasDeEncuestaDeSatisfaccion', backref='respuestas_encuesta_de_satisfaccion_de_proyectos',lazy=True)

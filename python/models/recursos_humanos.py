@@ -33,35 +33,6 @@ class Integrantes(db.Model,BaseMixin,AuditMixin):
 
     puesto = db.relationship("Puestos", backref="integrantes", lazy=True)
 
-class PagosDeNomina(db.Model,BaseMixin,AuditMixin):
-
-    id_cuenta_de_banco = db.Column(db.UUID, db.ForeignKey("cuentas_de_banco.id"), nullable=False)
-
-    fecha = db.Column(db.Date, nullable=True)
-    importe_total = db.Column(db.Float, nullable=False, default=0.00)
-    notas = db.Column(db.Text) 
-    estatus = db.Column(db.String(50), default="En revisión")
-
-    cuenta_de_banco = db.relationship("CuentasDeBanco", backref="pagos_de_nomina", lazy=True)
-
-class SueldosPagadosEnNomina(db.Model,BaseMixin,AuditMixin):
-
-    id_pago_de_nomina = db.Column(db.UUID, db.ForeignKey("pagos_de_nomina.id"), nullable=False)
-    id_integrante = db.Column(db.UUID, db.ForeignKey("integrantes.id"), nullable=False)
-    importe = db.Column(db.Float, nullable=False)
-    importe_ajuste=db.Column(db.Float,nullable=False, default=0)
-    importe_total=db.Column(db.Float,nullable=False, default=0)
-    notas = db.Column(db.Text) 
-
-    pago_de_nomina = db.relationship("PagosDeNomina", backref="sueldos_pagados_en_nomina", lazy=True)
-    integrante = db.relationship("Integrantes", backref="sueldos_pagados_en_nomina", lazy=True)
-
-    @validates('importe')
-    def validate_non_negative(self, key, value):
-        if Decimal(value) < 0:
-            raise ValueError(f"{key.replace('_',' ').capitalize()} no puede ser negativo")
-        return value
-
 class SueldosDeIntegrantes(db.Model,BaseMixin,AuditMixin):
 
     id_integrante = db.Column(db.UUID, db.ForeignKey("integrantes.id"), nullable=False)

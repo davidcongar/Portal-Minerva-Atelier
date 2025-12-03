@@ -181,7 +181,7 @@
             const estatus = info?.event?.extendedProps?.estatus ?? null;
             if (typeof window.openActions === 'function' && id != null) {
               // dynamic/<table_name>
-              const base = meta.tableName ? `dynamic/${meta.tableName}` : 'dynamic';
+              const base = meta.tableName ? `${meta.tableName}` : 'dynamic';
               window.openActions(base, id, estatus);
             } else {
               console.warn('[InitCalendar] openActions no está disponible o faltan datos del evento.');

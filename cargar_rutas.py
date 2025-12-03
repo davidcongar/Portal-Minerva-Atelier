@@ -12,7 +12,7 @@ from datetime import datetime
 import numpy as np
 import os
 
-working_directory='/Users/davidcontreras/Documents/Repositorios_SS/Portal Minerva Atelier/'
+working_directory='/Users/davidcontreras/Documents/Repositorios_SS/Portal-Minerva-Atelier/'
 os.chdir(working_directory)
 from app import *
 from python.models import *
@@ -120,19 +120,67 @@ agregar_acceso_admin()
 crear_rutas_base('usuarios')
 crear_rutas_base('roles')
 crear_rutas_base('archivos')
+crear_rutas_base('proveedores')
+crear_rutas_base('categorias_de_gastos')
+crear_rutas_base('gastos')
+crear_rutas_base('gastos_recurrentes')
+crear_rutas_base('precios_de_proveedores')
+crear_rutas_base('compras')
+crear_rutas_base('productos_en_compras')
+crear_rutas_base('servicios')
+crear_rutas_base('precios_de_servicios')
+crear_rutas_base('facturas')
+crear_rutas_base('servicios_en_facturas')
+crear_rutas_base('cotizaciones')
+crear_rutas_base('detalle_de_cotizaciones')
+
+crear_rutas_base('almacenes')
+crear_rutas_base('categorias_de_productos')
+crear_rutas_base('productos')
+crear_rutas_base('inventario')
+crear_rutas_base('recepciones_de_compras')
+crear_rutas_base('productos_en_recepciones_de_ordenes_de_compra')
+crear_rutas_base('ajustes_de_inventario')
+crear_rutas_base('transferencias_de_inventario')
+crear_rutas_base('productos_en_transferencias_de_inventario')
+crear_rutas_base('envios')
+crear_rutas_base('productos_en_envios')
+
+crear_rutas_base('cuentas_de_banco')
+crear_rutas_base('pagos_administrativos')
+crear_rutas_base('gastos_y_compras_en_pagos')
+crear_rutas_base('transferencias_de_dinero')
+crear_rutas_base('ajustes_de_dinero')
+crear_rutas_base('ingresos')
+crear_rutas_base('facturas_en_ingresos')
+
+crear_rutas_base('clientes')
+crear_rutas_base('briefs')
+crear_rutas_base('preguntas_de_briefs')
+crear_rutas_base('agenda')
+
+crear_rutas_base('proyectos')
+crear_rutas_base('actividades_base')
+crear_rutas_base('actividades')
+crear_rutas_base('preguntas_de_calidad_de_servicio')
+crear_rutas_base('calidad_de_servicio_de_proyectos')
+crear_rutas_base('respuestas_calidad_de_servicio')
+crear_rutas_base('preguntas_de_encuesta_de_satisfaccion')
+crear_rutas_base('encuesta_de_satisfaccion_de_proyectos')
+crear_rutas_base('respuestas_encuesta_de_satisfaccion')
+crear_rutas_base('briefs_de_clientes')
+crear_rutas_base('respuestas_briefs_de_clientes')
+
 crear_rutas_base('puestos')
 crear_rutas_base('integrantes')
-crear_rutas_base('sectores')
-crear_rutas_base('empresas')
-crear_rutas_base('integrantes_asignados_a_empresas')
-crear_rutas_base('categorias_de_clientes')
-crear_rutas_base('clientes')
-crear_rutas_base('contactos_de_clientes')
-crear_rutas_base('categorias_de_interacciones')
-crear_rutas_base('tipos_de_interacciones')
-crear_rutas_base('interacciones')
-crear_rutas_base('intereses_de_clientes')
-crear_rutas_base('actividades')
+crear_rutas_base('pagos_de_nomina')
+crear_rutas_base('sueldos_pagados_en_nomina')
+crear_rutas_base('sueldos_de_integrantes')
+
+crear_rutas_base('ventas')
+
+
+
 '''
 actions={'contacto_inicial','en_proceso','perdido','activo','finalizar','cancelar'}
 crear_ruta('clientes',actions)

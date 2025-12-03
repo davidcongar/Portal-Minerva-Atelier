@@ -8,6 +8,7 @@ import json
 from datetime import date, datetime,timedelta
 from decimal import Decimal
 import random
+from sqlalchemy import inspect
 
 #####
 # funciones auxiliares
@@ -212,7 +213,12 @@ def record_to_ordered_list(model, joins, record, columns_order):
     else:
         record_mapping = {}
         model_instance = record
+    mapper = inspect(model_instance.__class__)
+    fk_map = {}
 
+    for column in mapper.columns:
+        for fk in column.foreign_keys:
+            fk_map[column.name] = fk.column.table.name
     # Step 1: Base model columns
     base_data = {}
     for col in model.__table__.columns.keys():
@@ -248,8 +254,12 @@ def record_to_ordered_list(model, joins, record, columns_order):
                 alias_field = f"id_{table_alias.lower()}_{column_name}"
                 value = base_data.get(alias_field)
             else:
-                value = base_data.get(col)
-            if value is not None:
+                if 'id_' in col and col not in ("id_visualizacion", "id_usuario_correo_electronico","id_categoria_de_gasto","id_proveedor","id_cuenta_de_banco"):
+                    id_col=re.sub(r'_(nombre|descripcion|nombre_completo|id_visualizacion).*$', '', col)
+                    value = f'{base_data.get(col)}__{base_data.get(id_col)}__{fk_map.get(id_col)}'
+                else:
+                    value = base_data.get(col)
+            if value is not None and value!='None__None':
                 ordered_fields.append((col, value))
     else:
         # Default: preserve order of base_data

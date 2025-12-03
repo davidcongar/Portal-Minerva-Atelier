@@ -293,53 +293,55 @@
         });
     });
 </script>
-
-{% if record %}
-    <script>
-        const record_edit = {{ record.id | tojson }};
-    </script>
-{% else %}
-    <script>
-        const record_edit = '';
-    </script>
-{% endif %}
-
-{% if parent_record %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const parent_record = {{ parent_record | tojson }};
-        const params = new URLSearchParams(window.location.search);
-        const id_parent_record = params.get('id_parent_record');
+        (
+    function fillInputsFromUrl() {
+      const params = new URLSearchParams(window.location.search);
 
-        if (!id_parent_record) return;
+      params.forEach((value, key) => {
+        const input = document.querySelector(`[name="${key}"]`);
+        if (input) {
+          input.value = value;
+        }
+      });
+    })();
+</script>
+{% if parent_record %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const parent_record = {{ parent_record | tojson }};
+            const params = new URLSearchParams(window.location.search);
+            const id_parent_record = params.get('id_parent_record');
 
-        // Helper: safely set value only if the option exists
-        const setSelectValueIfExists = ($el, value) => {
-            if ($el.find(`option[value="${value}"]`).length > 0) {
-                $el.val(value).trigger('change').prop('disabled', true);
-                return true;
-            }
-            return false;
-        };
+            if (!id_parent_record) return;
 
-        // Handle list or single select ID
-        if (Array.isArray(parent_record)) {
-            for (const id of parent_record) {
-                const $el = $('#' + id);
-                if ($el.length && setSelectValueIfExists($el, id_parent_record)) {
-                    break; // stop after successful assignment
+            // Helper: safely set value only if the option exists
+            const setSelectValueIfExists = ($el, value) => {
+                if ($el.find(`option[value="${value}"]`).length > 0) {
+                    $el.val(value).trigger('change').prop('disabled', true);
+                    return true;
+                }
+                return false;
+            };
+
+            // Handle list or single select ID
+            if (Array.isArray(parent_record)) {
+                for (const id of parent_record) {
+                    const $el = $('#' + id);
+                    if ($el.length && setSelectValueIfExists($el, id_parent_record)) {
+                        break; // stop after successful assignment
+                    }
+                }
+            } else {
+                const $el = $('#' + parent_record);
+                if ($el.length) {
+                    setSelectValueIfExists($el, id_parent_record);
                 }
             }
-        } else {
-            const $el = $('#' + parent_record);
-            if ($el.length) {
-                setSelectValueIfExists($el, id_parent_record);
-            }
-        }
-    });
-</script>
-
+        });
+    </script>
 {% endif %}
+
 {% if javascript and record %}
     <script src="{{ url_for('static', filename='js/form_logic/edit/' ~ table_name ~ '.js') }}"></script>
 {% elif javascript %}

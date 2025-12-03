@@ -135,10 +135,16 @@ app.register_blueprint(report_queries_bp)
 app.register_blueprint(access_control_bp)
 
 
-from python.routes.clientes import clientes_bp
-app.register_blueprint(clientes_bp)
-from python.routes.interacciones import interacciones_bp
-app.register_blueprint(interacciones_bp)
+from python.routes.ajustes_de_dinero import ajustes_de_dinero_bp
+app.register_blueprint(ajustes_de_dinero_bp)
+from python.routes.transferencias_de_dinero import transferencias_de_dinero_bp
+app.register_blueprint(transferencias_de_dinero_bp)
+from python.routes.gastos import gastos_bp
+app.register_blueprint(gastos_bp)
+
+
+
+
 
 from python.services.system.template_formats import *
 

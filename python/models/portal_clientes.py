@@ -29,17 +29,22 @@ class Clientes(db.Model,BaseMixin,AuditMixin):
 
 class Briefs(db.Model,BaseMixin,AuditMixin):
 
+    id_servicio = db.Column(db.UUID, db.ForeignKey("servicios.id"),nullable=False)
+
     nombre = db.Column(db.String(255), nullable=False)
     descripcion = db.Column(db.Text)
+    estatus = db.Column(db.String(255),default="Activo")
+
+    servicio = db.relationship('Servicios', backref='briefs',lazy=True)
 
 class PreguntasDeBriefs(db.Model,BaseMixin,AuditMixin):
 
     id_brief = db.Column(db.UUID, db.ForeignKey("briefs.id"))
     orden=db.Column(db.Integer, nullable=False)
     pregunta = db.Column(db.String(255), nullable=False)
+    estatus = db.Column(db.String(255),default="Activo")
 
     brief = db.relationship("Briefs", backref="preguntas_de_briefs", lazy=True)
-
 
 class Agenda(db.Model,BaseMixin,AuditMixin):
 
@@ -55,3 +60,25 @@ class Agenda(db.Model,BaseMixin,AuditMixin):
 
     cliente = db.relationship("Clientes", backref="agenda", lazy=True)
     integrante = db.relationship("Integrantes", backref="agenda", lazy=True)
+
+class BriefsDeClientes(db.Model,BaseMixin,AuditMixin):
+
+    id_cliente = db.Column(db.UUID, db.ForeignKey("clientes.id"),nullable=False)
+    id_proyecto = db.Column(db.UUID, db.ForeignKey("proyectos.id"),nullable=False)
+    fecha_cierre = db.Column(db.Date)
+
+    estatus = db.Column(db.String(255),default="En revisión")
+
+    cliente = db.relationship('Clientes', backref='briefs_de_clientes',lazy=True)
+    proyecto = db.relationship('Proyectos', backref='briefs_de_clientes',lazy=True)
+
+
+class RespuestasBriefsDeClientes(db.Model,BaseMixin,AuditMixin):
+
+    id_brief_de_cliente = db.Column(db.UUID, db.ForeignKey("briefs_de_clientes.id"),nullable=False)
+    id_pregunta_de_brief = db.Column(db.UUID, db.ForeignKey("preguntas_de_briefs.id"),nullable=False)
+
+    respuesta = db.Column(db.Text)
+
+    brief_de_cliente = db.relationship('BriefsDeClientes', backref='respuestas_briefs_de_clientes',lazy=True)
+    pregunta_de_brief = db.relationship('PreguntasDeBriefs', backref='respuestas_briefs_de_clientes',lazy=True)

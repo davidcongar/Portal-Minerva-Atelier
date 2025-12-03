@@ -123,5 +123,5 @@ class ProductosEnCompras(db.Model,BaseMixin,AuditMixin):
     notas = db.Column(db.Text) 
     estatus = db.Column(db.String(255),default="Pendiente") # e.g., Pendiente, Recibido,Cancelado
 
-    orden_de_compra = db.relationship("OrdenesDeCompra", backref="productos_en_ordenes_de_compra", lazy=True)
+    orden_de_compra = db.relationship("Compras", backref="productos_en_ordenes_de_compra", lazy=True)
     producto = db.relationship("Productos", backref="productos_en_ordenes_de_compra", lazy=True)

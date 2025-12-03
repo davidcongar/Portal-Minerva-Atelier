@@ -50,12 +50,11 @@ class RecepcionesDeCompras(db.Model,BaseMixin,AuditMixin):
     notas = db.Column(db.Text)
     estatus = db.Column(db.String(50),nullable=False, default="En revisión")
 
-    almacen = db.relationship("Almacenes", backref="recepciones_de_ordenes_de_compra", lazy=True)
-
+    almacen = db.relationship("Almacenes", backref="recepciones_de_compras", lazy=True)
     compras = db.relationship("Compras", backref="recepciones_de_compras", lazy=True)
 
 
-class ProductosEnRecepcionesDeOrdenesDeCompra(db.Model,BaseMixin,AuditMixin):
+class ProductosEnRecepcionesDeCompras(db.Model,BaseMixin,AuditMixin):
 
     id_recepcion_de_compra = db.Column(db.UUID, db.ForeignKey("recepciones_de_compras.id"), nullable=False) 
     id_producto = db.Column(db.UUID, db.ForeignKey("productos.id"), nullable=False) 
@@ -128,9 +127,10 @@ class Envios(db.Model,BaseMixin,AuditMixin):
     notas = db.Column(db.Text)
     estatus = db.Column(db.String(50),nullable=False, default="En revisión")
 
-    almacen = db.relationship("Almacenes", backref="recepciones_de_ordenes_de_compra", lazy=True)
-
-    compras = db.relationship("Compras", backref="recepciones_de_compras", lazy=True)
+    almacen = db.relationship("Almacenes", backref="envios", lazy=True)
+    cliente = db.relationship("Clientes", backref="envios", lazy=True)
+    proyecto = db.relationship("Proyectos", backref="envios", lazy=True)
+    proveedor = db.relationship("Proveedores", backref="envios", lazy=True)
 
 
 class ProductosEnEnvios(db.Model,BaseMixin,AuditMixin):

@@ -43,16 +43,16 @@ class PagosAdministrativos(db.Model,BaseMixin,AuditMixin):
         return value
 
 
-class GastosyComprasEnPagos(db.Model,BaseMixin,AuditMixin):
+class GastosYComprasEnPagos(db.Model,BaseMixin,AuditMixin):
 
-    id_pago = db.Column(db.UUID, db.ForeignKey("pagos.id"), nullable=True) 
+    id_pago = db.Column(db.UUID, db.ForeignKey("pagos_administrativos.id"), nullable=True) 
     id_gasto = db.Column(db.UUID, db.ForeignKey("gastos.id"), nullable=True) 
     id_compra = db.Column(db.UUID, db.ForeignKey("compras.id"), nullable=True) 
 
     importe = db.Column(db.Float, nullable=False, default=0.00)
     notas = db.Column(db.Text)
 
-    pago = db.relationship("Pagos", backref="gastos_y_compras_en_pagos", lazy=True)
+    pago = db.relationship("PagosAdministrativos", backref="gastos_y_compras_en_pagos", lazy=True)
     gasto = db.relationship("Gastos", backref="gastos_y_compras_en_pagos", lazy=True)
     compra = db.relationship("Compras", backref="gastos_y_compras_en_pagos", lazy=True)
 
@@ -99,39 +99,28 @@ class AjustesDeDinero(db.Model,BaseMixin,AuditMixin):
         if Decimal(value) < 0:
             raise ValueError(f"{key.replace('_',' ').capitalize()} no puede ser negativo")
         return value
+class PagosDeNomina(db.Model,BaseMixin,AuditMixin):
 
-class Ingresos(db.Model,BaseMixin,AuditMixin):
+    id_cuenta_de_banco = db.Column(db.UUID, db.ForeignKey("cuentas_de_banco.id"), nullable=False)
 
-    id_cliente = db.Column(db.UUID, db.ForeignKey("clientes.id"), nullable=False) 
-    id_cuenta_de_banco = db.Column(db.UUID, db.ForeignKey("cuentas_de_banco.id"), nullable=False) 
+    fecha = db.Column(db.Date, nullable=True)
+    importe_total = db.Column(db.Float, nullable=False, default=0.00)
+    notas = db.Column(db.Text) 
+    estatus = db.Column(db.String(50), default="En revisión")
 
-    forma_de_pago=db.Column(db.String(255))
-    folio_fiscal_uuid=db.Column(db.String(255))
-    fecha_de_expedicion=db.Column(db.Date)
+    cuenta_de_banco = db.relationship("CuentasDeBanco", backref="pagos_de_nomina", lazy=True)
 
-    importe = db.Column(db.Float, nullable=False, default=0.00)
-    notas = db.Column(db.Text)
-    estatus = db.Column(db.String(255),default="En revisión") # e.g., En revisión,Finalizado,Cancelado
+class SueldosPagadosEnNomina(db.Model,BaseMixin,AuditMixin):
 
-    cliente = db.relationship("Clientes", backref="ingresos", lazy=True)
-    cuenta_de_banco = db.relationship("CuentasDeBanco", backref="ingresos", lazy=True)
+    id_pago_de_nomina = db.Column(db.UUID, db.ForeignKey("pagos_de_nomina.id"), nullable=False)
+    id_integrante = db.Column(db.UUID, db.ForeignKey("integrantes.id"), nullable=False)
+    importe = db.Column(db.Float, nullable=False)
+    importe_ajuste=db.Column(db.Float,nullable=False, default=0)
+    importe_total=db.Column(db.Float,nullable=False, default=0)
+    notas = db.Column(db.Text) 
 
-    @validates('importe')
-    def validate_non_negative(self, key, value):
-        if Decimal(value) < 0:
-            raise ValueError(f"{key.replace('_',' ').capitalize()} no puede ser negativo")
-        return value
-
-class FacturasEnIngresos(db.Model,BaseMixin,AuditMixin):
-
-    id_ingreso = db.Column(db.UUID, db.ForeignKey("ingresos.id"), nullable=False) 
-    id_factura = db.Column(db.UUID, db.ForeignKey("facturas.id"), nullable=True) 
-
-    importe = db.Column(db.Float, nullable=False, default=0.00)
-    notas = db.Column(db.Text)
-
-    factura = db.relationship("Facturas", backref="facturas_en_ingresos", lazy=True)
-    ingreso = db.relationship("Ingresos", backref="facturas_en_ingresos", lazy=True)
+    pago_de_nomina = db.relationship("PagosDeNomina", backref="sueldos_pagados_en_nomina", lazy=True)
+    integrante = db.relationship("Integrantes", backref="sueldos_pagados_en_nomina", lazy=True)
 
     @validates('importe')
     def validate_non_negative(self, key, value):

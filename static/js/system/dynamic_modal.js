@@ -1,3 +1,4 @@
+let getRecordRunCount = 0;
 document.addEventListener('alpine:init', () => {
     Alpine.store('modalData', { record: {} });
 });
@@ -82,6 +83,10 @@ function titleFormat(value) {
         "ejecucion": "ejecución",
         "dias":"días",
         "transito": "tránsito",
+        "id_pago_id_visualizacion": "ID Pago",
+        "id_gasto_id_visualizacion": "ID Gasto",
+        "id_compra_id_visualizacion": "ID Compra",
+
   };
 
   // Check for exact match
@@ -115,17 +120,21 @@ async function openActions(form, recordId,estatus) {
         const updateButton = document.querySelector('button[data-action="actualizar"]');
         const deleteButton = document.querySelector('button[data-action="delete"]');
         const downloadButton = document.querySelector('button[data-action="descargar"]');
+        const filesButton = document.querySelector('button[data-action="files"]');
 
         if (updateButton) {
-            updateButton.setAttribute('onclick', `redirectActions('/${form}/form?id=${recordId}')`);
+            updateButton.setAttribute('onclick', `redirectActions('/dynamic/${form}/form?id=${recordId}')`);
         }
 
         if (deleteButton) {
-            deleteButton.setAttribute('onclick', `redirectActions('/${form}/delete?id=${recordId}')`);
+            deleteButton.setAttribute('onclick', `redirectActions('/dynamic/${form}/delete?id=${recordId}')`);
         }
 
         if (downloadButton) {
             downloadButton.setAttribute('onclick', `redirectActions('/files/download_pdf?table=${form}&id=${recordId}')`);
+        }
+        if (filesButton) {
+            filesButton.setAttribute('onclick', `redirectActions('/dynamic/${form}/files/${recordId}')`);
         }
 
         const data = await get_record(form, recordId);
@@ -140,10 +149,12 @@ function closeActions() {
         const container = document.getElementById('modal_content');
         container.innerHTML = ''; 
         popupActions.classList.add('hidden');
+        getRecordRunCount = 0;
 }
 async function get_record(form, recordId) {
         try {
-            const path = `/${form}/data/${recordId}`;
+            getRecordRunCount++;
+            const path = `/dynamic/${form}/data/${recordId}`;
             const response = await fetch(path);
             if (!response.ok) {
                 throw new Error(`Network response was not ok: ${response.statusText}`);
@@ -162,8 +173,16 @@ async function get_record(form, recordId) {
             } catch (error) {
                 console.error("Error accessing modal_content_relationship:", error);
             }
+            document.getElementById("modal_title").textContent = `${titleFormat(form)} -`;
+            const buttons = document.getElementById("buttons_modal_exits");
 
-
+            if (getRecordRunCount === 1) {
+                // First time → show
+                buttons.classList.remove("hidden");
+            } else {
+                // Second time or more → hide
+                buttons.classList.add("hidden");
+            }
             for (const [key, rawValue] of Object.entries(recordObj)) {
                 let value = rawValue;
                 if(key==='id_visualizacion'){
@@ -189,8 +208,26 @@ async function get_record(form, recordId) {
                     </td>`;
                     tbody_modal_content_relationship.appendChild(tr);
                 } else if (!['id', 'id_proveedor', 'id_categoria_de_gasto', 'id_cuenta_de_banco'].includes(key)) {
-                    tr.innerHTML = `<td style="border-right: 1px solid #ccc; padding: 8px; ">${titleFormat(key)}</td><td style="word-break: break-word; white-space: normal; overflow-wrap: anywhere; max-width: 300px;">${value}</td>`;
-                    tbody_modal_content.appendChild(tr);
+                    if(value.includes('__')){
+                        const [before, id, table_name] = value.split("__");
+                        tr.innerHTML = `
+                            <td style="border-right:1px solid #ccc; padding:8px;">
+                                ${titleFormat(key)}
+                            </td>
+                            <td class="clickable-td"
+                                style="word-break:break-word; white-space:normal; overflow-wrap:anywhere; max-width:300px;">
+                                <a href="#"
+                                style="display:block; width:100%; height:100%; text-decoration:none; color:inherit;"
+                                onclick="openActions('${table_name}', '${id}', '')">
+                                    ${before}
+                                </a>
+                            </td>
+                        `;
+
+                    }else{
+                        tr.innerHTML = `<td style="border-right: 1px solid #ccc; padding: 8px; ">${titleFormat(key)}</td><td style="word-break: break-word; white-space: normal; overflow-wrap: anywhere; max-width: 300px;">${value}</td>`;
+                    }
+                    tbody_modal_content.appendChild(tr);                    
                 }
             }
 

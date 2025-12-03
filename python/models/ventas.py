@@ -29,6 +29,7 @@ class Ventas(db.Model,BaseMixin,AuditMixin):
 
     id_servicio=db.Column(db.UUID, db.ForeignKey("servicios.id"),nullable=False)
     id_cliente = db.Column(db.UUID, db.ForeignKey("clientes.id"),nullable=False)
+    id_cuenta_de_banco = db.Column(db.UUID, db.ForeignKey("cuentas_de_banco.id"),nullable=False)
 
     id_stripe = db.Column(db.String(255))
     espacio_de_proyecto = db.Column(db.String(255))
@@ -39,8 +40,9 @@ class Ventas(db.Model,BaseMixin,AuditMixin):
 
     estatus = db.Column(db.String(100),nullable=False, default="En revisión") # activo,finalizado, cancelado
 
-    cliente = db.relationship('Clientes', backref='proyectos',lazy=True)
-    servicio = db.relationship('Servicios', backref='proyectos', lazy=True)
+    cliente = db.relationship('Clientes', backref='ventas',lazy=True)
+    servicio = db.relationship('Servicios', backref='ventas', lazy=True)
+    cuenta_de_banco = db.relationship('CuentasDeBanco', backref='ventas',lazy=True)
 
     @validates('importe','importe_cobrado')
     def validate_non_negative(self, key, value):
@@ -51,7 +53,7 @@ class Ventas(db.Model,BaseMixin,AuditMixin):
 class Facturas(db.Model,BaseMixin,AuditMixin):
 
     id_cliente = db.Column(db.UUID, db.ForeignKey("clientes.id"),nullable=False)
-    id_proyecto = db.Column(db.UUID, db.ForeignKey("proyectos.id"),nullable=False)
+    id_venta = db.Column(db.UUID, db.ForeignKey("ventas.id"),nullable=False)
     uso_de_cfdi=db.Column(db.String(255))
     metodo_de_pago=db.Column(db.String(255))
     forma_de_pago=db.Column(db.String(255))
@@ -67,7 +69,7 @@ class Facturas(db.Model,BaseMixin,AuditMixin):
     estatus = db.Column(db.String(255),default="En revisión") # e.g., En revisión,Finalizado,Cancelado
 
     cliente = db.relationship('Clientes', backref='facturas', lazy=True)
-    proyecto = db.relationship('Proyectos', backref='facturas', lazy=True)
+    ventas = db.relationship('Ventas', backref='facturas', lazy=True)
 
     @validates('importe_total')
     def validate_non_negative(self, key, value):
