@@ -139,7 +139,7 @@
                                 {% elif "fecha" in column %}
                                     <!-- Campo de fecha -->
                                     <input type="date" id="{{ column }}" name="{{ column }}" value="{{record[column] if record else default_variable_values[column] }}" class="form-input rounded-lg" style="width:40%" {% if column in required_fields %} required {% endif %}>
-                                {% elif "tiempo" in column %}
+                                {% elif column in ["hora_inicio", "hora_fin"] %}
                                     <input type="time" id="{{ column }}" name="{{ column }}" value="{{record[column] if record else default_variable_values[column] }}" class="form-input rounded-lg" style="width:40%"  {% if column in required_fields %} required {% endif %}>
                                 {% else %}
                                 <!-- Campo de texto normal -->

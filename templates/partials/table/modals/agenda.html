@@ -1,0 +1,16 @@
+<div class="flex justify-end items-center gap-2" x-data x-show="true">
+    <template x-if="$store.modalData.record.estatus === 'Pendiente'">
+        <button type="submit"
+            @click.stop.prevent="window.location.href = `/agenda/finalizar/${encodeURIComponent($store.modalData.record.id)}`"
+            class="btn border text-primary border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-primary bg-primary/10">
+            Finalizar
+        </button>
+    </template>
+    <template x-if="['Pendiente','Confirmada'].includes($store.modalData.record.estatus)">
+        <button type="submit"
+            @click.stop.prevent="window.location.href = `/agenda/cancelar/${encodeURIComponent($store.modalData.record.id)}`"
+            class="btn border text-danger border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-danger bg-primary/10">
+            Cancelar
+        </button>
+    </template>
+</div>

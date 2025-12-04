@@ -180,14 +180,14 @@ def get_update_validation(table_name,record,column,value):
 
 def get_variables_table_view_input(table_name):
     columns = {
-        "ejemplo": {
-            "columns":["nombre","cantidad_ordenada","cantidad_recibida_anteriormente","cantidad_recibida","notas","estatus"],
-            "table_title":"Productos en orden de compra",
-            "query_table":"productos_en_orden_de_compra",
-            "table_name":"productos_en_ordenes_de_compra",
-            "url_confirm":"ordenes_de_compra.confirmar",
-            "details":['proveedor','fecha_orden'],
-            "edit_fields":['cantidad_recibida',"notas"]
+        "briefs_de_clientes": {
+            "columns":["pregunta","respuesta"],
+            "table_title":"Preguntas de Brief",
+            "query_table":"respuestas_briefs_de_clientes",
+            "table_name":"respuestas_briefs_de_clientes",
+            "url_confirm":"briefs_de_clientes.confirmar",
+            "details":['cliente','brief'],
+            "edit_fields":['respuesta']
         },
     }
     columns=columns.get(table_name,'')

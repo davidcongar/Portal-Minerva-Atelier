@@ -9,14 +9,16 @@ from python.models.sistema import *
 
 class Clientes(db.Model,BaseMixin,AuditMixin):
 
-    tipo_de_cliente = db.Column(db.String(255), nullable=True)
-    nombre = db.Column(db.String(255), nullable=False)
+    nombre_completo = db.Column(db.String(255), nullable=False)
     rfc = db.Column(EncryptedColumn(255))
+    razon_social = db.Column(db.String(255))
+    regimen_fiscal = db.Column(db.String(255))
+    domicilio_fiscal = db.Column(db.String(255))    
     direccion = db.Column(EncryptedColumn(255))
     codigo_postal = db.Column(EncryptedColumn(255))
     telefono = db.Column(EncryptedColumn(255))
     correo_electronico = db.Column(EncryptedColumn(255))
-    contrasena = db.Column(db.String(255), nullable=False)
+    contrasena = db.Column(db.String(255))
 
     def set_password(self, password):
         self.contrasena = generate_password_hash(password)
@@ -24,12 +26,12 @@ class Clientes(db.Model,BaseMixin,AuditMixin):
     def check_password(self, password):
         return check_password_hash(self.contrasena, password)
 
-    estatus = db.Column(db.String(255),default="Inactivo")
+    estatus = db.Column(db.String(255),default="En proceso")
 
 
 class Briefs(db.Model,BaseMixin,AuditMixin):
 
-    id_servicio = db.Column(db.UUID, db.ForeignKey("servicios.id"),nullable=False)
+    id_servicio = db.Column(db.UUID, db.ForeignKey("servicios.id"))
 
     nombre = db.Column(db.String(255), nullable=False)
     descripcion = db.Column(db.Text)
@@ -64,11 +66,13 @@ class Agenda(db.Model,BaseMixin,AuditMixin):
 class BriefsDeClientes(db.Model,BaseMixin,AuditMixin):
 
     id_cliente = db.Column(db.UUID, db.ForeignKey("clientes.id"),nullable=False)
-    id_proyecto = db.Column(db.UUID, db.ForeignKey("proyectos.id"),nullable=False)
+    id_brief = db.Column(db.UUID, db.ForeignKey("briefs.id"),nullable=False)
+    id_proyecto = db.Column(db.UUID, db.ForeignKey("proyectos.id"))
     fecha_cierre = db.Column(db.Date)
 
-    estatus = db.Column(db.String(255),default="En revisión")
+    estatus = db.Column(db.String(255),default="En proceso")
 
+    brief = db.relationship('Briefs', backref='briefs_de_clientes',lazy=True)
     cliente = db.relationship('Clientes', backref='briefs_de_clientes',lazy=True)
     proyecto = db.relationship('Proyectos', backref='briefs_de_clientes',lazy=True)
 

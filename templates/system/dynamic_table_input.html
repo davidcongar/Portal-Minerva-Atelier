@@ -40,7 +40,7 @@
                             </div>
                         </div>
                         <div class="overflow-auto"  style="max-height: calc(100vh - 440px);">
-                            <table class="min-w-[640px] w-full table-hover">
+                            <table class="min-w-[640px] w-full table-hover table-striped">
                                 <thead class="bg-white dark:bg-dark sticky top-0 z-10">
                                     <tr>
                                         {% for column in columns %}
@@ -91,7 +91,7 @@
                                                                 @blur="update_record(record,col)"></textarea>
                                                         </form>
                                                     </template>
-                                                    <template x-if="{{ edit_fields }}.includes(col) && ['notas','descripcion','sugerencias'].includes(col)">
+                                                    <template x-if="{{ edit_fields }}.includes(col) && ['notas','descripcion','sugerencias','respuesta'].includes(col)">
                                                         <form method="POST">
                                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                                             <textarea rows='3'  x-model="record[col]"

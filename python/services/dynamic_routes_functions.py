@@ -14,7 +14,7 @@ def get_joins():
         "id_almacen": (Almacenes, Almacenes.id, Almacenes.nombre),
         "id_compra": (Compras, Compras.id, Compras.id_visualizacion if hasattr(Compras, "id_visualizacion") else Compras.id_visualizacion),
         "id_servicio": (Servicios, Servicios.id, Servicios.nombre),
-        "id_cliente": (Clientes, Clientes.id, Clientes.nombre),
+        "id_cliente": (Clientes, Clientes.id, Clientes.nombre_completo),
         "id_proyecto": (Proyectos, Proyectos.id, Proyectos.id_visualizacion),
         "id_factura": (Facturas, Facturas.id, Facturas.folio_fiscal_uuid),
         "id_cotizacion": (Cotizaciones, Cotizaciones.id, Cotizaciones.descripcion),
@@ -52,9 +52,8 @@ def get_foreign_options():
         "id_rol": Roles.query.filter_by(estatus="Activo"),
         "id_categoria_de_reporte":CategoriasDeReportes.query.filter_by(estatus="Activo"),
         "id_integrante":Integrantes.query.filter_by(estatus="Activo"),
+        "id_puesto":Puestos.query.filter_by(estatus="Activo"),
         "id_cuenta_de_banco":CuentasDeBanco.query.filter_by(estatus="Activo"),
-        "id_integrante":Integrantes.query.filter_by(estatus="Activo"),
-        "id_integrante":Integrantes.query.filter_by(estatus="Activo"),
         "id_cuenta_de_banco_entrada":CuentasDeBanco.query.filter_by(estatus="Activo"),
         "id_cuenta_de_banco_salida":CuentasDeBanco.query.filter_by(estatus="Activo"),
         "id_servicio":Servicios.query.filter_by(estatus="Activo"),
@@ -67,6 +66,9 @@ def get_foreign_options():
         "id_compra": Compras.query.filter(Compras.estatus.in_(["Aprobada", "Recibida parcial"])),
         "id_almacen_salida":Almacenes.query.filter_by(estatus="Activo"),
         "id_almacen_entrada":Almacenes.query.filter_by(estatus="Activo"),
+        "id_cliente":Clientes.query.filter_by(estatus="Activo"),
+        "id_cliente": Clientes.query.filter(Clientes.estatus.in_(["En proceso", "Activo"])),
+        "id_proyecto":Proyectos.query.filter_by(estatus="Activo"),
 
         # --- Campos con opciones fijas ---
         "regimen_fiscal":['601 - General de Ley Personas Morales','603 - Personas Morales con Fines no Lucrativos','605 - Sueldos y Salarios e Ingresos Asimilados a Salarios','606 - Arrendamiento','607 - Régimen de Enajenación o Adquisición de Bienes','608 - Demás ingresos','610 - Residentes en el Extranjero sin Establecimiento Permanente en México','611 - Ingresos por Dividendos (socios y accionistas)','612 - Personas Físicas con Actividades Empresariales y Profesionales','614 - Ingresos por intereses','615 - Régimen de los ingresos por obtención de premios','616 - Sin obligaciones fiscales','620 - Sociedades Cooperativas de Producción que optan por diferir sus ingresos','621 - Incorporación Fiscal (ya derogado, solo histórico)','622 - Actividades Agrícolas, Ganaderas, Silvícolas y Pesqueras (Personas Morales)','623 - Opcional para Grupos de Sociedades','624 - Coordinados','625 - Régimen de las Actividades Empresariales con ingresos a través de Plataformas Tecnológicas','626 - Régimen Simplificado de Confianza (RESICO)',],
@@ -277,9 +279,9 @@ def get_columns(table_name,section):
             "pdf": ["id_visualizacion","id_envio_id_visualizacion","id_producto_nombre","cantidad","notas","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "clientes": {
-            "main_page": ["id_visualizacion","nombre","tipo_de_cliente","telefono","correo_electronico","estatus"],
-            "modal": ["id","id_visualizacion","tipo_de_cliente","nombre","rfc","direccion","codigo_postal","telefono","correo_electronico","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
-            "pdf": ["id_visualizacion","tipo_de_cliente","nombre","rfc","direccion","codigo_postal","telefono","correo_electronico","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
+            "main_page": ["id_visualizacion","nombre_completo","telefono","correo_electronico","estatus"],
+            "modal": ["id","id_visualizacion","nombre_completo","rfc","direccion","codigo_postal","telefono","correo_electronico","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "pdf": ["id_visualizacion","nombre_completo","rfc","direccion","codigo_postal","telefono","correo_electronico","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "briefs": {
             "main_page": ["id_visualizacion","id_servicio_nombre","nombre","estatus"],
@@ -292,9 +294,9 @@ def get_columns(table_name,section):
             "pdf": ["id_visualizacion","id_brief_nombre","orden","pregunta","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "agenda": {
-            "main_page": ["id_visualizacion","id_cliente_nombre","id_integrante_nombre","fecha","hora_inicio","hora_fin","estatus"],
-            "modal": ["id","id_visualizacion","id_cliente_nombre","id_integrante_nombre","fecha","hora_inicio","hora_fin","notas","motivo_de_cancelacion","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
-            "pdf": ["id_visualizacion","id_cliente_nombre","id_integrante_nombre","fecha","hora_inicio","hora_fin","notas","motivo_de_cancelacion","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
+            "main_page": ["id_visualizacion","id_cliente_nombre_completo","id_integrante_nombre_completo","fecha","hora_inicio","hora_fin","estatus"],
+            "modal": ["id","id_visualizacion","id_cliente_nombre_completo","id_integrante_nombre_completo","fecha","hora_inicio","hora_fin","notas","motivo_de_cancelacion","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "pdf": ["id_visualizacion","id_cliente_nombre_completo","id_integrante_nombre_completo","fecha","hora_inicio","hora_fin","notas","motivo_de_cancelacion","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "proyectos": {
             "main_page": ["id_visualizacion","id_venta_id_visualizacion","fecha_inicio","fecha_fin","estatus"],
@@ -307,9 +309,9 @@ def get_columns(table_name,section):
             "pdf": ["id_visualizacion","id_servicio_nombre","nombre","descripcion","entregable","horas_estimadas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "actividades": {
-            "main_page": ["id_visualizacion","id_proyecto_nombre","id_integrante_nombre","id_actividad_base_nombre","fecha_inicio","fecha_estimada","fecha_fin","estatus"],
-            "modal": ["id","id_visualizacion","id_proyecto_nombre","id_integrante_nombre","id_actividad_base_nombre","fecha_inicio","fecha_estimada","fecha_fin","prioridad","horas","notas","notas_cierre","comentarios_supervisor","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
-            "pdf": ["id_visualizacion","id_proyecto_nombre","id_integrante_nombre","id_actividad_base_nombre","fecha_inicio","fecha_estimada","fecha_fin","prioridad","horas","notas","comentarios_supervisor","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
+            "main_page": ["id_visualizacion","id_proyecto_nombre","id_integrante_nombre_completo","id_actividad_base_nombre","fecha_inicio","fecha_estimada","fecha_fin","estatus"],
+            "modal": ["id","id_visualizacion","id_proyecto_nombre","id_integrante_nombre_completo","id_actividad_base_nombre","fecha_inicio","fecha_estimada","fecha_fin","prioridad","horas","notas","notas_cierre","comentarios_supervisor","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "pdf": ["id_visualizacion","id_proyecto_nombre","id_integrante_nombre_completo","id_actividad_base_nombre","fecha_inicio","fecha_estimada","fecha_fin","prioridad","horas","notas","comentarios_supervisor","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "preguntas_de_calidad_de_servicio": {
             "main_page": ["id_visualizacion","id_servicio_nombre","orden","pregunta","tipo_de_respuesta"],
@@ -377,9 +379,9 @@ def get_columns(table_name,section):
             "pdf": ["id_visualizacion","id_integrante_nombre","banco","tipo_de_cuenta","nombre","numero_de_cuenta","clabe","balance","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "briefs_de_clientes": {
-            "main_page": ["id_visualizacion","id_cliente_nombre","id_proyecto_nombre","fecha_cierre","estatus"],
-            "modal": ["id","id_visualizacion","id_cliente_nombre","id_proyecto_nombre","fecha_cierre","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
-            "pdf": ["id_visualizacion","id_cliente_nombre","id_proyecto_nombre","fecha_cierre","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
+            "main_page": ["id_visualizacion","id_cliente_nombre_completo","id_proyecto_nombre","fecha_cierre","estatus"],
+            "modal": ["id","id_visualizacion","id_cliente_nombre_completo","id_proyecto_nombre","fecha_cierre","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "pdf": ["id_visualizacion","id_cliente_nombre_completo","id_proyecto_nombre","fecha_cierre","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "respuestas_briefs_de_clientes": {
             "main_page": ["id_visualizacion","id_brief_de_cliente_id_visualizacion","id_pregunta_de_brief_visualizacion","respuesta"],
@@ -412,6 +414,9 @@ def get_estatus_options(table_name):
         'actividades': ["Pendiente","En proceso","Realizada","Con cambios","Cerrada",'Cancelada'],
         'ajustes_de_inventario': ["En revisión","Aprobado","Finalizado","Cancelado"],
         'transferencias_de_inventario': ["En revisión","Aprobada","Finalizada","Cancelado"],
+        'briefs_de_clientes': ["En proceso","Contestado","Cancelado"],
+        'agenda': ["Pendiente","Finalizada","Cancelada"],
+
     }
     options=options.get(table_name, ["Activo", "Inactivo"])
     return options
@@ -429,6 +434,8 @@ def get_open_status(table_name):
         'productos_en_compras': ['Pendiente','Recibido','Recibido parcial'],
         'ajustes_de_inventario': ['En revisión','Aprobado'],
         'transferencias_de_inventario': ['En revisión','Aprobada'],
+        'briefs_de_clientes': ["En proceso"],
+        'agenda': ["Pendiente","Finalizada"],
     }
     status=status.get(table_name,['Activo'])
     return status
@@ -467,7 +474,9 @@ def get_breadcrumbs(table_name):
         "proyectos":['Proyectos','proyectos'],
         "clientes":['Proyectos','proyectos'],
         "briefs_de_clientes":['Proyectos','proyectos'],
+        "respuestas_briefs_de_clientes":['Proyectos','proyectos'],
         "briefs":['Proyectos','proyectos'],
+        "preguntas_de_briefs":['Proyectos','proyectos'],
         "agenda":['Proyectos','proyectos'],
         "actividades_base":['Proyectos','proyectos'],
         "actividades":['Proyectos','proyectos'],
@@ -496,27 +505,32 @@ def get_ignored_columns(table_name):
         "gastos": {'importe_pagado'},
         "compras": {'importe_total','subtotal','descuentos','estatus_de_pago'},
         "pagos": {'importe'},  
+        "clientes": {'rfc','razon_social','regimen_fiscal','domicilio_fiscal','direccion','codigo_postal','telefono','contrasena'},  
         "cuentas_de_banco": {'balance'},
         "facturas": {'importe_total','impuestos','subtotal','importe_cobrado'},
         "integrantes": {'fecha_terminacion'},
         "actividades": {'notas_cierre','notas_cambios','fecha_realizado','fecha_cerrado','horas'},
-        "pagos_administrativos":{'importe'}
+        "pagos_administrativos":{'importe'},
+        "briefs_de_clientes":{'fecha_cierre'},
+        "agenda":{'id_integrante','hora_fin','motivo_de_cancelacion','notas'},
+
     }
     columns=columns.get(table_name,columnas_generales) | columnas_generales
     return columns
 
 def get_ignored_columns_edit(table_name,estatus):
-    columnas_generales = {'default':{'fecha_de_creacion', 'id_usuario', 'id_visualizacion', 'fecha_de_actualizacion','estatus'}}
+    columnas_generales = {'default':{'fecha_de_creacion', 'id_usuario', 'id_visualizacion', 'fecha_de_actualizacion'}}
     tables = {
-        "usuarios":{'default':{'codigo_unico','id_rol','contrasena','contrasena_api','intentos_de_inicio_de_sesion','ultima_sesion','ultimo_cambio_de_contrasena','codigo_unico_expira'}},
+        "usuarios":{'default':{'codigo_unico','id_rol','contrasena','contrasena_api','intentos_de_inicio_de_sesion','ultima_sesion','ultimo_cambio_de_contrasena','codigo_unico_expira','estatus'}},
         "archivos":{'default':{'tabla_origen','id_registro','nombre','ruta_s3'}},
-        "proyectos":{'default':{'importe_cobrado','fecha_fin'}},   
-        "gastos": {'default':{'importe_pagado'}},
-        "pagos": {'default':{'importe'}},
-        "compras": {'default':{'importe_total','subtotal','descuentos','estatus_de_pago'}},
-        "ajustes_de_inventario": {'default':{'cantidad','tipo_de_ajuste','id_almacen','id_producto'}},
-        "transferencias_de_inventario": {'default':{'id_almacen_salida','id_almacen_entrada'}},
-        "pagos_administrativos":{'default':{'importe'}},
+        "proyectos":{'default':{'importe_cobrado','fecha_fin','estatus'}},   
+        "gastos": {'default':{'importe_pagado','estatus'}},
+        "pagos": {'default':{'importe','estatus'}},
+        "compras": {'default':{'importe_total','subtotal','descuentos','estatus_de_pago','estatus'}},
+        "ajustes_de_inventario": {'default':{'cantidad','tipo_de_ajuste','id_almacen','id_producto','estatus'}},
+        "transferencias_de_inventario": {'default':{'id_almacen_salida','id_almacen_entrada','estatus'}},
+        "pagos_administrativos":{'default':{'importe','estatus'}},
+        "preguntas_de_briefs":{'default':{'id_brief'}},
         "cuentas_de_banco": {'default':{'balance'}},
         "facturas": {'default':{'importe_total','impuestos','subtotal','importe_cobrado'},'Aprobada':{'id_cliente','id_proyecto','importe_total','impuestos','subtotal','importe_cobrado'}},
         "actividades": {'default':{''},
@@ -542,7 +556,9 @@ def get_non_mandatory_columns(table_name):
         "cuentas_de_banco": {'clabe','numero_de_cuenta','id_integrante'} ,
         "facturas": {'folio_fiscal_uuid','fecha_de_expedicion'} ,
         "actividades": {'comentarios'},
-        "integrantes":{'rfc','curp','numero_seguridad_social'},
+        "integrantes":{'rfc','curp','numero_seguridad_social','direccion','codigo_postal','telefono','correo_electronico','genero','estado_civil','fecha_nacimiento'},
+        "briefs": {'id_servicio'},
+        "briefs_de_clientes": {'id_proyecto'},
     }
     columns=columns.get(table_name,{''}) | columnas_generales
     return columns
@@ -554,6 +570,7 @@ def get_table_relationships(table_name):
         "pagos_administrativos":["gastos_y_compras_en_pagos"],
         "compras":["productos_en_compras"],
         "recepciones_de_compras":["productos_en_recepciones_de_compras"],
+        "clientes":["briefs_de_clientes"],
 
     }
     relationships=relationships.get(table_name,'')
@@ -590,7 +607,7 @@ def get_url_after_add(table_name):
 
 def get_calendar_date_variable(table_name):
     date_variable={
-        "interacciones":"fecha_hora",
+        "agenda":"fecha",
     }
     date_variable=date_variable.get(table_name,'')
     return date_variable
@@ -632,7 +649,7 @@ def get_date_fields():
     return date_fields
 
 def get_non_edit_status(table_name):
-    general_status = {'Cancelado','Cancelada','Recibida','Facturada','Finalizada','Entregada','Realizada','Realizado','Pagado','Pagado parcial','Aprobada','Aprobado','Recibida parcial','Pagado parcial','En proceso'}
+    general_status = {'Cancelado','Contestado','Cancelada','Recibida','Facturada','Finalizada','Entregada','Realizada','Realizado','Pagado','Pagado parcial','Aprobada','Aprobado','Recibida parcial','Pagado parcial','En proceso'}
     status_to_remove = {
         "facturas": {'Aprobada'},
         "actividades": {'En proceso','Realizada'},
