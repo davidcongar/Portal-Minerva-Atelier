@@ -29,16 +29,16 @@ class Ventas(db.Model,BaseMixin,AuditMixin):
 
     id_servicio=db.Column(db.UUID, db.ForeignKey("servicios.id"),nullable=False)
     id_cliente = db.Column(db.UUID, db.ForeignKey("clientes.id"),nullable=False)
-    id_cuenta_de_banco = db.Column(db.UUID, db.ForeignKey("cuentas_de_banco.id"),nullable=False)
+    id_cuenta_de_banco = db.Column(db.UUID, db.ForeignKey("cuentas_de_banco.id"))
 
     id_stripe = db.Column(db.String(255))
     espacio_de_proyecto = db.Column(db.String(255))
     importe = db.Column(db.Float, nullable=False, default=0.00)
     tipo_de_iva = db.Column(db.String(255))
-    iva = db.Column(db.Float, nullable=False, default=0.00)
-    importe_total = db.Column(db.Float, nullable=False, default=0.00)
+    iva = db.Column(db.Float, default=0.00)
+    importe_total = db.Column(db.Float, default=0.00)
 
-    estatus = db.Column(db.String(100),nullable=False, default="En revisión") # activo,finalizado, cancelado
+    estatus = db.Column(db.String(100),nullable=False, default="Pendiente")
 
     cliente = db.relationship('Clientes', backref='ventas',lazy=True)
     servicio = db.relationship('Servicios', backref='ventas', lazy=True)

@@ -155,6 +155,10 @@ from python.routes.briefs_de_clientes import briefs_de_clientes_bp
 app.register_blueprint(briefs_de_clientes_bp)
 from python.routes.agenda import agenda_bp
 app.register_blueprint(agenda_bp)
+from python.routes.ventas import ventas_bp
+app.register_blueprint(ventas_bp)
+
+
 
 
 

@@ -82,6 +82,9 @@ def get_foreign_options():
         "prioridad":["P0","P1","P2","P3"],
         "inventariable":["Si","No"],
         "unidad_de_medida":["Pieza","Caja"],
+        "tipo_de_iva":["16%","0%","8%"],
+        "espacio_de_proyecto":["Oficina","Cuarto principal","Cuarto de visitas","Sala","Comedor","Sala de TV","Cocina"],
+
     }
     return foreign_options
 
@@ -369,9 +372,9 @@ def get_columns(table_name,section):
             "pdf": ["id_visualizacion","id_integrante_nombre","sueldo","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
        "ventas": {
-            "main_page": ["id_visualizacion","id_servicio_nombre","id_cliente_nombre","importe","iva","importe_total","estatus"],
-            "modal": ["id","id_visualizacion","id_servicio_nombre","id_cliente_nombre","id_stripe","espacio_de_proyecto","importe","tipo_de_iva","iva","importe_total","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
-            "pdf": ["id_visualizacion","id_servicio_nombre","id_cliente_nombre","id_stripe","espacio_de_proyecto","importe","tipo_de_iva","iva","importe_total","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
+            "main_page": ["id_visualizacion","id_servicio_nombre","id_cliente_nombre_completo","importe","iva","importe_total","estatus"],
+            "modal": ["id","id_visualizacion","id_servicio_nombre","id_cliente_nombre_completo","id_stripe","espacio_de_proyecto","importe","tipo_de_iva","iva","importe_total","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "pdf": ["id_visualizacion","id_servicio_nombre","id_cliente_nombre_completo","id_stripe","espacio_de_proyecto","importe","tipo_de_iva","iva","importe_total","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "cuentas_de_banco": {
             "main_page": ["id_visualizacion","id_integrante_nombre","banco","tipo_de_cuenta","nombre","balance","estatus"],
@@ -416,6 +419,7 @@ def get_estatus_options(table_name):
         'transferencias_de_inventario': ["En revisión","Aprobada","Finalizada","Cancelado"],
         'briefs_de_clientes': ["En proceso","Contestado","Cancelado"],
         'agenda': ["Pendiente","Finalizada","Cancelada"],
+        'ventas': ["Pendiente","Cobrada","Cancelada"],
 
     }
     options=options.get(table_name, ["Activo", "Inactivo"])
@@ -436,6 +440,7 @@ def get_open_status(table_name):
         'transferencias_de_inventario': ['En revisión','Aprobada'],
         'briefs_de_clientes': ["En proceso"],
         'agenda': ["Pendiente","Finalizada"],
+        'ventas': ["Pendiente"],
     }
     status=status.get(table_name,['Activo'])
     return status
@@ -513,6 +518,7 @@ def get_ignored_columns(table_name):
         "pagos_administrativos":{'importe'},
         "briefs_de_clientes":{'fecha_cierre'},
         "agenda":{'id_integrante','hora_fin','motivo_de_cancelacion','notas'},
+        "ventas":{'id_stripe','id_cuenta_de_banco','importe_total','iva'},
 
     }
     columns=columns.get(table_name,columnas_generales) | columnas_generales
@@ -531,6 +537,7 @@ def get_ignored_columns_edit(table_name,estatus):
         "transferencias_de_inventario": {'default':{'id_almacen_salida','id_almacen_entrada','estatus'}},
         "pagos_administrativos":{'default':{'importe','estatus'}},
         "preguntas_de_briefs":{'default':{'id_brief'}},
+        "agenda":{'default':{'id_integrante','hora_fin','motivo_de_cancelacion','notas','estatus','id_cliente'}},
         "cuentas_de_banco": {'default':{'balance'}},
         "facturas": {'default':{'importe_total','impuestos','subtotal','importe_cobrado'},'Aprobada':{'id_cliente','id_proyecto','importe_total','impuestos','subtotal','importe_cobrado'}},
         "actividades": {'default':{''},
@@ -590,6 +597,7 @@ def get_default_variable_values(table_name):
         "ajustes_de_inventario": {"fecha_de_ajuste": current_time.strftime("%Y-%m-%d")},
         "transferencias_de_inventario": {"fecha_de_transferencia": current_time.strftime("%Y-%m-%d")},
         "pagos_administrativos": {"fecha_pago": current_time.strftime("%Y-%m-%d")},
+        "ventas": {"importe": 0,"tipo_de_iva":"16%","iva":0},
     }
     default_values=default_values.get(table_name,{})
     return default_values

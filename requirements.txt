@@ -61,3 +61,4 @@ XlsxWriter==3.2.2
 flask-limiter==3.12
 cryptography==46.0.3
 webauthn==2.7.0
+stripe==14.0.1

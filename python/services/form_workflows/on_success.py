@@ -60,3 +60,10 @@ def clientes(id):
         )
         db.session.add(new_pregunta)
     db.session.commit()
+
+@handler_on_success('ventas')
+def ventas(id):
+    record=Ventas.query.get(id)
+    record.iva=record.importe*.16
+    record.importe_total=record.importe*1.16
+    db.session.commit()
