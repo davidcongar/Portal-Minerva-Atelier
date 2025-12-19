@@ -11,7 +11,8 @@ from flask import (
 from python.services.system.files import ExcelService, PDFService
 from python.services.system.authentication import *
 from python.services.system.helper_functions import *
-from python.services.dynamic_routes_functions import *
+from python.services.dynamic_functions.tables import *
+from python.services.dynamic_functions.forms import *
 from python.services.system.extensions import csrf
 
 files_bp = Blueprint("files", __name__, url_prefix="/files")

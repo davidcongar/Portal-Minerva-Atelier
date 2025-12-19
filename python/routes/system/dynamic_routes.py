@@ -13,7 +13,8 @@ from python.services.system.authentication import *
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.dynamic import AppenderQuery
 from sqlalchemy.orm import aliased
-from python.services.dynamic_routes_functions import *
+from python.services.dynamic_functions.tables import *
+from python.services.dynamic_functions.forms import *
 from python.services.system.boto3_s3 import S3Service
 from uuid import UUID
 

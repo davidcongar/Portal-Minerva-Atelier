@@ -20,11 +20,4 @@
             Cancelar
         </button>
     </template>
-    <template x-if="$store.modalData.record.estatus !== 'Cancelado'">
-        <button type="submit"
-            @click.stop="window.location.href='/dynamic/ajustes_de_inventario/files/' + $store.modalData.record.id"
-            class="btn border text-primary border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-primary bg-primary/10">
-            Archivos
-        </button>
-    </template>
 </div>

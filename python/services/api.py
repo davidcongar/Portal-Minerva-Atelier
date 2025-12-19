@@ -7,7 +7,8 @@ from python.services.system.authentication import *
 
 import io
 from PIL import Image, ImageDraw, ImageFont
-from python.services.dynamic_routes_functions import *
+from python.services.dynamic_functions.tables import *
+from python.services.dynamic_functions.forms import *
 import traceback
 
 api_bp = Blueprint("api", __name__, url_prefix="/api")

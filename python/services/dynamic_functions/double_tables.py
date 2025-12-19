@@ -2,7 +2,8 @@ from datetime import timedelta
 from python.services.system.helper_functions import *
 from python.models.modelos import *
 from sqlalchemy import func
-from python.services.general_functions import *
+from python.services.dynamic_functions.general_functions import *
+
 
 def get_variables_double_table_view(table_name):
     columns = {
@@ -107,92 +108,6 @@ def add_record_double_table(main_table_name,second_table,id_main_record,id_recor
             new_record.importe=gasto.importe-gasto.importe_pagado
             gasto.importe_pagado=new_record.importe             
     return new_record
-
-def get_update_validation(table_name,record,column,value):
-    validation={}
-    if table_name=='productos_en_compras' and column in ('cantidad_ordenada','descuento_porcentaje','precio_unitario'):
-        if column=='cantidad_ordenada':
-            record.subtotal=float(value)*record.precio_unitario
-            record.importe_total=record.subtotal*(100-record.descuento_porcentaje)/100   
-        elif column=='descuento_porcentaje':
-            record.importe_total=record.subtotal*(100-float(value))/100      
-        elif column=='precio_unitario':
-            record.subtotal=float(value)*record.cantidad_ordenada
-            record.importe_total=record.subtotal*(100-record.descuento_porcentaje)/100   
-        validation['status']=1
-    elif table_name=='productos_en_recepciones_de_compras' and column in ('cantidad'):
-        recepcion=RecepcionesDeCompras.query.get(record.id_recepcion_de_compra)
-        oc=Compras.query.get(recepcion.id_compra)
-        prod_oc=ProductosEnCompras.query.filter_by(id_compra=oc.id,id_producto=record.id_producto).first()
-        cantidad_global=prod_oc.cantidad_recibida-record.cantidad+float(value)
-        if cantidad_global>prod_oc.cantidad_ordenada:
-            validation['status']=0
-            validation['value_warning']=prod_oc.cantidad_recibida          
-            validation['message']="La cantidad a recibir no puede ser mayor a la cantidad ordenada."
-        else:
-            prod_oc.cantidad_recibida=cantidad_global
-            validation['status']=1
-            db.session.flush()
-    elif table_name=='productos_en_transferencias_de_inventario':
-        if column=='cantidad':
-            inventario=Inventario.query.filter_by(id_almacen=record.transferencia_de_inventario.id_almacen_salida,id_producto=record.id_producto).first()
-            cantidad_disponible=inventario.cantidad+record.cantidad
-            if float(value)>cantidad_disponible:
-                validation['status']=0
-                validation['value_warning']=record.cantidad         
-                validation['message']="La cantidad a transferir no puede ser mayor a la cantidad disponible en inventario."
-            else:
-                # agregar a no disponible
-                inventario.cantidad=inventario.cantidad+record.cantidad-float(value)
-                inventario.cantidad_en_transito=inventario.cantidad_en_transito-record.cantidad+float(value)
-                validation['status']=1
-    elif table_name=='gastos_y_compras_en_pagos':
-        if record.id_gasto:
-            main_record=Gastos.query.get(record.id_gasto)
-            importe_pagado=(
-                    db.session.query(func.sum(GastosYComprasEnPagos.importe))
-                    .join(PagosAdministrativos, GastosYComprasEnPagos.id_pago == PagosAdministrativos.id)
-                    .filter(GastosYComprasEnPagos.id_gasto == record.id_gasto,GastosYComprasEnPagos.id!=record.id)
-                    .filter(PagosAdministrativos.estatus != "Cancelado")
-                    .scalar()
-                ) or 0
-            importe_restante=main_record.importe-importe_pagado
-        else:
-            main_record=Compras.query.get(record.id_compra)
-            importe_pagado=(
-                    db.session.query(func.sum(GastosYComprasEnPagos.importe))
-                    .join(PagosAdministrativos, GastosYComprasEnPagos.id_pago == PagosAdministrativos.id)
-                    .filter(GastosYComprasEnPagos.id_compra == record.id_compra,GastosYComprasEnPagos.id!=record.id)
-                    .filter(PagosAdministrativos.estatus != "Cancelado")
-                    .scalar()
-                ) or 0
-            importe_restante=main_record.importe_total-importe_pagado    
-        if float(value)>importe_restante:
-            validation['status']=0
-            validation['message']="El importe no puede ser mayor al importe restante."
-            validation['value_warning']=importe_restante
-        else:
-            main_record.importe_pagado=main_record.importe_pagado-record.importe+float(value)
-            validation['status']=1                                       
-    else:
-        validation['status']=1
-    return validation
-
-def get_variables_table_view_input(table_name):
-    columns = {
-        "briefs_de_clientes": {
-            "columns":["pregunta","respuesta"],
-            "table_title":"Preguntas de Brief",
-            "query_table":"respuestas_briefs_de_clientes",
-            "table_name":"respuestas_briefs_de_clientes",
-            "url_confirm":"briefs_de_clientes.confirmar",
-            "details":['cliente','brief'],
-            "edit_fields":['respuesta']
-        },
-    }
-    columns=columns.get(table_name,'')
-    return columns
-
 
 def on_add_double_table(table_name,id):
     if table_name=='compras':

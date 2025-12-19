@@ -10,7 +10,8 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy import String, Text, or_,func,desc
 from datetime import date,timedelta
 from python.services.system.helper_functions import *
-from python.services.general_functions import *
+from python.services.dynamic_functions.general_functions import *
+
 
 ajustes_de_dinero_bp = Blueprint("ajustes_de_dinero", __name__,url_prefix="/ajustes_de_dinero")
 

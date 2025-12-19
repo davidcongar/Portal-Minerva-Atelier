@@ -7,7 +7,8 @@ import re
 import json
 from datetime import date, datetime
 from decimal import Decimal
-from python.services.general_functions import *
+from python.services.dynamic_functions.general_functions import *
+
 from python.services.system.helper_functions import *
 
 #####

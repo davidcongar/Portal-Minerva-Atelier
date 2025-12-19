@@ -21,11 +21,13 @@ from svglib.svglib import svg2rlg
 import os
 from python.models import db
 from python.services.system.helper_functions import *
-from python.services.dynamic_routes_functions import *
+from python.services.dynamic_functions.tables import *
+from python.services.dynamic_functions.forms import *
 from flask import request
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import aliased
-from python.services.pdf import *
+from python.services.dynamic_functions.pdf import *
+
 
 class ExcelService:
     @staticmethod
