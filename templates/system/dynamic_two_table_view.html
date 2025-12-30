@@ -60,7 +60,7 @@
             {% endfor %}
         </div>
         <div class="flex gap-2">
-            <form method="GET" action="{{ url_for('dynamic.table_view', table_name=table_name) }}">
+            <form method="GET" action="{{ url_for('dynamic.double_table_view_confirm', table_name=table_name,id=main_record.id) }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit"
                     class="py-2 px-3 bg-success border border-success rounded-md text-white transition-all duration-300 hover:bg-success/[0.85] hover:border-success/[0.85]">
@@ -114,7 +114,7 @@
                         </div>
 
                         <div class="overflow-auto" style="max-height: calc(100vh - 410px);">
-                            <table class="min-w-[640px] w-full table-hover">
+                            <table class="min-w-[640px] w-full table-hover table-striped">
                                 <thead class="bg-white dark:bg-dark sticky top-0 z-10">
                                     <tr>
                                         <th></th>
@@ -146,7 +146,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <template x-for="(record, index) in items" :key="index">
+                                    <template x-for="record in items" :key="record.id">
                                         <tr class="cursor-pointer hover:bg-gray-100">
                                             <!-- Botón de agregar -->
                                             <td>
@@ -160,7 +160,7 @@
                                                 <td>
                                                     <span 
                                                         x-text="record[col] 
-                                                        ? (['importe','sueldo','precio_unitario','monto','importe_pagado','importe_total','importe_restante'].includes(col) 
+                                                        ? (['importe','sueldo','precio_unitario','monto','importe_pagado','importe_total','importe_restante','importe_cobrado'].includes(col) 
                                                             ? money_format(record[col]) 
                                                             : record[col]) 
                                                         : '-'">
@@ -181,7 +181,7 @@
             <div id="table-data2" data-table="/dynamic/{{ table_name }}/double_table/data/second/{{ main_record.id }}" data-columns='{{ columns_second_table|tojson }}'></div>
             <div class="flex flex-col">
                 <div class="grid grid-cols-1 gap-5">
-                    <div class="bg-white dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 p-5 rounded-lg" x-data="tabla2" x-init="initData(); $watch('searchInput', value => { search(value) })" >
+                    <div class="bg-white dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 p-5 rounded-lg" x-data="tabla2" x-init="$watch('items', () => {$nextTick(() => rebindSelect2());}); initData();">
                         <div class="sticky top-0 z-10 flex justify-between items-center gap-3">
                             <div>
                                 <h2 class="text-base font-semibold">{{ title_second_table }}</h2>
@@ -219,14 +219,14 @@
                             </div>
                         </div>
                         <div class="overflow-auto"  style="max-height: calc(100vh - 410px);">
-                            <table class="min-w-[640px] w-full table-hover">
+                            <table class="min-w-[640px] w-full table-hover table-striped">
                                 <thead class="bg-white dark:bg-dark sticky top-0 z-10">
                                     <tr>
                                         <th></th>
                                         {% for column in columns_second_table %}
                                         <th data-column="{{ column }}">
                                             <div class="flex items-center justify-between gap-2">
-                                                <p class="font-semibold">{{ column|title_format }}</p>
+                                                <p class="font-semibold">{{ column|title_format }} {% if column in required_fields %} * {% endif %} </p>
                                                 <div class="flex flex-col">
                                                     <!-- Icono para ordenar ascendente -->
                                                     <svg @click="sort('{{ column }}', sorted.rule === 'asc' ? 'desc' : 'asc')"
@@ -251,7 +251,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <template x-for="(record, index) in items" :key="index">
+                                    <template x-for="record in items" :key="record.id">
                                         <tr class="cursor-pointer hover:bg-gray-100">
                                             <!-- Botón de borrar -->
                                             <td>
@@ -263,15 +263,31 @@
                                                 </button>
                                             </td>
                                             <template x-for="(col, i) in {{ columns_second_table }}" :key="i">
-                                                <td >  
-                                                    <template x-if="{{ edit_fields }}.includes(col) && ['cantidad','importe','importe_ajuste','precio_unitario','cantidad_ordenada','descuento_porcentaje','subtotal'].includes(col)">
+                                                <td>  
+                                                    <template x-if="String(col).includes('archivo')">
+                                                        <form method="POST" class="space-y-4" id="dynamic_form"
+                                                            x-bind:action="`{{ url_for('dynamic.upload_file', table_name=model_second_table, id='__id__', column='__replace__') }}`.replace('__replace__', col).replace('__id__', record.id)"
+                                                            enctype="multipart/form-data">        
+                                                            <div class="border w-10 h-10 flex items-center justify-center text-primary border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-primary bg-primary/10">
+                                                                <input type="file" :id="`file-upload-${col}-${record.id}`" name="archivo" class="hidden"  @change="console.log('changed', $event.target.files)">
+                                                                <label :for="`file-upload-${col}-${record.id}`">
+                                                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                        <path d="M3 15C3 17.8284 3 19.2426 3.87868 20.1213C4.75736 21 6.17157 21 9 21H15C17.8284 21 19.2426 21 20.1213 20.1213C21 19.2426 21 17.8284 21 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                        <path d="M12 16V3M12 3L16 7.375M12 3L8 7.375" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                    </svg>
+                                                                </label>                    
+                                                            </div>    
+                                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                        </form>
+                                                    </template>      
+                                                    <template x-if="{{ edit_fields }}.includes(col) && ['cantidad','sub_total','importe','importe_ajuste','precio_unitario','cantidad_ordenada','descuento_porcentaje','subtotal','valor_unitario','impuesto'].includes(col)">
                                                         <form method="POST">
                                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                                             <input type="number" x-model="record[col]"
-                                                                class="form-input rounded-lg w-32 h-12 text-xl" 
+                                                                class="form-input rounded-lg w-32 h-12 " 
                                                                 @blur="update_record(record,col)" />
                                                         </form>
-                                                    </template>
+                                                    </template>                                                    
                                                     <template x-if="{{ edit_fields }}.includes(col) && String(col).includes('fecha')">
                                                         <form method="POST">
                                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -280,15 +296,22 @@
                                                                 @blur="update_record(record,col)"></input>
                                                         </form>
                                                     </template>
-                                                    <template x-if="{{ edit_fields }}.includes(col) && ['notas','descripcion','sugerencias'].includes(col)">
+                                                    <template x-if="{{ edit_fields }}.includes(col) && ['notas','descripcion','sugerencias','motivo'].includes(col)">
                                                         <form method="POST">
                                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                                             <textarea rows='3'  x-model="record[col]"
-                                                                class="form-textarea rounded-lg w-30 h-20" 
+                                                                class="form-textarea rounded-lg w-50 h-20" 
                                                                 @blur="update_record(record,col)"></textarea>
                                                         </form>
                                                     </template>
-
+                                                    <template x-if="{{ edit_fields }}.includes(col) && ['folio_fiscal'].includes(col)">
+                                                        <form method="POST">
+                                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                            <input type="text" x-model="record[col]"
+                                                                class="form-input rounded-lg w-32 h-12 " 
+                                                                @blur="update_record(record,col)" />
+                                                        </form>
+                                                    </template>
                                                     <template x-if="{{ edit_fields }}.includes(col) && ['hora_inicio','hora_fin'].includes(col)">
                                                         <form method="POST">
                                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -296,33 +319,17 @@
                                                                 class="form-input rounded-lg" style="width:150px"
                                                                 @blur="update_record(record,col)"></input>
                                                         </form>
-                                                    </template>                                                    
-                                                    <template x-if="{{ edit_fields }}.includes(col) && ['id_empleado'].includes(col)">
-                                                        <form method="POST">
-                                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                                            <select :id="col + '_' + record.id"  :name="col" class="searchable-select" x-model="record[col]" x-init="$nextTick(() => {$el._select2 = $($el).select2({ width: '100%' }).on('change', () => { record[col] = $el.value; update_record(record,col); });})">
-                                                                <option value="" >
-                                                                        Selecciona una opción
-                                                                    </option>
-                                                                {% for option in foreign_options['id_empleado'] %}
-                                                                    <option value="{{ option.id }}" >
-                                                                        {{ option.nombre or option.nombre_completo or option.nombre_empresa or option.id_visualizacion }}
-                                                                    </option>
-                                                                {% endfor %}
-                                                            </select>
-                                                        </form>
                                                     </template>
+                                                    {% include 'partials/double_table/dropdowns/' ~ table_name ~ '.html' ignore missing %}                                        
                                                     <!-- Mostrar otras columnas normalmente -->
                                                     <template x-if="!{{ edit_fields }}.includes(col) && !String(col).includes('fecha')">
-                                                        <td>
                                                             <span 
                                                                 x-text="record[col] 
-                                                                ? (['importe','precio_unitario','subtotal','importe_total','monto','importe_pagado','importe_total','importe_restante','subtotal'].includes(col) 
+                                                                ? (['importe','precio_unitario','sub_total','impuesto','importe_total','monto','importe_pagado','importe_total','importe_restante','subtotal'].includes(col) 
                                                                     ? money_format(record[col]) 
                                                                     : record[col]) 
                                                                 : '-'">
                                                             </span>
-                                                        </td>
                                                     </template>
                                                 </td>
                                             </template>
@@ -337,163 +344,24 @@
         </div>
     </div>
 </div>
-<script src="/static/js/system/data-search.js"></script>
-<script src="/static/js/system/data_table.js"></script>
-<script src="/static/js/system/loader.js"></script>
-<script src="/static/js/system/dynamic_table_init.js"></script>
-<script src="/static/js/system/format_functions.js"></script>
 <script>
-function initSelect2() {
-  $('.searchable-select').select2({ width: '100%' });
-}
-
-document.addEventListener('DOMContentLoaded', initSelect2);
-
-// Also re-run after Alpine reloads data
-document.addEventListener('alpine:init', () => {
-  Alpine.effect(() => {
-    initSelect2();
-  });
-});
-
-async function reload_tables(){
-    const tableEl = document.querySelector('[x-data="tabla"]');
-    if (tableEl) {
-        const comp = Alpine.$data(tableEl);
-        if (comp?.reload) {
-            await comp.reload();
-        }
-    }
-    const tableEl2 = document.querySelector('[x-data="tabla2"]');
-    if (tableEl2) {
-        const comp = Alpine.$data(tableEl2);
-        if (comp?.reload) {
-            await comp.reload();
-        }
-    }
-    initSelect2(); // Re-init Select2 after reload
-}
-async function addRecord(tableName,modelFirstTable, modelSecondTable, mainId, recordId, csrfToken) {
-    showLoader();
-    const url = `/dynamic/${tableName}/double_table/add/${modelFirstTable}/${modelSecondTable}/${mainId}/${recordId}`;
-    try {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": csrfToken
-            },
-            body: JSON.stringify({}) // you can send extra data if needed
-        });
-
-        if (response.ok) {
-            reload_tables();
-        } else {
-            alert("Error al eliminar el reigstro.");
-        }
-    } catch (error) {
-        window.dispatchEvent(new CustomEvent('show-warning', {
-            detail: 'Error al eliminar el registro'  // the message from your AJAX or backend
-        }));
-        warningAlert.style.display = 'flex';  // Show the warning message
-        warningAlert.style.opacity = '1';  // Set opacity to 1 for showing
-        setTimeout(function() {
-            warningAlert.style.opacity = '0';  // Start fading out
-            // After the fade-out animation is complete, hide the element
-            setTimeout(function() {
-                warningAlert.style.display = 'none';
-            }, 1000);  // Match this delay with the CSS transition time (1s)
-        }, 3000);
-    }
-}
-</script>
-<script>
-async function deleteRecord(tableName, modelSecondTable, mainId, recordId, csrfToken) {
-    showLoader();
-    const url = `/dynamic/${tableName}/double_table/delete/${modelSecondTable}/${mainId}/${recordId}`;
-    try {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": csrfToken
-            },
-            body: JSON.stringify({}) // you can send extra data if needed
-        });
-
-        if (response.ok) {
-            reload_tables();
-        } else {
-            alert("Error al eliminar el reigstro.");
-        }
-    } catch (error) {
-        window.dispatchEvent(new CustomEvent('show-warning', {
-            detail: 'Error al eliminar el registro'  // the message from your AJAX or backend
-        }));
-        warningAlert.style.display = 'flex';  // Show the warning message
-        warningAlert.style.opacity = '1';  // Set opacity to 1 for showing
-        setTimeout(function() {
-            warningAlert.style.opacity = '0';  // Start fading out
-            // After the fade-out animation is complete, hide the element
-            setTimeout(function() {
-                warningAlert.style.display = 'none';
-            }, 1000);  // Match this delay with the CSS transition time (1s)
-        }, 3000);
-    }
-}
-</script>
-<script>
+    const allow_new_value_dropdowns=['column_name'];
     const table_name={{ model_second_table|tojson }};
-
-    function update_record(record,column) {
-        fetch(`/dynamic/${table_name}/double_table/update/${column}/${record.id}/${record[column]}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token() }}',
-            },
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data.message)
-            if (data.message !== "" && data.status==='warning') {
-                window.dispatchEvent(new CustomEvent('show-warning', {
-                    detail: data.message   // the message from your AJAX or backend
-                }));
-                warningAlert.style.display = 'flex';  // Show the warning message
-                warningAlert.style.opacity = '1';  // Set opacity to 1 for showing
-                setTimeout(function() {
-                    warningAlert.style.opacity = '0';  // Start fading out
-                    // After the fade-out animation is complete, hide the element
-                    setTimeout(function() {
-                        warningAlert.style.display = 'none';
-                    }, 1000);  // Match this delay with the CSS transition time (1s)
-                }, 3000);
-                reload_tables();
-            }else{
-                window.dispatchEvent(new CustomEvent('show-success', {
-                    detail: data.message   // the message from your AJAX or backend
-                }));
-                successAlert.style.display = 'flex';  // Show the warning message
-                successAlert.style.opacity = '1';  // Set opacity to 1 for showing
-                setTimeout(function() {
-                    successAlert.style.opacity = '0';  // Start fading out
-                    // After the fade-out animation is complete, hide the element
-                    setTimeout(function() {
-                        successAlert.style.display = 'none';
-                    }, 1000);  // Match this delay with the CSS transition time (1s)
-                }, 3000);                
-                reload_tables();
-            }
-        })
-        .catch(error => console.error("Error:", error));
-    }
+    document.addEventListener('alpine:init', () => {
+        Alpine.store('view', { mode: 'split' }); // split | first | second
+    });    
 </script>
-<script>
-  document.addEventListener('alpine:init', () => {
-    Alpine.store('view', { mode: 'split' }); // split | first | second
-  });
-</script>
+<script src="/static/js/system/table/data-search.js"></script>
+<script src="/static/js/system/table/data_table.js"></script>
+<script src="/static/js/system/table/loader.js"></script>
+<script src="/static/js/system/table/dynamic_table_init.js"></script>
+<script src="/static/js/system/table/format_functions.js"></script>
+<script src="/static/js/system/double_table/upload_file.js"></script>
+<script src="/static/js/system/double_table/update_record.js"></script>
+<script src="/static/js/system/double_table/add_record.js"></script>
+<script src="/static/js/system/double_table/delete_record.js"></script>
+<script src="/static/js/system/double_table/reload_tables.js"></script>
+<script src="/static/js/system/double_table/select2.js"></script>
 
 {% include "partials/system/loader.html" %}
 

@@ -9,6 +9,8 @@ from datetime import date, datetime,timedelta
 from decimal import Decimal
 import random
 from sqlalchemy import inspect
+from config import *
+import math
 
 #####
 # funciones auxiliares
@@ -41,7 +43,6 @@ def sanitize_data(model, data):
             continue
 
         value = data[col.name]
-
         # 🧩 1. Si viene como lista con un solo valor, tomar el primero
         if isinstance(value, list) and len(value) == 1:
             value = value[0]
@@ -58,13 +59,22 @@ def sanitize_data(model, data):
                 else:
                     value = None
         elif "time" in col_type_str:
-            t = datetime.strptime(value, "%H:%M").time()
-            
-            # convert to datetime to shift timezone
-            dt = datetime.combine(datetime.today(), t)
-            dt = dt + timedelta(hours=6)
-
-            value = dt.time()            
+            value=datetime.fromisoformat(value)+timedelta(hours=6)
+        elif "date" in col_type_str:
+            if not value:
+                value = None
+            elif isinstance(value, (datetime, date)):
+                value = value if isinstance(value, date) else value.date()
+            else:
+                try:
+                    # Try DD/MM/YYYY (SAT / MX)
+                    value = datetime.strptime(value, "%d/%m/%Y").date()
+                except ValueError:
+                    try:
+                        # Try ISO YYYY-MM-DD
+                        value = date.fromisoformat(value)
+                    except ValueError:
+                        value = None
         # 🧩 3. Convierte cadenas vacías según tipo
         elif value == "" or value is None:
             if any(t in col_type_str for t in ["date", "time", "timestamp", "uuid", "json"]):
@@ -85,8 +95,8 @@ def sanitize_data(model, data):
                     value = float(value)
             except (ValueError, TypeError):
                 value = None  # fallback seguro
-
-        # ✅ Guarda el valor limpio de vuelta
+        if isinstance(value, float) and math.isnan(value):
+            value = None                
         data[col.name] = value
 
     return data
@@ -321,3 +331,98 @@ def query_to_dict(record,model):
 
 def generate_pin(length=6):
     return ''.join([str(random.randint(0, 9)) for _ in range(length)])
+
+def resolve_foreign_keys_bulk(model, df):
+    """
+    Resolves all FK id_visualizacion values in a DataFrame using batch queries.
+    Returns a new DataFrame with FK columns replaced by real PKs.
+    """
+
+    fk_info = []  # (local_col, RefModel, ref_pk_col)
+
+    # --- Discover FK metadata once ---
+    for column in model.__table__.columns:
+        for fk in column.foreign_keys:
+            local_col = column.name
+            ref_table = fk.column.table.name
+            ref_pk_col = fk.column.name
+            RefModel = get_model_by_name(ref_table)
+            if RefModel:
+                fk_info.append((local_col, RefModel, ref_pk_col))
+
+    # --- For each FK: gather distinct visual IDs → bulk query ---
+    fk_maps = {}  # (RefModel, ref_pk_col) -> {visual_id: real_pk}
+
+    for local_col, RefModel, ref_pk_col in fk_info:
+
+        if local_col not in df.columns:
+            continue
+
+        needed_ids = (
+            df[local_col]
+            .dropna()
+            .astype(str)
+            .unique()
+            .tolist()
+        )
+
+        if not needed_ids:
+            continue
+
+        # ONE bulk query
+        rows = (
+            db.session.query(RefModel.id_visualizacion, getattr(RefModel, ref_pk_col))
+            .filter(RefModel.id_visualizacion.in_(needed_ids))
+            .all()
+        )
+
+        fk_maps[(local_col, RefModel, ref_pk_col)] = {
+            str(vis): real_pk for vis, real_pk in rows
+        }
+
+    # --- Now replace values fast (O(1) lookup, no queries) ---
+    df = df.copy()
+
+    for local_col, RefModel, ref_pk_col in fk_info:
+        if local_col not in df.columns:
+            continue
+
+        key = (local_col, RefModel, ref_pk_col)
+        mapping = fk_maps.get(key, {})
+
+        # check for missing visual IDs
+        missing = set(
+            df[local_col].dropna().astype(str)
+        ) - set(mapping.keys())
+
+        if missing:
+            raise ValueError(
+                f"No se pudieron resolver los valores de la columna relacionada con la tabla '{RefModel.__tablename__}': "
+                f"id inexistentes: {', '.join(missing)}"
+            )
+
+        # replace visual IDs with real PKs
+        df[local_col] = (
+            df[local_col]
+            .astype(str)
+            .map(mapping)
+            .fillna(df[local_col])   # keep empty cells
+        )
+
+    return df
+
+def detect_table_from_columns(df_columns):
+    normalized = {c.strip() for c in df_columns}
+
+    best_match = None
+    best_score = 0
+
+    for table_name, column_map in TABLE_COLUMN_MAPS.items():
+        expected = set(column_map.keys())
+        score = len(expected & normalized)
+
+        if score > best_score:
+            best_match = table_name
+            best_score = score
+
+    return best_match if best_score > 0 else None

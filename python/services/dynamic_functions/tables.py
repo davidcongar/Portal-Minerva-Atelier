@@ -495,3 +495,10 @@ def get_data_tabs(table_name,parent_table,id_parent_record):
 def get_date_fields():
     date_fields=["fecha_venta", "fecha_orden", "fecha_de_gasto", "fecha_de_transferencia","fecha","fecha_hora"]
     return date_fields
+
+def get_checkbox(table_name):
+    checkbox = {
+        'table_name':True,
+    }
+    checkbox=checkbox.get(table_name, False)
+    return checkbox

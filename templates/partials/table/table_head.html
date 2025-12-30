@@ -1,5 +1,10 @@
-<thead class="text-left bg-lesswhite dark:bg-dark sticky top-0 z-5">
+<thead class="text-left bg-white dark:bg-dark sticky top-0 z-5">
     <tr>
+        {% if checkbox %}
+            <th>
+                <input type="checkbox" id="chk1" class="form-checkbox" @change="toggleAllCheckboxes" />
+            </th>
+        {% endif %}
         {% for column in columns %}
         <th data-column="{{ column }}">
             <div class="flex items-center justify-between gap-2">

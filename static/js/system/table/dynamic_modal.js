@@ -1,4 +1,5 @@
 let getRecordRunCount = 0;
+
 document.addEventListener('alpine:init', () => {
     Alpine.store('modalData', { record: {} });
 });
@@ -13,7 +14,6 @@ function redirectActions(url) {
             }
         } else if (url.includes("download_pdf")) {
             // Para descargar PDF se utiliza fetch y se procesa la descarga
-            console.log(url);
             fetch(url, { 
                     method: "POST",
                     headers: {
@@ -83,9 +83,16 @@ function titleFormat(value) {
         "ejecucion": "ejecución",
         "dias":"días",
         "transito": "tránsito",
+        "minima": "mínima",
+        "maxima": "máxima",
+        "calificacion": "calificación",
+        "subcategoria": "subcategoría",
+
         "id_pago_id_visualizacion": "ID Pago",
         "id_gasto_id_visualizacion": "ID Gasto",
-        "id_compra_id_visualizacion": "ID Compra",
+        "id_compra_id_visualizacion": "ID Compra",       
+        "id_viaje_id_visualizacion": "ID Viaje",    
+        "id_facturac_viaticos_id_visualizacion": "ID Factura Viáticos",    
 
   };
 
@@ -189,7 +196,7 @@ async function get_record(form, recordId) {
                     document.getElementById('id_registro').textContent=value;
                 }
 
-                if (/(importe|monto|precio|subtotal|descuentos|propina|comisiones|costos_adicionales|otros_costos|costo_de_envio|impuestos|iva)/i.test(key) && !isNaN(value)) {
+                if (/(importe|monto|precio|subtotal|descuentos|propina|comisiones|otros_costos|costo_de_envio|impuestos)/i.test(key) && !isNaN(value)) {
                     value = formatCurrency(value);
                 } else if (!isNaN(value)) {
                     value = formatNumber(value);
@@ -208,10 +215,26 @@ async function get_record(form, recordId) {
                     </td>`;
                     tbody_modal_content_relationship.appendChild(tr);
                 } else if (!['id', 'id_proveedor', 'id_categoria_de_gasto', 'id_cuenta_de_banco'].includes(key)) {
-                    if(value.includes('__')){
+                    if(key.includes('archivo')){
+                        const [uuid, name] = value.split("__");
+                        tr.innerHTML = `
+                            <td style="white-space:normal;border-right:1px solid #ccc; padding:8px;">
+                                ${titleFormat(key)}
+                            </td>
+                            <td class="clickable-td"
+                                style="word-break:break-word; white-space:normal; overflow-wrap:anywhere; max-width:300px;">
+                                <a href="#"
+                                style="display:block; width:100%; height:100%; text-decoration:none; color:inherit;"
+                                onclick="downloadFile('${uuid}','view')">
+                                    ${name}
+                                </a>
+                            </td>
+                        `;
+                    }                    
+                    else if(value.includes('__')){
                         const [before, id, table_name] = value.split("__");
                         tr.innerHTML = `
-                            <td style="border-right:1px solid #ccc; padding:8px;">
+                            <td style="white-space:normal;border-right:1px solid #ccc; padding:8px;">
                                 ${titleFormat(key)}
                             </td>
                             <td class="clickable-td"
@@ -223,7 +246,6 @@ async function get_record(form, recordId) {
                                 </a>
                             </td>
                         `;
-
                     }else{
                         tr.innerHTML = `<td style="border-right: 1px solid #ccc; padding: 8px; ">${titleFormat(key)}</td><td style="word-break: break-word; white-space: normal; overflow-wrap: anywhere; max-width: 300px;">${value}</td>`;
                     }

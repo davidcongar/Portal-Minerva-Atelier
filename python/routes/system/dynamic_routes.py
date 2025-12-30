@@ -13,10 +13,11 @@ from python.services.system.authentication import *
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.dynamic import AppenderQuery
 from sqlalchemy.orm import aliased
-from python.services.dynamic_functions.tables import *
 from python.services.dynamic_functions.forms import *
+from python.services.dynamic_functions.tables import *
 from python.services.system.boto3_s3 import S3Service
 from uuid import UUID
+import pandas as pd
 
 s3_service = S3Service()
 
@@ -80,31 +81,22 @@ def table_view(table_name):
                 "activeItem": table_name,
                 "breadcrumbs": breadcrumbs
             }
-    buttons_modal_exits = os.path.exists(f'templates/partials/table/modals/{table_name}.html')
-    table_buttons = os.path.exists(f'templates/partials/table/buttons/{table_name}.html')
-    filters = os.path.exists(f'templates/partials/table/filters/{table_name}.html')
-    javascript = os.path.exists(f'static/js/table_logic/{table_name}.js')
-    additional_buttons = os.path.exists(f'templates/partials/table/additional_buttons/{table_name}.html')
     number_buttons=get_table_buttons().get(table_name,0)
     date_variable=get_calendar_date_variable(table_name)
     relationships=get_table_relationships(table_name)
     data_tabs=get_data_tabs(table_name,parent_table,id_parent_record)
-
+    checkbox=get_checkbox(table_name)
     return render_template(
         "system/dynamic_table.html",
-        buttons_modal_exits=buttons_modal_exits,
         columns=columns,
         table_name=table_name,
-        table_buttons=table_buttons,
         data_tabs=data_tabs,
         number_buttons=number_buttons,
         date_variable=date_variable,
         id_parent_record=id_parent_record,
         parent_table=parent_table,
         relationships=relationships,
-        javascript=javascript,
-        filters=filters,
-        additional_buttons=additional_buttons,
+        checkbox=checkbox,
         html='table',
         **context
     )
@@ -130,6 +122,10 @@ def data(table_name):
     categories=request.args.get("categories", "", type=str)
 
     query = model.query
+
+    if session['nombre_rol']!='Administrador' and session['nombre_rol']!='Sistema':
+        query=query.filter(model.id_usuario==session['id_usuario'])
+              
     # Agregar joins condicionales
     joins = get_joins()
     filtered_joins = {field: val for field, val in joins.items() if field in model.__table__.columns}
@@ -174,7 +170,7 @@ def data(table_name):
         query = query.filter(getattr(model, status_field) == status)
     else:
         open_status=get_open_status(table_name)
-        if open_status and hasattr(model, status_field):
+        if open_status:
             query = query.filter(getattr(model, status_field).in_(open_status))
     
 
@@ -235,7 +231,6 @@ def data(table_name):
 
     # Aplicar paginación
     query = query.offset((page - 1) * view).limit(view)
-
     records = query.all()
     items = [query_to_dict(record,model) for record in records]
     return jsonify(
@@ -297,8 +292,9 @@ def form(table_name):
     if record_id!=None:
         record = model.query.get(record_id)
         name = getattr(record, "nombre", None)
-        accion = f"Editar registro: {name}" if name else "Editar registro "+ str(record.id_visualizacion)
-        estatus=getattr(record, "estatus", None)
+        flujo = request.args.get("accion", None, type=str)
+        accion = (f"Editar registro: {name}" if name else "Editar registro: "+ str(record.id_visualizacion)) if flujo is None else (f"{flujo}: {name}" if name else f"{flujo}:"+ str(record.id_visualizacion))
+        estatus = getattr(record, "estatus", None) if flujo is None else flujo
         ignored_columns=get_ignored_columns_edit(table_name,estatus)
         columns = [col for col in model.__table__.columns.keys() if col not in ignored_columns]
         non_mandatory_columns=get_non_mandatory_columns(table_name)
@@ -306,7 +302,7 @@ def form(table_name):
         if not record:
             flash(f"Registro con ID {record_id} no encontrado en '{table_name}'.", "danger")
             return redirect(request.referrer or url_for("dynamic.table_view", table_name=table_name))
-        if record.estatus in get_non_edit_status(table_name) or table_name in get_no_edit_access():
+        if record.estatus in get_non_edit_status() or table_name in get_no_edit_access():
             flash(f"Registro ya no se puede editar.", "info")
             return redirect(request.referrer or url_for("dynamic.table_view", table_name=table_name))
         javascript = os.path.exists(f'static/js/form_logic/edit/{table_name}.js')
@@ -323,7 +319,7 @@ def form(table_name):
         "activeMenu": active_menu,
         "activeItem": table_name,
         "foreign_options": foreign_options,
-        "breadcrumbs": [{"name":modulo.replace('_', ' '),"url":""},{"name":table_name.replace('_', ' ').capitalize(),"url":url_for("dynamic.table_view", table_name=table_name)},{"name":accion,"url":""}]
+        "breadcrumbs": [{"name":modulo,"url":""},{"name":table_name.replace('_', ' ').capitalize(),"url":url_for("dynamic.table_view", table_name=table_name)},{"name":accion,"url":""}]
     }
     form_filters=get_form_filters(table_name)
     parent_record=get_parent_record(table_name)
@@ -403,11 +399,33 @@ def add(table_name):
             selected_items = db.session.query(related_model).filter(related_model.id.in_([int(v) for v in value if v])).all()
             # Assign relationship
             getattr(new_record, key).extend(selected_items)
+        # archivos
+        archivos = [file for key, file in request.files.items() if key.startswith("id_archivo")]
+        if archivos:
+            for archivo in archivos:
+                if archivo.filename:
+                    # create file in archivos
+                    new_file=Archivos(
+                        nombre_del_archivo=archivo.name,
+                        tabla_origen=table_name,
+                        id_registro=new_record.id,
+                        ruta_s3='',
+                        nombre='',
+                        id_usuario=session['id_usuario']
+                    )      
+                    db.session.add(new_file)
+                    db.session.flush()
+                    s3_service.upload_file(archivo, new_file.id,table_name)
+                    new_file.ruta_s3=f"{table_name}/{new_file.id}_{archivo.filename}"
+                    new_file.nombre=archivo.filename
+                    db.session.add(new_file)
+                    setattr(new_record, archivo.name, f'{new_file.id}__{archivo.filename}')       
         # Commit transaction
         on_success(table_name,new_record.id)
         db.session.commit()
         flash(f"Registro creado exitosamente en '{table_name.replace('_', ' ').capitalize()}'.", "success")    
     except Exception as e:
+        print(e)
         db.session.rollback()
         flash(f"Error al crear el registro: {str(e)}", "danger")
         return(request.referrer or "/")
@@ -502,6 +520,31 @@ def edit(table_name):
                         else:
                             # Assign normal fields
                             setattr(record, key, value[0] if isinstance(value, list) and len(value) == 1 else value)
+            # archivos
+            archivos = [file for key, file in request.files.items() if key.startswith("id_archivo")]
+            if archivos:
+                for archivo in archivos:
+                    if archivo.filename:
+                        old_file=Archivos.query.filter_by(id_registro=record.id,nombre_del_archivo=archivo.name,tabla_origen=table_name).first()
+                        if old_file:
+                            s3_service.delete_file(old_file.ruta_s3)
+                            db.session.delete(old_file)
+                        # create file in archivos
+                        new_record=Archivos(
+                            nombre_del_archivo=archivo.name,
+                            tabla_origen=table_name,
+                            id_registro=record.id,
+                            ruta_s3='',
+                            nombre='',
+                            id_usuario=session['id_usuario']
+                        )      
+                        db.session.add(new_record)
+                        db.session.flush()
+                        s3_service.upload_file(archivo, new_record.id,table_name)
+                        new_record.ruta_s3=f"{table_name}/{new_record.id}_{archivo.filename}"
+                        new_record.nombre=archivo.filename
+                        db.session.add(new_record)
+                        setattr(record, archivo.name, f'{new_record.id}__{archivo.filename}')   
             db.session.flush()
             edit_on_success(table_name,record.id)
             db.session.commit()
@@ -571,6 +614,7 @@ def double_table_view(table_name,id):
     model_first_table=variables.get('model_first_table')
     model_second_table=variables.get('model_second_table')
     edit_fields=variables.get('edit_fields')
+    required_fields=variables.get('required_fields')
     foreign_options = get_foreign_options()
     form_options=get_form_options(table_name)
     foreign_options = {**foreign_options, **form_options}
@@ -615,6 +659,7 @@ def double_table_view(table_name,id):
         model_second_table=model_second_table,
         details=details,
         edit_fields=edit_fields,
+        required_fields=required_fields,
         html='table',
         foreign_options=foreign_options,
         **context
@@ -686,7 +731,6 @@ def double_table_add(main_table_name,first_table,second_table,id_main_record,id_
             on_add_double_table(main_table_name,id_main_record)
             db.session.commit()
         except Exception as e:
-            print(e)
             db.session.rollback()
             flash(f"Error al agregar el registro: {str(e)}", "danger")
     return redirect(url_for("dynamic.double_table_view",table_name=main_table_name,id=id_main_record))
@@ -698,15 +742,22 @@ def delete_double_table(main_table_name,table_name,id,id_main_record):
         try:
             model=get_model_by_name(table_name)
             record = model.query.get(id)
-            on_delete_double_table(table_name,id)
-            db.session.delete(record)
-            db.session.flush()
-            on_delete_double_table(main_table_name,id_main_record)
-            db.session.commit()
+            validation=validate_delete(table_name,id)
+            if validation:
+                on_delete_double_table(table_name,id)
+                db.session.delete(record)
+                db.session.flush()
+                on_delete_double_table(main_table_name,id_main_record)
+                db.session.commit()
+                message=''
+                status='success'                
+            else:
+                message='El registro no puede ser eliminado'
+                status='warning'
         except Exception as e:
             db.session.rollback()
             flash(f"Error al eliminar el registro: {str(e)}", "danger")
-    return redirect(url_for("dynamic.double_table_view",table_name=main_table_name,id=id_main_record))
+        return jsonify({"status": status, "message": message})
 
 @dynamic_bp.route("/<string:table_name>/double_table/update/<string:column>/<id>/", methods=["POST"])
 @dynamic_bp.route("/<string:table_name>/double_table/update/<string:column>/<id>/<value>", methods=[ "POST"])
@@ -729,7 +780,6 @@ def double_table_update(table_name,column,id,value=0):
             message='El valor se ha actualizado correctamente.'
             status='success'
     except Exception as e:
-        print(e)
         db.session.rollback()
         flash(f"Error al actualizar el valor: {str(e)}", "danger")
     return jsonify({"status": status, "message": message,"value":value_warning})
@@ -848,6 +898,14 @@ def table_view_input_confirm(table_name,id):
     url_confirm=variables.get('url_confirm')
     return redirect(url_for(url_confirm, id=id))
 
+@dynamic_bp.route("/<string:table_name>/double_table/confirm/<id>")
+@login_required
+@roles_required()
+def double_table_view_confirm(table_name,id):
+    variables = get_variables_double_table_view(table_name)
+    url_confirm=variables.get('url_confirm')
+    return redirect(url_for(url_confirm, id=id))
+
 ###################
 # Files View
 ###################
@@ -886,3 +944,112 @@ def table_view_files(table_name,id):
         date_variable=date_variable,
         **context
     )
+
+###################
+# Import data 
+###################
+
+@dynamic_bp.route("/import_data/<string:table_name>", methods=["POST"])
+@login_required
+@roles_required()
+def import_data(table_name):
+    file = request.files.get("archivo")
+    if not file:
+        flash("No se seleccionó ningún archivo.", "info")
+        return redirect(url_for('dynamic.table_view', table_name=table_name))
+
+    model = get_model_by_name(table_name)
+    if model is None:
+        return jsonify({'alert':'info','message': f"La tabla '{table_name}' no existe."})
+
+    try:
+        # --- Read file ---
+        if file.filename.endswith(".csv"):
+            df = pd.read_csv(file)
+        elif file.filename.endswith(".xlsx"):
+            df = pd.read_excel(file)
+        else:
+            return jsonify({'alert':'info','message': "El archivo debe ser CSV o XLSX."})
+        if TABLE_COLUMN_MAPS[table_name]:
+            df.columns = df.columns.str.strip()
+
+            # --- Auto detect table ---
+            table_name = detect_table_from_columns(df.columns)
+            if not table_name:
+                return jsonify({
+                    "alert": "error",
+                    "message": "No se pudo detectar la tabla automáticamente."
+                })
+                
+            model = get_model_by_name(table_name)
+            column_map = TABLE_COLUMN_MAPS[table_name]
+            # --- Rename columns ---
+            df = df.rename(columns=column_map)
+        # --- Validate required columns ---
+        model_columns = {c.name for c in model.__table__.columns}
+
+        required_columns = {
+            c.name
+            for c in model.__table__.columns
+            if not c.nullable and not c.primary_key
+        }
+
+        file_columns = set(df.columns)
+        missing_cols = required_columns - file_columns - {
+            'estatus', 'id_usuario', 'id', 'fecha_de_actualizacion',
+            'fecha_de_creacion', 'id_visualizacion'
+        }
+
+        if missing_cols:
+            return jsonify({'alert':'info','message': f"Faltan columnas requeridas: {', '.join(missing_cols)}"})
+
+        # --- 🔥 Resolve all FKs with 1–N batch queries ---
+        df = resolve_foreign_keys_bulk(model, df)
+        # --- Insert rows ---
+        for _, row in df.iterrows():
+            clean = {c: row[c] for c in df.columns if c in model_columns}
+            clean=sanitize_data(model, clean)
+            record = model(**clean)
+            record.id_visualizacion = get_id_visualizacion(table_name)
+            record.id_usuario = session['id_usuario']
+            db.session.add(record)
+
+        db.session.commit()
+        return jsonify({'alert':'success','message': f"Se importaron {len(df)} registros."})
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'alert':'error','message': "Error en la importación: {e}"})
+
+###################
+# Upload specific files
+###################
+
+@dynamic_bp.route("/upload_file/<string:table_name>/<id>/<column>", methods=["POST"])
+@login_required
+def upload_file(table_name,id,column):
+    model=get_model_by_name(table_name)
+    record=model.query.get(id)
+    old_file=Archivos.query.filter_by(id_registro=id,nombre_del_archivo=column,tabla_origen=table_name).first()
+    if old_file:
+        s3_service.delete_file(old_file.ruta_s3)
+        db.session.delete(old_file)
+    # create file in archivos
+    new_record=Archivos(
+        nombre_del_archivo=column,
+        tabla_origen=table_name,
+        id_registro=id,
+        ruta_s3='',
+        nombre='',
+        id_usuario=session['id_usuario']
+    )
+    archivo = request.files.get("archivo")
+    db.session.add(new_record)
+    db.session.flush()
+    s3_service.upload_file(archivo, new_record.id,table_name)
+    new_record.ruta_s3=f"{table_name}/{new_record.id}_{archivo.filename}"
+    new_record.nombre=archivo.filename
+    db.session.add(new_record)
+    setattr(record, column, new_record.id)
+    db.session.commit()
+    return jsonify({'alert':'success','message': f"El archivo se cargo exitosamente."})

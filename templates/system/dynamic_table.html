@@ -6,22 +6,24 @@
 {% include "./partials/system/alerts.html" %}
 <!-- Breadcrumb -->
 {% include 'partials/table/breadcrumbs.html' %}
+{% set no_tabs=['logs_auditoria','archivos','inventario','productos_en_recepciones_de_compras','servicios_en_facturas','facturas_en_ingresos','gastos_y_compras_en_pagos']%}
 <!-- Elemento oculto para pasar data al JS: nombre de tabla y columnas -->
 {% if report %}
     <div id="table-data" data-table="/report_queries/{{ table_name }}/data" data-columns='{{ columns|tojson }}' hidden></div>
 {% else %}
     <div id="table-data" data-table="/dynamic/{{ table_name }}/data" data-columns='{{ columns|tojson }}' hidden></div>
 {% endif %}
+
 <div class="flex flex-col h-[calc(100vh-188px)] sm:h-[calc(100vh-204px)]"  x-data="calendarComponent()" x-init="init()">
     <div class="grid grid-cols-1 gap-5">
-        {% if table_name not in ('logs_auditoria','archivos','inventario','productos_en_recepciones_de_compras','servicios_en_facturas','facturas_en_ingresos','gastos_y_compras_en_pagos') and not report%}
+        {% if table_name not in no_tabs and not report %}
             {% include 'partials/table/dynamic_tabs.html' %}
             {% set height=470 %}
         {% else %}
             {% set height=400 %}
         {% endif %}
         <div class="sticky top-0 bg-lesswhite dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 p-5 rounded-lg">
-            <div class="overflow-auto space-y-4" x-data="tabla" x-init="initData(); initDatePicker(); $watch('searchInput', value => { search(value) })">
+            <div class="overflow-auto space-y-4" x-data="tabla" x-init="initData(); initDatePicker(); $watch('searchInput', value => { search(value) });selectedIds = [];document.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = false);">
                 {% include 'partials/table/table_title.html' %}                
                 <div id="table_view" class="flex-1 overflow-y-auto" style="max-height: calc(100vh - {{height}}px)">
                         <table class="w-full table-hover table-striped">
@@ -32,21 +34,26 @@
                                     <tr class="cursor-pointer hover:bg-gray-100" 
                                     {% if not report %}
                                     @click="openActions('{{ table_name }}', record.id,record.estatus)"
-                                    {% endif %}
-                                    >
+                                    {% endif %}>
+                                        {% if checkbox %}
+                                            <td>
+                                                <input type="checkbox" class="form-checkbox" :value="record.id" @change.stop="handleCheckboxChange(record.id)" @click.stop  />
+                                            </td>
+                                        {% endif %}
                                         <!-- Se recorre el array de columnas que se pasó desde el servidor -->
                                         <template x-for="(col, i) in columns" :key="i">
-                                            <td style="word-wrap: break-word;word-break: break-word;white-space: normal;overflow: hidden;text-overflow: ellipsis">
+                                            <td style="white-space: normal">
                                                 <!-- If the column is 'estatus', show a badge -->
-                                                <template x-if="col === 'estatus'">
+                                                <template x-if="col.includes('estatus')">
                                                     <div 
                                                         class="inline-flex items-center rounded-full text-xs justify-center px-2.5 py-1.5"
                                                         :class="{
-                                                            'bg-success text-white':['Activo'].includes(record[col]),
+                                                            'bg-purple text-white':['En revisión'].includes(record[col]),
+                                                            'bg-success text-white':['Activo','Asignado','Validado','Transferible'].includes(record[col]),
                                                             'bg-danger text-white':['Perdido'].includes(record[col]),
-                                                            'bg-warning text-white':['Contacto inicial'].includes(record[col]),
-                                                            'bg-primary text-white':['En proceso','Pendiente'].includes(record[col]),
-                                                            'bg-gray/10':['Inactivo','Finalizado','Finalizada','Cancelada'].includes(record[col]),
+                                                            'bg-warning':['Contacto inicial','No aprobado','Con UUID sin validar'].includes(record[col]),
+                                                            'bg-primary text-white':['En proceso','En banca','Pendiente','Aprobado','Aprobada','Cobrada'].includes(record[col]),
+                                                            'bg-gray/10':['Inactivo','No transferible','Sin enviar','Pagado','Sin validar','Sin asignar','Finalizado','Facturado','Finalizada','Cancelada'].includes(record[col]),
                                                             'bg-a text-white': !record[col]
                                                         }"
                                                         x-text="record[col] || '-'">
@@ -54,7 +61,7 @@
                                                 </template>
 
                                                 <!-- Otherwise, use your normal text logic -->
-                                                <template x-if="col !== 'estatus'">
+                                                <template x-if="!col.toLowerCase().includes('estatus')">
                                                     <span 
                                                         x-text="record[col] 
                                                             ? (col.includes('importe') || col.includes('$') || col.includes('valor') || col.includes('comisiones') || col.includes('monto')|| col.includes('impuestos') || col.includes('descuentos') || col.includes('precio')|| col.includes('subtotal')|| col.includes('propina') || col.includes('balance') || col.includes('costo') || col.includes('sueldo') || col.includes('utilidad')|| col.includes('ticket_promedio')|| col.includes('ingresos')|| col.includes('gastos')|| col.includes('nomina')
@@ -69,10 +76,7 @@
                                                 </template>
                                             </td>
                                         </template>
-
-                                        {% if table_buttons %}
-                                            {% include 'partials/table/buttons/' ~ table_name ~ '.html' %}
-                                        {% endif %}   
+                                        {% include 'partials/table/buttons/' ~ table_name ~ '.html' ignore missing %}
                                     </tr>
                                 </template>
                                 <!-- Si no hay registros, se muestra un mensaje -->
@@ -90,36 +94,26 @@
                 </div>
             </div>
         </div>
-
         {% include 'partials/table/modals/dynamic_modal.html' %}
     </div>
 </div>
 {% include "./partials/system/loader.html" %}
 <!-- Incluir archivos JS centralizados -->
- <script>
-    async function reload_table(){
-        const tableEl = document.querySelector('[x-data="tabla"]');
-        if (tableEl) {
-            const comp = Alpine.$data(tableEl);
-            if (comp?.reload) {
-                await comp.reload();
-            }
-        }
-    }    
-</script>
-<script src="/static/js/system/data-search.js"></script>
-<script src="/static/js/system/data_table.js"></script>
-<script src="/static/js/system/loader.js"></script>
-<script src="/static/js/system/dynamic_table_init.js"></script>
-<script src="/static/js/system/format_functions.js"></script>
-<script src="/static/js/system/generate_files.js"></script>
-<script src="/static/js/system/download_file.js"></script>
+
+<script src="/static/js/system/table/reload_table.js"></script>
+<script src="/static/js/system/table/data-search.js"></script>
+<script src="/static/js/system/table/data_table.js"></script>
+<script src="/static/js/system/table/loader.js"></script>
+<script src="/static/js/system/table/dynamic_table_init.js"></script>
+<script src="/static/js/system/table/format_functions.js"></script>
+<script src="/static/js/system/table/generate_files.js"></script>
+<script src="/static/js/system/table/download_file.js"></script>
+<script src="/static/js/system/table/calendar.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>  
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/locales/es.min.js"></script>
-<script src="/static/js/system/calendar.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/main.min.css">
 {% if javascript %}
     <script src="{{ url_for('static', filename='js/table_logic/%s.js' % table_name) }}"></script>

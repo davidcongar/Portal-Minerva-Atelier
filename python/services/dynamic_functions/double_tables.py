@@ -17,7 +17,9 @@ def get_variables_double_table_view(table_name):
             "model_first_table":"productos",
             "model_second_table":"productos_en_compras",
             "details":["id_visualizacion","proveedor",'importe_total'],
-            "edit_fields":['cantidad_ordenada','descuento_porcentaje','subtotal','fecha_entrega_estimada']
+            "edit_fields":['cantidad_ordenada','descuento_porcentaje','subtotal','fecha_entrega_estimada'],
+            "required_fields":[''],
+            "url_confirm":"compras.confirm"                   
         },    
         "recepciones_de_compras": {
             "columns_first_table":["producto","unidad_de_medida","cantidad_ordenada","cantidad_por_recibir"],
@@ -29,7 +31,9 @@ def get_variables_double_table_view(table_name):
             "model_first_table":"productos_en_compras",
             "model_second_table":"productos_en_recepciones_de_compras",
             "edit_fields":['cantidad','lote','fecha_de_caducidad'],
-            "details":["id_visualizacion"]
+            "details":["id_visualizacion"],
+            "required_fields":[''],
+            "url_confirm":"recepciones_de_compras.confirm"  
         },  
         "transferencias_de_inventario": {
             "columns_first_table":["almacen","producto","cantidad_disponible"],
@@ -42,6 +46,8 @@ def get_variables_double_table_view(table_name):
             "model_second_table":"productos_en_transferencias_de_inventario",
             "details":["id_visualizacion","almacen_entrada","almacen_salida"],
             "edit_fields":['cantidad',"id_posicion_de_sub_almacen_entrada"],
+            "required_fields":[''],
+            "url_confirm":"transferencias_de_inventario.confirm"  
         },    
         "pagos_administrativos": {
             "columns_first_table":["id_","tipo","proveedor","notas", "importe_total","importe_pagado","importe_restante"],
@@ -53,7 +59,9 @@ def get_variables_double_table_view(table_name):
             "model_first_table":"gastos",
             "model_second_table":"gastos_y_compras_en_pagos",
             "details":["id_visualizacion","proveedor","importe"],
-            "edit_fields":['notas','importe']
+            "edit_fields":['notas','importe'],
+            "required_fields":[''],
+            "url_confirm":"pagos_administrativos.confirm"  
         },                   
     }
     columns=columns.get(table_name,'')
@@ -116,6 +124,13 @@ def on_add_double_table(table_name,id):
     elif table_name=='pagos_administrativos':
         record=PagosAdministrativos.query.get(id)
         calcular_importe_pago(record)
+
+def validate_delete(table_name,id):
+    if table_name=='table_name':
+        record=table_name.query.get(id)
+        if record.column=='':
+            return False
+    return True
 
 def on_update_double_table(table_name,id):
     if table_name=='productos_en_compras':

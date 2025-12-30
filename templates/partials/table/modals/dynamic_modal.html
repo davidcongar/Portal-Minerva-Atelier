@@ -19,9 +19,7 @@
             </div>
             <div class="p-5 space-y-4">  
                     <div class="flex justify-end items-center ml-auto" id="buttons_modal_exits">
-                        {% if buttons_modal_exits %}
-                            {% include 'partials/table/modals/' ~ table_name ~ '.html' %}
-                        {% endif %}
+                        {% include 'partials/table/modals/' ~ table_name ~ '.html' ignore missing %}
                     </div>            
                 <div class="text-big font-normal">
                     <h5 class="font-semibold text-lg">Información de registro</h5>
@@ -92,4 +90,4 @@
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 </form>
 <script src="/static/js/system/loader.js"></script>
-<script src="/static/js/system/dynamic_modal.js"></script>
+<script src="/static/js/system/table/dynamic_modal.js"></script>
