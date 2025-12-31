@@ -2,8 +2,7 @@
         fetch(`/dynamic/${table_name}/double_table/update/${column}/${record.id}/${record[column]}`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token() }}',
+                'Content-Type': 'application/json'
             },
         })
         .then(response => response.json())

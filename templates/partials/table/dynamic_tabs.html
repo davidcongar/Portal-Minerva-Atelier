@@ -1,4 +1,3 @@
-{% set no_count = ['No transferible','Cobrada','Cerrado','Cerrada','Finalizada','Finalizado','Cancelado','Cancelada','Pagado','Pagada','Realizada','Realizado','Perdido','Inactivo'] %}
 <div x-data="{activeDefTab:'todos'}">
     <ul class="flex flex-wrap text-xs text-center dark:border-gray/20 border-b border-lightgray/10">
         <li class="">
@@ -16,7 +15,7 @@
                     :class="activeDefTab === '{{ tab['tab'] }}' ? 'bg-primary/10 text-primary' : 'bg-transparent text-gray hover:bg-primary/10 hover:text-primary'"
                     class="inline-flex items-center gap-2 px-5 py-3 rounded-t-lg">
                     {{ tab['tab'] }}
-                    {% if tab['tab'] not in no_count %}
+                    {% if tab['tab'] not in vars.no_tab_count %}
                         <span>
                             {{ tab["count"] | default(0) }}
                         </span>

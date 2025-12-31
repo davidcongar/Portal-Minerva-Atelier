@@ -4,7 +4,7 @@ async function deleteRecord(tableName, modelSecondTable, mainId, recordId, csrfT
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token() }}',
+            'X-CSRFToken': csrfToken,
         },
     })
     .then(response => response.json())

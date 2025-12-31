@@ -1,0 +1,23 @@
+<!--Dynamic tables variables-->
+{% set no_tabs= ['logs_auditoria','archivos','inventario','productos_en_recepciones_de_compras','servicios_en_facturas','facturas_en_ingresos','gastos_y_compras_en_pagos'] %}
+{% set no_tab_count = ['No transferible','Cobrada','Cerrado','Cerrada','Finalizada','Finalizado','Cancelado','Cancelada','Pagado','Pagada','Realizada','Realizado','Perdido','Inactivo'] %}
+{% set no_add_button = ['servicios_en_facturas','facturas_en_ingresos'] %}
+{% set date_range_search = ['fecha_venta','fecha_orden','fecha_de_gasto','fecha_de_transferencia','fecha','fecha_hora']  %}
+
+<!--Dynamic form variables-->
+{% set columns_foreign_options= ['espacio_de_proyecto','regimen_fiscal','tipo_de_iva','unidad_de_medida','inventariable','prioridad','estatus', 'genero','estado_civil','tipo_de_cuenta','tipo_de_ajuste','forma_de_pago','uso_de_cfdi','metodo_de_pago'] %}
+{% set date_time_columns=[] %}
+{% set date_columns=[] %}
+{% set time_columns=[] %}
+{% set file_columns=[] %}
+
+{% macro id_proyecto(option) %}
+    {{ option.id_visualizacion ~ ' - ' ~ option.nombre }}
+{% endmacro %}
+
+<!--Dynamic two table variables-->
+{% set textarea_columns= ['notas','descripcion','sugerencias','motivo'] %}
+{% set number_colums= ['cantidad','sub_total','importe','importe_ajuste','precio_unitario','cantidad_ordenada','descuento_porcentaje','subtotal','valor_unitario','impuesto'] %}
+{% set text_columns=['folio_fiscal'] %}
+{% set money_format_columns=['importe','precio_unitario','sub_total','impuesto','importe_total','monto','importe_pagado','importe_total','importe_restante','subtotal'] %}
+{% set allow_new_value_dropdowns=[] %}

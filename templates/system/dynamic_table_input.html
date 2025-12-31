@@ -75,53 +75,72 @@
                                         <tr class="cursor-pointer hover:bg-gray-100">
                                             <template x-for="(col, i) in {{ columns }}" :key="i">
                                                 <td >  
-                                                    <template x-if="{{ edit_fields }}.includes(col) && ['cantidad_recibida'].includes(col)">
+                                                    <template x-if="file_columns.includes(col)">
+                                                        <form method="POST" class="space-y-4" id="dynamic_form"
+                                                            x-bind:action="`{{ url_for('dynamic.upload_file', table_name=model_second_table, id='__id__', column='__replace__') }}`.replace('__replace__', col).replace('__id__', record.id)"
+                                                            enctype="multipart/form-data">        
+                                                            <div class="border w-10 h-10 flex items-center justify-center text-primary border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-primary bg-primary/10">
+                                                                <input type="file" :id="`file-upload-${col}-${record.id}`" name="archivo" class="hidden"  @change="console.log('changed', $event.target.files)">
+                                                                <label :for="`file-upload-${col}-${record.id}`">
+                                                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                        <path d="M3 15C3 17.8284 3 19.2426 3.87868 20.1213C4.75736 21 6.17157 21 9 21H15C17.8284 21 19.2426 21 20.1213 20.1213C21 19.2426 21 17.8284 21 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                        <path d="M12 16V3M12 3L16 7.375M12 3L8 7.375" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                    </svg>
+                                                                </label>                    
+                                                            </div>    
+                                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                        </form>
+                                                    </template>      
+                                                    <template x-if="{{ edit_fields }}.includes(col) && number_colums.includes(col)">
                                                         <form method="POST">
                                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                                             <input type="number" x-model="record[col]"
-                                                                class="form-input rounded-lg w-32 h-12 text-xl" 
+                                                                class="form-input rounded-lg w-32 h-12 " 
                                                                 @blur="update_record(record,col)" />
                                                         </form>
-                                                    </template>
-                                                    <template x-if="{{ edit_fields }}.includes(col) && String(col).includes('fecha')">
+                                                    </template>                                                    
+                                                    <template x-if="{{ edit_fields }}.includes(col) && date_columns.includes(col)">
                                                         <form method="POST">
                                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                                             <input type="date" x-model="record[col]"
                                                                 class="form-input rounded-lg" style="width:150px"
-                                                                @blur="update_record(record,col)"></textarea>
+                                                                @blur="update_record(record,col)"></input>
                                                         </form>
                                                     </template>
-                                                    <template x-if="{{ edit_fields }}.includes(col) && ['notas','descripcion','sugerencias','respuesta'].includes(col)">
+                                                    <template x-if="{{ edit_fields }}.includes(col) && textarea_columns.includes(col)">
                                                         <form method="POST">
                                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                                             <textarea rows='3'  x-model="record[col]"
-                                                                class="form-textarea rounded-lg w-30 h-20" 
+                                                                class="form-textarea rounded-lg w-50 h-20" 
                                                                 @blur="update_record(record,col)"></textarea>
                                                         </form>
                                                     </template>
-                                                    <template x-if="{{ edit_fields }}.includes(col) && ['id_producto'].includes(col)">
+                                                    <template x-if="{{ edit_fields }}.includes(col) && text_columns.includes(col)">
                                                         <form method="POST">
                                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                                            <select :id="col + '_' + record.id"  :name="col" class="searchable-select" x-model="record[col]" x-init="$nextTick(() => {$el._select2 = $($el).select2({ width: '100%' }).on('change', () => { record[col] = $el.value; update_record(record,col); });})">
-                                                                {% for option in foreign_options['id_producto'] %}
-                                                                    <option value="{{ option.id }}" >
-                                                                        {{ option.nombre or option.nombre_completo or option.nombre_empresa or option.id_visualizacion }}
-                                                                    </option>
-                                                                {% endfor %}
-                                                            </select>
+                                                            <input type="text" x-model="record[col]"
+                                                                class="form-input rounded-lg w-32 h-12 " 
+                                                                @blur="update_record(record,col)" />
                                                         </form>
                                                     </template>
+                                                    <template x-if="{{ edit_fields }}.includes(col) && time_columns.includes(col)">
+                                                        <form method="POST">
+                                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                            <input type="time" x-model="record[col]"
+                                                                class="form-input rounded-lg" style="width:150px"
+                                                                @blur="update_record(record,col)"></input>
+                                                        </form>
+                                                    </template>
+                                                    {% include 'partials/input_table/dropdowns/' ~ table_name ~ '.html' ignore missing %}                                        
                                                     <!-- Mostrar otras columnas normalmente -->
                                                     <template x-if="!{{ edit_fields }}.includes(col) && !String(col).includes('fecha')">
-                                                        <td style="word-wrap: break-word;word-break: break-word;white-space: normal;overflow: hidden;text-overflow: ellipsis">
                                                             <span 
                                                                 x-text="record[col] 
-                                                                ? (['cantidad_recibida'].includes(col) 
+                                                                ? (money_format_columns.includes(col) 
                                                                     ? money_format(record[col]) 
                                                                     : record[col]) 
                                                                 : '-'">
                                                             </span>
-                                                        </td>
                                                     </template>
                                                 </td>
                                             </template>
@@ -142,61 +161,20 @@
 <script src="/static/js/system/loader.js"></script>
 <script src="/static/js/system/dynamic_table_init.js"></script>
 <script src="/static/js/system/format_functions.js"></script>
-<script src="/static/js/system/update_record_validation.js"></script>
+<script src="/static/js/system/input_table/update_record.js"></script>
+<script src="/static/js/system/double_table/select2.js"></script>
+
 <script>
-    function initSelect2() {
-        $('.searchable-select').select2({ width: '100%' });
-    }
-
-    document.addEventListener('DOMContentLoaded', initSelect2);
-
-    // Also re-run after Alpine reloads data
-    document.addEventListener('alpine:init', () => {
-    Alpine.effect(() => {
-        initSelect2();
-    });
-    });
-
-    initSelect2();
-
-    const table_name={{ table_name|tojson }};
-
-    function update_record(record,column) {
-        fetch(`/dynamic/${table_name}/double_table/update/${column}/${record.id}/${record[column]}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token() }}',
-            },
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message !== "" && data.status==='warning') {
-                window.dispatchEvent(new CustomEvent('show-warning', {
-                    detail: data.message   // the message from your AJAX or backend
-                }));
-                warningAlert.style.display = 'flex';  // Show the warning message
-                warningAlert.style.opacity = '1';  // Set opacity to 1 for showing
-                setTimeout(function() {
-                    warningAlert.style.opacity = '0';  // Start fading out
-                    // After the fade-out animation is complete, hide the element
-                    setTimeout(function() {
-                        warningAlert.style.display = 'none';
-                    }, 1000);  // Match this delay with the CSS transition time (1s)
-                }, 3000);
-                if (data.value!=''){
-                    record[column] = data.value;  
-                    const input = document.querySelector(
-                        `[data-record-id="${record.id}"][data-column="${column}"]`
-                    );
-                    if (input) {
-                        input.value = data.value;
-                    }
-                }
-            }
-        })
-        .catch(error => console.error("Error:", error));
-    }
+    const allow_new_value_dropdowns={{ vars.allow_new_value_dropdowns | tojson }};
+    const table_name={{ model_second_table | tojson }};
+    const file_columns = {{ vars.file_columns | tojson }};
+    const date_columns = {{ vars.date_columns | tojson }};
+    const date_time_columns = {{ vars.date_time_columns | tojson }};
+    const time_columns = {{ vars.time_columns | tojson }};
+    const textarea_columns = {{ vars.textarea_columns | tojson }};
+    const number_colums = {{ vars.number_colums | tojson }};
+    const text_columns = {{ vars.text_columns | tojson }};
+    const money_format_columns = {{ vars.money_format_columns | tojson }};
 </script>
 
 

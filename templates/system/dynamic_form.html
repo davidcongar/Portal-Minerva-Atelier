@@ -4,7 +4,7 @@
 {% include './partials/system/alerts.html' %}
 <!-- Breadcrumb -->
 {% include 'partials/table/breadcrumbs.html' %}
-{% set columns_foreign_options=['espacio_de_proyecto','regimen_fiscal','tipo_de_iva','unidad_de_medida','inventariable','prioridad','estatus', 'genero','estado_civil','tipo_de_cuenta','tipo_de_ajuste','forma_de_pago','uso_de_cfdi','metodo_de_pago']%}
+{% import 'variables.html' as vars %}
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -82,7 +82,7 @@
                                         {% endfor %}
                                     </select>
                                 {% endfor %}
-                            {% elif column in multiple_choice_data%}
+                            {% elif column in multiple_choice_data %}
                                 {% for field, data in multiple_choice_data.items() %}
                                     <select id="{{ field }}" name="{{ field }}" class="js-example-basic-multiple"  multiple {% if column in required_fields %} required {% endif %}>
                                         {% for option in data.options %}
@@ -100,7 +100,7 @@
                                     </option>
                                     {% for option in foreign_options[column] %}
                                          <!-- Opciones de select dentro de foreign options que no sean de otras bases-->
-                                        {% if column in columns_foreign_options %}
+                                        {% if column in vars.columns_foreign_options %}
                                             <option value="{{ option }}" {% if record and record[column] == option %}selected{% endif %} {% if default_variable_values[column] == option %}selected{% endif %}>
                                                 {{ option }}
                                             </option>
@@ -115,10 +115,8 @@
                                                     data-filter="{{ option[form_filters[column]] }}"
                                                 {% endif %}
                                                 >
-                                                {% if column=='id_proyecto' %}
-                                                    {{ option.id_visualizacion| string+' - '+option.categoria.nombre| string }}
-                                                {% elif column=='id_compra' %}
-                                                    {{ option.id_visualizacion| string+' - '+option.proveedor.nombre| string+' - '+option.fecha_orden| string }}                                                    
+                                                {% if vars[column] is defined %}
+                                                    {{ vars[column](option) }}
                                                 {% else %}
                                                     {{option.nombre or option.nombre_completo or option.nombre_empresa or option.id_visualizacion }}
                                                 {% endif %}
@@ -134,14 +132,14 @@
                                 <select name="{{ column }}"  id="{{ column  }}" class="js-example-basic-multiple" multiple="multiple" {% if column in required_fields %} required {% endif %}>
                                 </select>
                             {% else %}
-                                {% if "fecha_hora" in column %}
+                                {% if column in date_time_columns %}
                                     <input type="datetime-local" id="{{ column }}" name="{{ column }}" value="{{ (record[column] | local_time) if record else default_variable_values[column] }}" class="form-input rounded-lg" style="width:40%" {% if column in required_fields %} required {% endif %}>
-                                {% elif "fecha" in column %}
+                                {% elif "fecha" in column or column in date_columns %}
                                     <!-- Campo de fecha -->
                                     <input type="date" id="{{ column }}" name="{{ column }}" value="{{record[column] if record else default_variable_values[column] }}" class="form-input rounded-lg" style="width:40%" {% if column in required_fields %} required {% endif %}>
-                                {% elif column in ["hora_inicio", "hora_fin"] %}
+                                {% elif column in time_columns %}
                                     <input type="time" id="{{ column }}" name="{{ column }}" value="{{record[column] if record else default_variable_values[column] }}" class="form-input rounded-lg" style="width:40%"  {% if column in required_fields %} required {% endif %}>
-                                {% elif "archivo" in column %}
+                                {% elif "archivo" in column or column in file_columns %}
                                     <div class="flex items-center gap-2 mt-4" data-file-widget>
                                         <input type="file" id="file-upload_{{ column }}" name="{{ column }}" class="hidden" data-file-input>
                                         <label for="file-upload_{{ column }}"
