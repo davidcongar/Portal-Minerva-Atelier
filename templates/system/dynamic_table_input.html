@@ -1,6 +1,7 @@
 {% extends 'partials/system/layout1.html' %}
 {% block content %}
 {% include "partials/system/alerts.html" %}
+{% import 'variables.html' as vars %}
 
 
 <!-- Breadcrumb -->
@@ -30,7 +31,7 @@
             <div id="table-data" data-table="/dynamic/{{ main_table_name }}/input_table/data/{{ main_record.id }}" data-columns='{{ columns|tojson }}'></div>
             <div class="flex flex-col">
                 <div class="grid grid-cols-1 gap-5">
-                    <div class="sticky top-0 bg-white dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 p-5 rounded-lg" x-data="tabla" x-init="initData(); $watch('searchInput', value => { search(value) })" >
+                    <div class="sticky top-0 bg-white dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 p-5 rounded-lg" x-data="tabla" x-init="$watch('items', () => {$nextTick(() => rebindSelect2());}); initData();$watch('searchInput', value => { search(value) })">
                         <div class="flex justify-between items-center gap-3">
                             <div>
                                 <h2 class="text-base font-semibold">{{ table_title }}</h2>
@@ -46,7 +47,7 @@
                                         {% for column in columns %}
                                         <th data-column="{{ column }}">
                                             <div class="flex items-center justify-between gap-2">
-                                                <p class="font-semibold">{{ column|title_format }}</p>
+                                                <p class="font-semibold">{{ column|title_format }} {% if column in required_fields %} * {% endif %} </p>
                                                 <div class="flex flex-col">
                                                     <!-- Icono para ordenar ascendente -->
                                                     <svg @click="sort('{{ column }}', sorted.rule === 'asc' ? 'desc' : 'asc')"
@@ -77,7 +78,7 @@
                                                 <td >  
                                                     <template x-if="file_columns.includes(col)">
                                                         <form method="POST" class="space-y-4" id="dynamic_form"
-                                                            x-bind:action="`{{ url_for('dynamic.upload_file', table_name=model_second_table, id='__id__', column='__replace__') }}`.replace('__replace__', col).replace('__id__', record.id)"
+                                                            x-bind:action="`{{ url_for('dynamic.upload_file', table_name=table_name, id='__id__', column='__replace__') }}`.replace('__replace__', col).replace('__id__', record.id)"
                                                             enctype="multipart/form-data">        
                                                             <div class="border w-10 h-10 flex items-center justify-center text-primary border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-primary bg-primary/10">
                                                                 <input type="file" :id="`file-upload-${col}-${record.id}`" name="archivo" class="hidden"  @change="console.log('changed', $event.target.files)">
@@ -156,17 +157,17 @@
     </div>
 </div>
 
-<script src="/static/js/system/data-search.js"></script>
-<script src="/static/js/system/data_table.js"></script>
-<script src="/static/js/system/loader.js"></script>
-<script src="/static/js/system/dynamic_table_init.js"></script>
-<script src="/static/js/system/format_functions.js"></script>
+<script src="/static/js/system/table/data-search.js"></script>
+<script src="/static/js/system/table/data_table.js"></script>
+<script src="/static/js/system/table/loader.js"></script>
+<script src="/static/js/system/table/dynamic_table_init.js"></script>
+<script src="/static/js/system/table/format_functions.js"></script>
 <script src="/static/js/system/input_table/update_record.js"></script>
 <script src="/static/js/system/double_table/select2.js"></script>
 
 <script>
     const allow_new_value_dropdowns={{ vars.allow_new_value_dropdowns | tojson }};
-    const table_name={{ model_second_table | tojson }};
+    const table_name={{ table_name | tojson }};
     const file_columns = {{ vars.file_columns | tojson }};
     const date_columns = {{ vars.date_columns | tojson }};
     const date_time_columns = {{ vars.date_time_columns | tojson }};
@@ -175,6 +176,7 @@
     const number_colums = {{ vars.number_colums | tojson }};
     const text_columns = {{ vars.text_columns | tojson }};
     const money_format_columns = {{ vars.money_format_columns | tojson }};
+    
 </script>
 
 

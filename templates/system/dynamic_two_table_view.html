@@ -182,7 +182,7 @@
             <div id="table-data2" data-table="/dynamic/{{ table_name }}/double_table/data/second/{{ main_record.id }}" data-columns='{{ columns_second_table|tojson }}'></div>
             <div class="flex flex-col">
                 <div class="grid grid-cols-1 gap-5">
-                    <div class="bg-white dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 p-5 rounded-lg" x-data="tabla2" x-init="$watch('items', () => {$nextTick(() => rebindSelect2());}); initData();">
+                    <div class="bg-white dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 p-5 rounded-lg" x-data="tabla2" x-init="$watch('items', () => {$nextTick(() => rebindSelect2());}); initData();$watch('searchInput', value => { search(value) })">
                         <div class="sticky top-0 z-10 flex justify-between items-center gap-3">
                             <div>
                                 <h2 class="text-base font-semibold">{{ title_second_table }}</h2>

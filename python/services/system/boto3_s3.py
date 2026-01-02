@@ -5,27 +5,25 @@ import uuid
 
 import boto3
 from botocore.exceptions import ClientError
+from botocore.config import Config
 
 from python.models.modelos import *
 import mimetypes
 
 class S3Service:
     def __init__(self, use_local_profile=False, profile_name="default"):
-        """
-        Inicializa el servicio de S3. Permite el uso de perfiles locales.
+        region = os.getenv("AWS_REGION") or "us-east-2"   # <-- Force region
 
-        :param use_local_profile: Indica si debe usarse un perfil local.
-        :param profile_name: El nombre del perfil AWS a usar localmente.
-        """
         if use_local_profile:
-            session = boto3.Session(profile_name=profile_name)
-            self.s3_client = session.client("s3")
+            session = boto3.Session(profile_name=profile_name, region_name=region)
+            self.s3_client = session.client("s3", region_name=region)
         else:
             self.s3_client = boto3.client(
                 "s3",
+                region_name="us-east-2",
                 aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
                 aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-                region_name=os.getenv("AWS_REGION")
+                config=Config(s3={"addressing_style": "virtual"})
             )
         self.bucket_name = os.getenv("AWS_S3_BUCKET_NAME")
 
@@ -71,3 +69,13 @@ class S3Service:
             return response
         except ClientError as e:
             raise Exception(f"Error al generar la URL firmada: {e}")
+
+    def delete_file(self, filepath):
+        try:
+            self.s3_client.delete_object(
+                Bucket=self.bucket_name,
+                Key=filepath
+            )
+            return True
+        except ClientError as e:
+            raise Exception(f"Error al eliminar el archivo de S3: {e}")

@@ -762,6 +762,7 @@ def delete_double_table(main_table_name,table_name,id,id_main_record):
 @dynamic_bp.route("/<string:table_name>/double_table/update/<string:column>/<id>/", methods=["POST"])
 @dynamic_bp.route("/<string:table_name>/double_table/update/<string:column>/<id>/<value>", methods=[ "POST"])
 @login_required
+@csrf.exempt
 def double_table_update(table_name,column,id,value=0):
     try:
         value_warning=''
@@ -788,6 +789,7 @@ def double_table_update(table_name,column,id,value=0):
 #  Table View Input
 ###################
 
+
 @dynamic_bp.route("/<string:main_table_name>/input_table/view/<id>")
 @login_required
 @roles_required()
@@ -799,6 +801,7 @@ def table_view_input(main_table_name,id):
     table_title = variables.get('table_title')
     table_name = variables.get('table_name')
     edit_fields=variables.get('edit_fields')
+    required_fields=variables.get('required_fields')
     foreign_options = get_foreign_options()
     form_options=get_form_options(table_name)
     foreign_options = {**foreign_options, **form_options}
@@ -816,7 +819,7 @@ def table_view_input(main_table_name,id):
         if any(word in detail.lower() for word in ["importe", "monto", "precio"]):
             try:
                 # Safely cast to Decimal/float and format as money
-                value = f"${Decimal(value):,.2f}"
+                value = f"${float(value):,.2f}"
             except Exception:
                 # fallback if value is not numeric
                 value = str(value)
@@ -838,10 +841,12 @@ def table_view_input(main_table_name,id):
         table_title=table_title,
         html='table',
         edit_fields=edit_fields,
+        required_fields=required_fields,
         foreign_options=foreign_options,
         details=details,
         **context
     )
+
 
 @dynamic_bp.route("/<string:table_name>/input_table/data/<id>", methods=["GET", "POST"])
 @login_required
@@ -1050,6 +1055,6 @@ def upload_file(table_name,id,column):
     new_record.ruta_s3=f"{table_name}/{new_record.id}_{archivo.filename}"
     new_record.nombre=archivo.filename
     db.session.add(new_record)
-    setattr(record, column, new_record.id)
+    setattr(record, column, f'{new_record.id}__{archivo.filename}')
     db.session.commit()
     return jsonify({'alert':'success','message': f"El archivo se cargo exitosamente."})
