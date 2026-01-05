@@ -1,11 +1,10 @@
 <!-- templates/partials/table_modal.html -->
-<div id="modal" class="hidden fixed inset-0 bg-dark/90 dark:bg-lesswhite/5 backdrop-blur-sm z-[99999] hidden overflow-y-auto">
+<div id="modal" class="hidden fixed inset-0 bg-dark/90 dark:bg-white/5 backdrop-blur-sm z-[99999] hidden overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen px-4">
         <div class="bg-lesswhite dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 rounded-lg overflow-hidden my-8 w-full max-w-xl">
-            <div class="flex bg-lesswhite dark:bg-dark items-center border-b border-lightgray/10 dark:border-gray/20 justify-between px-5 py-3">
+            <div class="flex bg-white dark:bg-dark items-center border-b border-lightgray/10 dark:border-gray/20 justify-between px-5 py-3">
                 <h5 class="font-semibold text-lg">
                     <span  id="modal_title"></span>
-                    <span id="id_registro"></span>
                     <span>|</span>
                     <span id="estatus"></span>
                 </h5>
@@ -17,11 +16,11 @@
                     </svg>
                 </button>
             </div>
-            <div class="p-5 space-y-4">  
+            <div class="p-5 space-y-4">         
+                <div class="text-big font-normal">
                     <div class="flex justify-end items-center ml-auto" id="buttons_modal_exits">
                         {% include 'partials/table/modals/' ~ table_name ~ '.html' ignore missing %}
-                    </div>            
-                <div class="text-big font-normal">
+                    </div>                       
                     <h5 class="font-semibold text-lg">Información de registro</h5>
                     <br>
                     <table class="overflow-auto w-full table-striped" id="modal_content"></table>
@@ -36,7 +35,7 @@
                 <div class="flex justify-start items-center gap-4 ">
                     <!-- Botón para descargar -->
                     <button data-action="descargar" type="button"
-                        class="bg-gray/10 w-10 h-10 flex items-center justify-center hover:bg-dark hover:text-white dark:hover:bg-lesswhite dark:hover:text-dark border border-transparent rounded-md transition-all duration-300">
+                        class="bg-gray/10 w-10 h-10 flex items-center justify-center hover:bg-dark hover:text-white dark:hover:bg-white dark:hover:text-dark border border-transparent rounded-md transition-all duration-300">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path
                                 d="M12.5535 16.5061C12.4114 16.6615 12.2106 16.75 12 16.75C11.7894 16.75 11.5886 16.6615 11.4465 16.5061L7.44648 12.1311C7.16698 11.8254 7.18822 11.351 7.49392 11.0715C7.79963 10.792 8.27402 10.8132 8.55352 11.1189L11.25 14.0682V3C11.25 2.58579 11.5858 2.25 12 2.25C12.4142 2.25 12.75 2.58579 12.75 3V14.0682L15.4465 11.1189C15.726 10.8132 16.2004 10.792 16.5061 11.0715C16.8118 11.351 16.833 11.8254 16.5535 12.1311L12.5535 16.5061Z"
@@ -47,9 +46,9 @@
                         </svg>
                     </button>
                     <!-- Botón para actualizar -->
-                    {% if table_name not in ('reportes','archivos') and not parent_table or table_name in ('preguntas_de_briefs') %}
+                    {% if table_name not in ('reportes','archivos','logs_auditoria') and not parent_table and can_access('/dynamic/' ~ table_name ~ '/edit') %}
                         <button data-action="actualizar" type="button"
-                            class="bg-gray/10 w-10 h-10 flex items-center justify-center hover:bg-dark hover:text-white dark:hover:bg-lesswhite dark:hover:text-dark border border-transparent rounded-md transition-all duration-300">
+                            class="bg-gray/10 w-10 h-10 flex items-center justify-center hover:bg-dark hover:text-white dark:hover:bg-white dark:hover:text-dark border border-transparent rounded-md transition-all duration-300">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M9.57342 2.71915L10.1913 2.10123C11.2151 1.07742 12.8751 1.07742 13.8989 2.10123C14.9227 3.12503 14.9227 4.78494 13.8989 5.80874L13.2809 6.42666M9.57342 2.71915C9.57342 2.71915 9.65066 4.03223 10.8093 5.19082C11.9679 6.34942 13.2809 6.42666 13.2809 6.42666M9.57342 2.71915L3.89259 8.39997C3.50782 8.78475 3.31543 8.97714 3.14997 9.18926C2.9548 9.4395 2.78746 9.71025 2.65094 9.99672C2.5352 10.2396 2.44916 10.4977 2.27708 11.0139L1.54791 13.2014M13.2809 6.42666L7.60011 12.1075C7.21533 12.4923 7.02295 12.6847 6.81082 12.8501C6.56059 13.0453 6.28984 13.2126 6.00336 13.3491C5.7605 13.4649 5.50239 13.5509 4.98616 13.723L2.79865 14.4522M2.79865 14.4522L2.26393 14.6304C2.00989 14.7151 1.72981 14.649 1.54046 14.4596C1.35111 14.2703 1.28499 13.9902 1.36967 13.7361L1.54791 13.2014M2.79865 14.4522L1.54791 13.2014"
@@ -69,17 +68,17 @@
                                     fill="currentColor" />
                             </svg>
                         </button>
-                    {% endif %}
-                    {% if table_name not in ('reportes','archivos') and not parent_table %}
-                    <div class="flex justify-end items-center gap-2" x-data x-show="true">
-                        <template x-if="!['Cancelada'].includes($store.modalData.record.estatus)">
-                            <button data-action="files" type="button"
-                                class="btn border text-primary border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-primary bg-primary/10">
-                                Archivos
-                            </button>
-                        </template>   
-                    </div>         
-                    {% endif %}
+                    {% endif %} 
+                    {% if table_name in vars.files_button_functionality and not parent_table %}
+                        <div class="flex justify-end items-center gap-2" x-data x-show="true">
+                            <template x-if="!['Cancelada'].includes($store.modalData.record.estatus)">
+                                <button data-action="files" type="button"
+                                    class="btn border text-primary border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-primary bg-primary/10">
+                                    Archivos
+                                </button>
+                            </template>   
+                        </div>         
+                    {% endif %}                      
                 </div>                  
             </div>
         </div>
@@ -89,4 +88,4 @@
 <form id="action_buttons" method="POST" style="display: none;">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 </form>
-<script src="/static/js/system/loader.js"></script>
+<script src="/static/js/system/table/dynamic_modal.js"></script>

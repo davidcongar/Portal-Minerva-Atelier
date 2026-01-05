@@ -17,8 +17,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from python.services.system.extensions import limiter
 from python.services.system.extensions import csrf
-
-
+from python.services.system.template_formats import *
 
 # Cargar variables de entornoa
 load_dotenv()
@@ -34,6 +33,15 @@ app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "secret_key")
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+
+
+app.jinja_env.globals['can_access'] = can_access
+app.jinja_env.filters["date_format"] = date_format
+app.jinja_env.filters["commafy"] = commafy
+app.jinja_env.filters["money_format"] = money_format
+app.jinja_env.filters["title_format"] = title_format
+app.jinja_env.filters["remove_numbers"] = remove_numbers
+app.jinja_env.filters["local_time"] = local_time
 
 # Configuración de la sesión
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(weeks=1)

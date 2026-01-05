@@ -18,6 +18,7 @@ from python.services.dynamic_functions.tables import *
 from python.services.system.boto3_s3 import S3Service
 from uuid import UUID
 import pandas as pd
+from python.services.system.template_formats import title_format
 
 s3_service = S3Service()
 
@@ -589,11 +590,11 @@ def record_data(table_name,id_record):
     query=query.filter(model.id == id_record)
     records = query.all()
     columns_order= get_columns(table_name,'modal')
-    record = [record_to_ordered_list(model,joins,record,columns_order) for record in records]
+    record = [ [(title_format(key), value) for key, value in record_to_ordered_list(model, joins, r, columns_order)] for r in records]    
     relationships=get_table_relationships(table_name)
     if relationships!='':
         for i in relationships:
-            record[0].append((i,'/dynamic/'+i+'/view?parent_table='+table_name+'&id_parent_record='+id_record))
+            record[0].append((title_format(i),'/dynamic/'+i+'/view?parent_table='+table_name+'&id_parent_record='+id_record))
     return jsonify(record)
 
 ###################

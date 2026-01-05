@@ -53,75 +53,19 @@ function formatNumber(value) {
         return new Intl.NumberFormat('en-US').format(value);
 }
 function titleFormat(value) {
-  const replacements = {
-        "id_visualizacion": "ID",
-        "creacion": "creación",
-        "descripcion": "descripción",
-        "informacion": "información",
-        "categoria": "categoría",
-        "menu": "menú",
-        "telefono": "teléfono",
-        "razon": "razón",
-        "metodo": "método",
-        "transito": "tránsito",
-        "periodico": "periódico",
-        "genero":"género",
-        "direccion":"dirección",
-        "codigo":"código",
-        "contratacion":"contratación",
-        "numero":"número",
-        "razon":"razón",
-        "direccion":"dirección",
-        "nomina":"nómina",
-        "electronico":"electrónico",
-        "ultimo":"último",
-        "sesion":"sesión",
-        "metodo":"método",
-        "comision":"comisión",
-        "codigo":"código",
-        "actualizacion": "actualización",
-        "ejecucion": "ejecución",
-        "dias":"días",
-        "transito": "tránsito",
-        "minima": "mínima",
-        "maxima": "máxima",
-        "calificacion": "calificación",
-        "subcategoria": "subcategoría",
-
-        "id_pago_id_visualizacion": "ID Pago",
-        "id_gasto_id_visualizacion": "ID Gasto",
-        "id_compra_id_visualizacion": "ID Compra",       
-        "id_viaje_id_visualizacion": "ID Viaje",    
-        "id_facturac_viaticos_id_visualizacion": "ID Factura Viáticos",    
-
-  };
-
-  // Check for exact match
-  if (replacements[value]) {
-    return replacements[value].charAt(0).toUpperCase() + replacements[value].slice(1);
-  }
-
   // Replace underscores with spaces
-  let formatted = value.replace("_nombre_completo", "").replace("_nombre", "").replace(/_/g, " ");
+  let formatted = value.replace(/_/g, " ");
   // Remove "id " prefix if present
   if (formatted.startsWith("id ")) {
     formatted = formatted.slice(3);
   }
 
-  // Replace words with accented versions if needed
-  for (let k in replacements) {
-    const regex = new RegExp(`\\b${k}\\b`, "i");
-    if (regex.test(formatted)) {
-      formatted = formatted.replace(regex, replacements[k]);
-    }
-  }
   formatted = formatted.charAt(0).toUpperCase() + formatted.slice(1);
 
   return formatted;
 }
 async function openActions(form, recordId,estatus) {
         showLoader();
-        //document.getElementById('id_registro').textContent=recordId;
         document.getElementById('estatus').textContent = estatus;
 
         const updateButton = document.querySelector('button[data-action="actualizar"]');
@@ -180,7 +124,7 @@ async function get_record(form, recordId) {
             } catch (error) {
                 console.error("Error accessing modal_content_relationship:", error);
             }
-            document.getElementById("modal_title").textContent = `${titleFormat(form)} -`;
+            document.getElementById("modal_title").textContent = `${titleFormat(form)}`;
             const buttons = document.getElementById("buttons_modal_exits");
 
             if (getRecordRunCount === 1) {
@@ -196,7 +140,7 @@ async function get_record(form, recordId) {
                     document.getElementById('id_registro').textContent=value;
                 }
 
-                if (/(importe|monto|precio|subtotal|descuentos|propina|comisiones|otros_costos|costo_de_envio|impuestos)/i.test(key) && !isNaN(value)) {
+                if (money_format_columns.includes(key) && !isNaN(value)) {
                     value = formatCurrency(value);
                 } else if (!isNaN(value)) {
                     value = formatNumber(value);
@@ -205,7 +149,7 @@ async function get_record(form, recordId) {
 
 
                 if(String(value).includes('/dynamic')){
-                    tr.innerHTML = `<td style="border-right: 1px solid #ccc; padding: 8px;">${titleFormat(key)}</td>
+                    tr.innerHTML = `<td style="border-right: 1px solid #ccc; padding: 8px;">${key}</td>
                     <td style="text-align: center;">
                         <button type="submit"
                             @click.stop="window.location.href='${value}'"
@@ -214,12 +158,12 @@ async function get_record(form, recordId) {
                         </button>
                     </td>`;
                     tbody_modal_content_relationship.appendChild(tr);
-                } else if (!['id', 'id_proveedor', 'id_categoria_de_gasto', 'id_cuenta_de_banco'].includes(key)) {
+                } else if (!['Id'].includes(key)) {
                     if(key.includes('archivo')){
                         const [uuid, name] = value.split("__");
                         tr.innerHTML = `
                             <td style="white-space:normal;border-right:1px solid #ccc; padding:8px;">
-                                ${titleFormat(key)}
+                                ${key}
                             </td>
                             <td class="clickable-td"
                                 style="word-break:break-word; white-space:normal; overflow-wrap:anywhere; max-width:300px;">
@@ -235,7 +179,7 @@ async function get_record(form, recordId) {
                         const [before, id, table_name] = value.split("__");
                         tr.innerHTML = `
                             <td style="white-space:normal;border-right:1px solid #ccc; padding:8px;">
-                                ${titleFormat(key)}
+                                ${key}
                             </td>
                             <td class="clickable-td"
                                 style="word-break:break-word; white-space:normal; overflow-wrap:anywhere; max-width:300px;">
@@ -247,7 +191,7 @@ async function get_record(form, recordId) {
                             </td>
                         `;
                     }else{
-                        tr.innerHTML = `<td style="border-right: 1px solid #ccc; padding: 8px; ">${titleFormat(key)}</td><td style="word-break: break-word; white-space: normal; overflow-wrap: anywhere; max-width: 300px;">${value}</td>`;
+                        tr.innerHTML = `<td style="border-right: 1px solid #ccc; padding: 8px; ">${key}</td><td style="word-break: break-word; white-space: normal; overflow-wrap: anywhere; max-width: 300px;">${value}</td>`;
                     }
                     tbody_modal_content.appendChild(tr);                    
                 }
