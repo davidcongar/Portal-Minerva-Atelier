@@ -16,9 +16,9 @@ def title_format(value):
     # First check for exact match
     if value=='id_visualizacion':
         return "ID"
-    if 'id' in value:
-        return replacements[value]  
     if value in replacements:
+        if 'id' in value:
+            return replacements[value]  
         return replacements[value].capitalize()
     # Replace underscores with spaces
     
