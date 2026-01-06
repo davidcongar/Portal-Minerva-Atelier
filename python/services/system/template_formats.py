@@ -14,11 +14,12 @@ def title_format(value):
     replacements = TITLE_FORMATS
     
     # First check for exact match
-    if value in replacements:
-        return replacements[value]
     if value=='id_visualizacion':
         return "ID"
-
+    if 'id' in value:
+        return replacements[value]  
+    if value in replacements:
+        return replacements[value].capitalize()
     # Replace underscores with spaces
     
     formatted = value.replace("_id_visualizacion","").replace("_", " ")

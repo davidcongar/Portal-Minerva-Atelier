@@ -5,7 +5,7 @@
 <!-- Breadcrumb -->
 {% include 'partials/table/breadcrumbs.html' %}
 <div class="h-[calc(100vh-366px)] sm:h-[calc(100vh-204px)]">
-    <div class="bg-lesswhite dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 p-5 rounded-lg flex items-center justify-between">
+    <div class="bg-white dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 p-5 rounded-lg flex items-center justify-between">
         <div>
             <h1 class="font-semibold">Rol: {{rol.nombre}}</h1>
             <h1 class="font-semibold">Número de permisos: {{cantidad_permisos}}</h1>
@@ -118,11 +118,11 @@
         }
     }
 </script>
-<script src="/static/js/system/data-search.js"></script>
-<script src="/static/js/system/data_table.js"></script>
-<script src="/static/js/system/loader.js"></script>
-<script src="/static/js/system/dynamic_table_init.js"></script>
-<script src="/static/js/system/format_functions.js"></script>
+<script src="/static/js/system/table/data-search.js"></script>
+<script src="/static/js/system/table/data_table.js"></script>
+<script src="/static/js/system/table/loader.js"></script>
+<script src="/static/js/system/table/dynamic_table_init.js"></script>
+<script src="/static/js/system/table/format_functions.js"></script>
 {% include "partials/system/loader.html" %}
 
 {% endblock content %}

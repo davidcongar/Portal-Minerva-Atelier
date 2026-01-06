@@ -196,7 +196,7 @@ def add_access(id):
     context = {
         "activeMenu": "permisos",
         "activeItem": "roles",
-        "breadcrumbs": [{"name":"Roles","url":url_for("dynamic.table_view", table_name='roles')},{"name":id,"url":""},{"name":rol.nombre,"url":""}]
+        "breadcrumbs": [{"name":"Roles","url":url_for("dynamic.table_view", table_name='roles')},{"name":rol.nombre,"url":""}]
     }
     return render_template(
         "system/access_control/add_access.html",
@@ -249,7 +249,7 @@ def add_users(id):
     context = {
         "activeMenu": "permisos",
         "activeItem": "usuarios",
-        "breadcrumbs": [{"name":"Roles","url":url_for("dynamic.table_view", table_name='roles')},{"name":id,"url":""},{"name":rol.nombre,"url":""}]
+        "breadcrumbs": [{"name":"Roles","url":url_for("dynamic.table_view", table_name='roles')},{"name":rol.nombre,"url":""}]
     }
     return render_template(
         "system/access_control/add_users.html",
