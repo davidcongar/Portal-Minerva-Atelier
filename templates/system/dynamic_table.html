@@ -13,7 +13,30 @@
 {% else %}
     <div id="table-data" data-table="/dynamic/{{ table_name }}/data" data-columns='{{ columns|tojson }}' hidden></div>
 {% endif %}
+<style>
+    .table-scroll-horizontal::-webkit-scrollbar {
+        height: 8px;
+    }
 
+    .table-scroll-horizontal::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .table-scroll-horizontal::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 4px;
+    }
+
+    .table-scroll-horizontal::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+        .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: visible;
+    }
+</style>
 <div class="flex flex-col h-[calc(100vh-188px)] sm:h-[calc(100vh-204px)]"  x-data="calendarComponent()" x-init="init()">
     <div class="grid grid-cols-1 gap-5">
         {% if table_name not in vars.no_tabs and not report %}
@@ -25,7 +48,7 @@
         <div class="sticky top-0 bg-white dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 p-5 rounded-lg">
             <div class="overflow-auto space-y-4" x-data="tabla" x-init="initData(); initDatePicker(); $watch('searchInput', value => { search(value) });selectedIds = [];document.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = false);">
                 {% include 'partials/table/table_title.html' %}                
-                <div id="table_view" class="flex-1 overflow-y-auto" style="max-height: calc(100vh - {{height}}px)">
+                <div id="table_view" class="flex-1 overflow-y-auto table-scroll-horizontal" style="max-height: calc(100vh - {{height}}px)">
                         <table class="w-full table-hover table-striped">
                             {% include 'partials/table/table_head.html' %}
                             <tbody>
@@ -114,6 +137,8 @@
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/locales/es.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/main.min.css">
 <script>
+    
+        const table_name = {{ table_name | tojson }};
         const percentage_format_columns = {{ vars.percentage_format_columns | tojson }};
         const money_format_columns = {{ vars.money_format_columns | tojson }};
         const purple_badge_values = {{ vars.purple_badge_values | tojson }};
@@ -122,6 +147,9 @@
         const warning_badge_values = {{ vars.warning_badge_values | tojson }};
         const danger_badge_values = {{ vars.danger_badge_values | tojson }};
         const gray_badge_values = {{ vars.gray_badge_values | tojson }};
+        const calendar_titles = {{ vars.calendar_titles | tojson }}; 
+        const title_formats = {{ title_formats | tojson }}; 
+
 </script>
 {% if javascript %}
     <script src="{{ url_for('static', filename='js/table_logic/%s.js' % table_name) }}"></script>

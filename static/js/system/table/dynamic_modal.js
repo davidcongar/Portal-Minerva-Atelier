@@ -53,6 +53,12 @@ function formatNumber(value) {
         return new Intl.NumberFormat('en-US').format(value);
 }
 function titleFormat(value) {
+  const replacements = title_formats;
+  // Check for exact match
+  if (replacements[value]) {
+    return replacements[value].charAt(0).toUpperCase() + replacements[value].slice(1);
+  }
+
   // Replace underscores with spaces
   let formatted = value.replace(/_/g, " ");
   // Remove "id " prefix if present
@@ -60,12 +66,20 @@ function titleFormat(value) {
     formatted = formatted.slice(3);
   }
 
+  // Replace words with accented versions if needed
+  for (let k in replacements) {
+    const regex = new RegExp(`\\b${k}\\b`, "i");
+    if (regex.test(formatted)) {
+      formatted = formatted.replace(regex, replacements[k]);
+    }
+  }
   formatted = formatted.charAt(0).toUpperCase() + formatted.slice(1);
 
   return formatted;
 }
 async function openActions(form, recordId,estatus) {
         showLoader();
+        //document.getElementById('id_registro').textContent=recordId;
         document.getElementById('estatus').textContent = estatus;
 
         const updateButton = document.querySelector('button[data-action="actualizar"]');
@@ -113,6 +127,7 @@ async function get_record(form, recordId) {
             const data = await response.json();
             const record = data[0]; // first record
             const recordObj = Object.fromEntries(record);
+            console.log(data)
 
             const modal_content = document.getElementById('modal_content');
             modal_content.innerHTML = '<tbody></tbody>';
@@ -122,7 +137,7 @@ async function get_record(form, recordId) {
                 modal_content_relationship.innerHTML = '<tbody></tbody>';
                 tbody_modal_content_relationship = modal_content_relationship.querySelector("tbody");
             } catch (error) {
-                console.error("Error accessing modal_content_relationship:", error);
+                //console.error("Error accessing modal_content_relationship:", error);
             }
             document.getElementById("modal_title").textContent = `${titleFormat(form)}`;
             const buttons = document.getElementById("buttons_modal_exits");
@@ -136,10 +151,6 @@ async function get_record(form, recordId) {
             }
             for (const [key, rawValue] of Object.entries(recordObj)) {
                 let value = rawValue;
-                if(key==='id_visualizacion'){
-                    document.getElementById('id_registro').textContent=value;
-                }
-
                 if (money_format_columns.includes(key) && !isNaN(value)) {
                     value = formatCurrency(value);
                 } else if (!isNaN(value)) {
@@ -149,7 +160,7 @@ async function get_record(form, recordId) {
 
 
                 if(String(value).includes('/dynamic')){
-                    tr.innerHTML = `<td style="border-right: 1px solid #ccc; padding: 8px;">${key}</td>
+                    tr.innerHTML = `<td style="border-right: 1px solid #ccc; padding: 8px;">${titleFormat(key)}</td>
                     <td style="text-align: center;">
                         <button type="submit"
                             @click.stop="window.location.href='${value}'"
@@ -158,12 +169,12 @@ async function get_record(form, recordId) {
                         </button>
                     </td>`;
                     tbody_modal_content_relationship.appendChild(tr);
-                } else if (!['Id'].includes(key)) {
+                } else if (!['id', 'id_proveedor', 'id_categoria_de_gasto', 'id_cuenta_de_banco'].includes(key)) {
                     if(key.includes('archivo')){
                         const [uuid, name] = value.split("__");
                         tr.innerHTML = `
                             <td style="white-space:normal;border-right:1px solid #ccc; padding:8px;">
-                                ${key}
+                                ${titleFormat(key)}
                             </td>
                             <td class="clickable-td"
                                 style="word-break:break-word; white-space:normal; overflow-wrap:anywhere; max-width:300px;">
@@ -179,7 +190,7 @@ async function get_record(form, recordId) {
                         const [before, id, table_name] = value.split("__");
                         tr.innerHTML = `
                             <td style="white-space:normal;border-right:1px solid #ccc; padding:8px;">
-                                ${key}
+                                ${titleFormat(key)}
                             </td>
                             <td class="clickable-td"
                                 style="word-break:break-word; white-space:normal; overflow-wrap:anywhere; max-width:300px;">
@@ -191,14 +202,11 @@ async function get_record(form, recordId) {
                             </td>
                         `;
                     }else{
-                        tr.innerHTML = `<td style="border-right: 1px solid #ccc; padding: 8px; ">${key}</td><td style="word-break: break-word; white-space: normal; overflow-wrap: anywhere; max-width: 300px;">${value}</td>`;
+                        tr.innerHTML = `<td style="border-right: 1px solid #ccc; padding: 8px; ">${titleFormat(key)}</td><td style="word-break: break-word; white-space: normal; overflow-wrap: anywhere; max-width: 300px;">${value}</td>`;
                     }
                     tbody_modal_content.appendChild(tr);                    
                 }
             }
-
-
-
             return recordObj;
         } catch (error) {
             console.error("Error fetching or processing data:", error);

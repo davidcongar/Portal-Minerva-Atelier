@@ -1,8 +1,8 @@
-<div x-data="{activeDefTab:'todos'}">
+<div x-data="{activeDefTab:'todos'}" id="tabs">
     <ul class="flex flex-wrap text-xs text-center dark:border-gray/20 border-b border-lightgray/10">
         <li class="">
             <a href="javaScript:;"
-                @click="$dispatch('filter-status', 'todos'); activeDefTab = 'todos'"
+                @click="$dispatch('filter-status', 'todos'); activeDefTab = 'todos';$nextTick(() => $dispatch('filter-status', activeDefTab))"
                 :class="activeDefTab === 'todos' ? 'bg-primary/10 text-primary' : 'bg-transparent text-gray hover:bg-primary/10 hover:text-primary'"
                 class="inline-flex items-center gap-2 px-5 py-3 rounded-t-lg">
                 Todos
@@ -11,7 +11,7 @@
         {% for tab in data_tabs %}
             <li>
                 <a href="javascript:;"
-                    @click="$dispatch('filter-status', '{{ tab['tab'] }}'); activeDefTab = '{{ tab['tab'] }}'"
+                    @click="$dispatch('filter-status', '{{ tab['tab'] }}'); activeDefTab = '{{ tab['tab'] }}';$nextTick(() => $dispatch('filter-status', activeDefTab))"
                     :class="activeDefTab === '{{ tab['tab'] }}' ? 'bg-primary/10 text-primary' : 'bg-transparent text-gray hover:bg-primary/10 hover:text-primary'"
                     class="inline-flex items-center gap-2 px-5 py-3 rounded-t-lg">
                     {{ tab['tab'] }}

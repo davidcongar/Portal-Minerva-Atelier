@@ -7,10 +7,12 @@
   /**
    * Utility: read table endpoint + columns from the hidden #table-data element.
    */
+  
   function getTableMeta() {
     const el = document.getElementById('table-data');
     if (!el) return null;
-    const url = el.getAttribute('data-table');          // e.g. /dynamic/<table_name>/data
+    const url = el.getAttribute('data-table'); 
+
     let columns;
     try { columns = JSON.parse(el.getAttribute('data-columns') || '[]'); }
     catch { columns = []; }
@@ -34,36 +36,27 @@
     if (!Array.isArray(columns) || !columns.length) return null;
     const lowered = columns.map(c => String(c).toLowerCase());
     // preferred common title-ish columns:
-    const candidates = ['titulo', 'title','id_empleado_nombre_completo', 'id_cliente_nombre', 'name', 'descripcion', 'description', 'asunto', 'concepto'];
-    for (const c of candidates) {
-      const i = lowered.indexOf(c);
-      if (i !== -1) return columns[i];
-    }
-    // otherwise first that isn't obviously an id/fecha/estatus/monto-type
-    for (let i = 0; i < columns.length; i++) {
-      const c = lowered[i];
-      if (!/^(id|fecha|estatus|status|monto|importe|precio)$/.test(c)) return columns[i];
-    }
-    return null;
+    return calendar_titles[table_name];
   }
-  const employeeColors = {};
-  function getColorForEmpleado(id) {
+  const bg_colors = {};
+  function getBackGroundColor(id) {
     if (!id) return '#999'; // fallback gray
-    if (!employeeColors[id]) {
+    if (!bg_colors[id]) {
       // generate a color (HSL cycle)
-      const hue = Object.keys(employeeColors).length * 47 % 360; // spread hues
-      employeeColors[id] = `hsl(${hue}, 70%, 50%)`;
+      const hue = Object.keys(bg_colors).length * 47 % 360; // spread hues
+      bg_colors[id] = `hsl(${hue}, 70%, 50%)`;
     }
-    return employeeColors[id];
+    return bg_colors[id];
   }
 
   /**
    * Fetch items from the same endpoint as the table.
    * Tries to pass start/end as query params; if backend ignores them, we’ll filter client-side.
    */
-  async function fetchItems(url, search = '') {
+  async function fetchItems(url, search = '',status='todos') {
     const u = new URL(url, window.location.origin);
     if (search) u.searchParams.set('search', search);
+    if (status) u.searchParams.set('status', status);
     const res = await fetch(u.toString(), { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`Error al obtener datos (${res.status})`);
     const data = await res.json();
@@ -81,14 +74,18 @@
     return items
       .filter(r => r && r[date_variable_back])
       .map(r => {
-        const date = new Date(`${r[date_variable_back]}T${'00:00'}`);
         let start_date;
         let end_date;
         let allDay;
         start_date=`${r[date_variable_back]}`
         allDay=false;
         end_date=null
-        const baseTitle =(titleField && r[titleField]) ? String(r[titleField]) : `Registro ${r.id ?? ''}`.trim();
+		const baseTitle = titleField
+		.map(f => r[f])
+		.filter(v => v != null && v !== '')
+		.map(v => String(v))
+		.join(' • ')
+		|| `Registro ${r.id_visualizacion ?? ''}`.trim();		
         const title = `${baseTitle}`;
         return {
           id: r.id,
@@ -96,9 +93,8 @@
           start: start_date,
           end: end_date,
           allDay,
-          
-          backgroundColor: getColorForEmpleado(r.id_empleado || r.id_cliente), 
-          borderColor: getColorForEmpleado(r.id_empleado || r.id_cliente),     
+          backgroundColor: getBackGroundColor(r.estatus), 
+          borderColor: getBackGroundColor(r.estatus),     
           textColor: '#fff', // optional contrast
           extendedProps: {
             estatus: r.estatus ?? r.status ?? null,
@@ -130,6 +126,9 @@
     }
     // Read optional search and date range UI if present
     const searchInput = document.getElementById('search');
+    const tab_el = document.getElementById('tabs');
+    const data_tab = Alpine.$data(tab_el);
+    const statusInput = data_tab.activeDefTab;
 
     // Show calendar container (in case it's hidden) before render
     calEl.style.display = 'block';
@@ -139,7 +138,7 @@
     // Fetch records and build events
     let items = [];
     try {
-      items = await fetchItems(meta.url, searchInput?.value || '');
+      items = await fetchItems(meta.url, searchInput?.value || '', statusInput || 'todos');
     } catch (e) {
       console.error('[InitCalendar] Error al cargar datos:', e);
     }
@@ -158,8 +157,8 @@
         locale,
         eventDisplay: 'block',   // 👈 force block rendering in month view
         height: 'auto',
-        slotMinTime: '08:00:00',     // 👈 start of business hours
-        slotMaxTime: '22:00:00',  
+        //slotMinTime: '08:00:00',     // 👈 start of business hours
+        //slotMaxTime: '22:00:00',  
         headerToolbar: {
           left: 'prev,next today',
           center: 'title',
@@ -197,14 +196,20 @@
 
     // Only wire listeners once
     if (!initialized) {
-      initialized = true;
+      	initialized = true;
 
-      // Rebuild calendar when search or date range changes
-      if (searchInput) {
-        searchInput.addEventListener('input', debounce(() => {
-          window.InitCalendar({ calendarEl: calEl, locale });
-        }, 300));
-      }
+		// Rebuild calendar when search or date range changes
+		if (searchInput) {
+			searchInput.addEventListener('input', debounce(() => {
+			window.InitCalendar({ calendarEl: calEl, locale });
+			}, 300));
+		}
+		window.addEventListener('filter-status', (e) => {
+			// If calendar is visible, refresh it
+			if (calendar) {
+				window.InitCalendar();
+			}
+		});
 
 
       // When the container becomes visible again (e.g., toggling from table -> calendar), force a resize

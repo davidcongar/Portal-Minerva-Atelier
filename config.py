@@ -1,6 +1,6 @@
 # title format replacements
 TITLE_FORMATS = {
-    "visualizacion": "visualización",
+    "id_visualizacion":'ID',
     "almacenes":"almacenes",
     "almacen": "almacén",
     "creacion": "creación",
