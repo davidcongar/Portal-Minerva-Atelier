@@ -426,7 +426,6 @@ def add(table_name):
         db.session.commit()
         flash(f"Registro creado exitosamente en '{table_name.replace('_', ' ').capitalize()}'.", "success")    
     except Exception as e:
-        print(e)
         db.session.rollback()
         flash(f"Error al crear el registro: {str(e)}", "danger")
         return(request.referrer or "/")
@@ -597,7 +596,6 @@ def record_data(table_name,id_record):
             record[0].append((i,'/dynamic/'+i+'/view?parent_table='+table_name+'&id_parent_record='+id_record))
     return jsonify(record)
 
-
 ###################
 # Double Table View
 ###################
@@ -635,7 +633,7 @@ def double_table_view(table_name,id):
         if any(word in detail.lower() for word in ["importe", "monto", "precio"]):
             try:
                 # Safely cast to Decimal/float and format as money
-                value = f"${Decimal(value):,.2f}"
+                value = f"${float(value):,.2f}"
             except Exception:
                 # fallback if value is not numeric
                 value = str(value)
@@ -791,7 +789,6 @@ def double_table_update(table_name,column,id,value=0):
 #  Table View Input
 ###################
 
-
 @dynamic_bp.route("/<string:main_table_name>/input_table/view/<id>")
 @login_required
 @roles_required()
@@ -848,7 +845,6 @@ def table_view_input(main_table_name,id):
         details=details,
         **context
     )
-
 
 @dynamic_bp.route("/<string:table_name>/input_table/data/<id>", methods=["GET", "POST"])
 @login_required
@@ -948,6 +944,7 @@ def table_view_files(table_name,id):
         columns=columns,
         id_registro_padre=record.id,
         table_name='archivos',
+        title_formats=TITLE_FORMATS,
         date_variable=date_variable,
         **context
     )
@@ -968,7 +965,6 @@ def import_data(table_name):
     model = get_model_by_name(table_name)
     if model is None:
         return jsonify({'alert':'info','message': f"La tabla '{table_name}' no existe."})
-
     try:
         # --- Read file ---
         if file.filename.endswith(".csv"):
@@ -977,7 +973,8 @@ def import_data(table_name):
             df = pd.read_excel(file)
         else:
             return jsonify({'alert':'info','message': "El archivo debe ser CSV o XLSX."})
-        if TABLE_COLUMN_MAPS[table_name]:
+        map = TABLE_COLUMN_MAPS.get(table_name)
+        if map:
             df.columns = df.columns.str.strip()
 
             # --- Auto detect table ---
@@ -991,7 +988,8 @@ def import_data(table_name):
             model = get_model_by_name(table_name)
             column_map = TABLE_COLUMN_MAPS[table_name]
             # --- Rename columns ---
-            df = df.rename(columns=column_map)
+            if column_map:
+                df = df.rename(columns=column_map)
         # --- Validate required columns ---
         model_columns = {c.name for c in model.__table__.columns}
 
@@ -1026,7 +1024,7 @@ def import_data(table_name):
 
     except Exception as e:
         db.session.rollback()
-        return jsonify({'alert':'error','message': "Error en la importación: {e}"})
+        return jsonify({'alert':'error','message': f"Error en la importación: {e}"})
 
 ###################
 # Upload specific files

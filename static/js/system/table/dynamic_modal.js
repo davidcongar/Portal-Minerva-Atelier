@@ -127,7 +127,6 @@ async function get_record(form, recordId) {
             const data = await response.json();
             const record = data[0]; // first record
             const recordObj = Object.fromEntries(record);
-            console.log(data)
 
             const modal_content = document.getElementById('modal_content');
             modal_content.innerHTML = '<tbody></tbody>';

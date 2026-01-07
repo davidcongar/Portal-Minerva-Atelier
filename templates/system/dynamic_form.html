@@ -209,7 +209,7 @@
                                     <input type="date" id="{{ column }}" name="{{ column }}" value="{{record[column] if record else default_variable_values[column] }}" class="form-input rounded-lg" style="width:40%" {% if column in required_fields %} required {% endif %}>
                                 {% elif column in time_columns %}
                                     <input type="time" id="{{ column }}" name="{{ column }}" value="{{record[column] if record else default_variable_values[column] }}" class="form-input rounded-lg" style="width:40%"  {% if column in required_fields %} required {% endif %}>
-                                {% elif "archivo" in column or column in file_columns %}
+                                {% elif ("archivo" in column or column in file_columns) and table_name != "archivos"%}
                                     <div class="flex items-center gap-2 mt-4" data-file-widget>
                                         <input type="file" id="file-upload_{{ column }}" name="{{ column }}" class="hidden" data-file-input>
                                         <label for="file-upload_{{ column }}"
