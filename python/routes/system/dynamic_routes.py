@@ -171,7 +171,7 @@ def data(table_name):
         query = query.filter(getattr(model, status_field) == status)
     else:
         open_status=get_open_status(table_name)
-        if open_status:
+        if open_status and hasattr(model,status_field):
             query = query.filter(getattr(model, status_field).in_(open_status))
     
 

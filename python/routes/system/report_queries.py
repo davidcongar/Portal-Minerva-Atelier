@@ -41,6 +41,7 @@ def report_queries(sql_name):
         "system/dynamic_table.html",
         columns=columns,
         table_name=sql_name,
+        title_formats=TITLE_FORMATS,
         report=1,
         **context,
     )
