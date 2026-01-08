@@ -391,7 +391,7 @@ def get_breadcrumbs(table_name):
         "roles":['Permisos','permisos'],
         "logs_auditoria":['Auditoría','auditoria'],
         "reportes":['Reportes','reportes'],
-        "archivos":[session['tabla_origen'].capitalize(),session['tabla_origen']],
+        "archivos":[session['tabla_origen'].replace('_',' ').capitalize(),session['tabla_origen']],
 
         "almacenes":['Almacén','almacen'],
         "categorias_de_productos":['Almacén','almacen'],
