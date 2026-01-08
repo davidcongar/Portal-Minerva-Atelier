@@ -1,6 +1,7 @@
 <div class="flex justify-between items-center gap-3">
     <h2 class="text-base font-semibold mb-4">{{ table_name|title_format }}</h2>
     <div class="flex space-x-2 items-center">
+        {% include 'partials/table/additional_buttons/' ~ table_name ~ '.html'  ignore missing %}
         {% if date_variable!='' and  date_variable %}
             <button id="calendar_button" type="button" class="btn flex items-center gap-2 justify-center text-primary border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-primary bg-primary/10"
                 onclick="(function(){
@@ -11,7 +12,6 @@
                 Calendario
             </button>
         {% endif %}
-        {% include 'partials/table/additional_buttons/' ~ table_name ~ '.html'  ignore missing %}
         <!-- Botón para agregar nuevo registro -->
         {% if not report and table_name not in vars.no_add_button %}
             <div class="flex justify-end">
