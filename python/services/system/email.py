@@ -81,7 +81,7 @@ def one_time_code_email(recipient_email,unique_code):
             subject="Código de un solo uso para inicio de sesión - Portal Minerva Atelier",
             recipient_email=recipient_email,
             template="partials/system/email_template.html",
-            body_content="El sigueinte código tiene una vigencia de 15 minutos para inciar sesión.",
+            body_content="El siguiente código tiene una vigencia de 15 minutos para inciar sesión.",
             details_list=[
                 f"{unique_code}"
             ]
