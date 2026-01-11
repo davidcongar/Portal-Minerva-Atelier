@@ -83,6 +83,7 @@ def table_view(table_name):
             }
     number_buttons=get_table_buttons().get(table_name,0)
     date_variable=get_calendar_date_variable(table_name)
+    javascript = os.path.exists(f'static/js/table_logic/{table_name}.js')
     relationships=get_table_relationships(table_name)
     data_tabs=get_data_tabs(table_name,parent_table,id_parent_record)
     checkbox=get_checkbox(table_name)
@@ -98,6 +99,7 @@ def table_view(table_name):
         relationships=relationships,
         checkbox=checkbox,
         title_formats=TITLE_FORMATS,
+        javascript=javascript,
         html='table',
         **context
     )
