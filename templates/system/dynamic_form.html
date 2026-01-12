@@ -105,14 +105,14 @@
                                 <select name="{{ column }}"  id="{{ column  }}" class="js-example-basic-multiple" multiple="multiple" {% if column in required_fields %} required {% endif %}>
                                 </select>
                             {% else %}
-                                {% if column in date_time_columns %}
+                                {% if column in vars.date_time_columns %}
                                     <input type="datetime-local" id="{{ column }}" name="{{ column }}" value="{{ (record[column] | local_time) if record else default_variable_values[column] }}" class="form-input rounded-lg" style="width:40%" {% if column in required_fields %} required {% endif %}>
                                 {% elif "fecha" in column or column in date_columns %}
                                     <!-- Campo de fecha -->
                                     <input type="date" id="{{ column }}" name="{{ column }}" value="{{record[column] if record else default_variable_values[column] }}" class="form-input rounded-lg" style="width:40%" {% if column in required_fields %} required {% endif %}>
-                                {% elif column in time_columns %}
+                                {% elif column in vars.time_columns %}
                                     <input type="time" id="{{ column }}" name="{{ column }}" value="{{record[column] if record else default_variable_values[column] }}" class="form-input rounded-lg" style="width:40%"  {% if column in required_fields %} required {% endif %}>
-                                {% elif ("archivo" in column or column in file_columns) and table_name != "archivos"%}
+                                {% elif ("archivo" in column or column in  vars.file_columns) and table_name != "archivos"%}
                                     <div class="flex items-center gap-2 mt-4" data-file-widget>
                                         <input type="file" id="file-upload_{{ column }}" name="{{ column }}" class="hidden" data-file-input>
                                         <label for="file-upload_{{ column }}"
