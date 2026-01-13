@@ -10,6 +10,8 @@ from sqlalchemy.types import TypeDecorator, String
 from cryptography.fernet import Fernet
 import os
 from dotenv import load_dotenv 
+from sqlalchemy.dialects.postgresql import UUID,ARRAY
+import uuid
 
 load_dotenv()
 

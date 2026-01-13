@@ -59,11 +59,11 @@ def get_form_options(table_name):
 def get_multiple_choice_data():
     multiple_choice_data = {}
     options = {
-        "ejemplo": ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+        "tags": ['Lunes','Martes','Miércoles'],
     }      
     for i in options:
         multiple_choice_data[i] = {
-            "selected": options[i],
+            "selected": [],
             "options": options[i]
         }
     return multiple_choice_data

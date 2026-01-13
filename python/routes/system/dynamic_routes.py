@@ -48,12 +48,6 @@ def table_view(table_name):
     columns=get_columns(table_name,'main_page')
     if columns==None:
         columns = model.__table__.columns.keys()
-        # Get Many-to-Many relationships
-        many_to_many_columns = [
-            rel.key for rel in model.__mapper__.relationships.values()  if rel.secondary is not None and "archivos" not in rel.key.lower() and "rutas" not in rel.key.lower()
-        ]
-        # Combine both lists
-        columns = columns + many_to_many_columns
 
     # Datos para resaltar el menú activo en el sidebar
     if parent_table:
@@ -126,6 +120,72 @@ def data(table_name):
 
     query = model.query
 
+    mapper = inspect(model)
+    m2m_search_columns = [] 
+    for rel in mapper.relationships:
+        if rel.secondary is None:
+            continue  # only many-to-many
+
+        related_model = rel.mapper.class_
+        secondary = rel.secondary
+
+        # --- Detect FK columns ---
+        base_pk = model.__mapper__.primary_key[0]
+        related_pk = related_model.__mapper__.primary_key[0]
+
+        base_fk_col = None
+        related_fk_col = None
+
+        for col in secondary.c:
+            for fk in col.foreign_keys:
+                if fk.column is base_pk:
+                    base_fk_col = col
+                elif fk.column is related_pk:
+                    related_fk_col = col
+
+        if base_fk_col is None or related_fk_col is None:
+            continue  # safety
+
+        # --- Choose display column dynamically ---
+        display_col_name = next(
+            (c.key for c in related_model.__table__.columns
+            if c.key in ("nombre", "name", "descripcion")),
+            related_pk.key
+        )
+
+        display_col = getattr(related_model, display_col_name)
+
+        # --- Build aggregation subquery ---
+        subq = (
+            db.session.query(
+                base_fk_col.label("parent_id"),
+                func.string_agg(
+                    func.cast(display_col, db.String),
+                    ", "
+                ).label(rel.key)
+            )
+            .outerjoin(
+                related_model,
+                related_pk == related_fk_col
+            )
+            .group_by(base_fk_col)
+            .subquery()
+        )
+
+        subq_alias = aliased(subq, name=f"{rel.key}_agg")
+
+        # --- Join subquery to main query ---
+        query = query.outerjoin(
+            subq_alias,
+            subq_alias.c.parent_id == base_pk
+        )
+
+        # --- Expose aggregated column ---
+        agg_col = subq_alias.c[rel.key]
+        query = query.add_columns(agg_col)
+        m2m_search_columns.append(agg_col)
+
+
     if session['nombre_rol']!='Administrador' and session['nombre_rol']!='Sistema':
         query=query.filter(model.id_usuario==session['id_usuario'])
               
@@ -155,7 +215,7 @@ def data(table_name):
     
     # Aplicar búsqueda
     if search:
-        query = search_table(query, model, search, aliased_name_columns)
+        query = search_table(query, model, search, aliased_name_columns,m2m_search_columns)
 
     if table_name=='archivos':
         query=query.filter(Archivos.id_registro==session['id_registro_tabla_origen'])
@@ -262,19 +322,18 @@ def form(table_name):
     form_options=get_form_options(table_name)
     foreign_options = {**foreign_options, **form_options}
     # Add Many-to-Many relationships
+    record_id = request.args.get("id")
+    if record_id!=None:
+        record = model.query.get(record_id)    
     many_to_many_data = {}
     for attr_name, attr in model.__mapper__.relationships.items():
         if attr.secondary is not None:  # Ensures it's Many-to-Many
             related_model = attr.mapper.class_
 
-            # Get selected values for the current record
-            selected_items = []
-
-            # Ensure selected_items is iterable
-            if isinstance(selected_items, list) or hasattr(selected_items, '__iter__'):
-                selected_ids = [item.id for item in selected_items]  
-            else:
-                selected_ids = [selected_items.id] if selected_items else []
+            selected_ids = []
+            if record_id!=None:
+                selected_items = getattr(record, attr_name, [])
+                selected_ids = [item.id for item in selected_items]
 
             # Get all available options
             all_options = related_model.query.all()
@@ -284,16 +343,13 @@ def form(table_name):
                 "selected": selected_ids,
                 "options": all_options
             }
-
     # Add Multiple choice fields
     multiple_choice_data=get_multiple_choice_data()
 
     modulo,active_menu=get_breadcrumbs(table_name)
     default_variable_values={}
     # edicion
-    record_id = request.args.get("id")
     if record_id!=None:
-        record = model.query.get(record_id)
         name = getattr(record, "nombre", None)
         flujo = request.args.get("accion", None, type=str)
         accion = (f"Editar registro: {name}" if name else "Editar registro: "+ str(record.id_visualizacion)) if flujo is None else (f"{flujo}: {name}" if name else f"{flujo}:"+ str(record.id_visualizacion))
@@ -326,6 +382,9 @@ def form(table_name):
     }
     form_filters=get_form_filters(table_name)
     parent_record=get_parent_record(table_name)
+    columns = list(many_to_many_data.keys()) + columns
+    required_fields = list(many_to_many_data.keys()) + columns
+
     return render_template(
         "system/dynamic_form.html",
         columns=columns,
@@ -357,7 +416,7 @@ def add(table_name):
         return redirect(url_for("dynamic.table_view", table_name=table_name))
     try:
         # Retrieve all form data (handling multi-select fields correctly)
-        model_columns = model.__table__.columns.keys()
+        model_columns = model.__table__.columns.keys() + model.__mapper__.relationships.keys()
         data = {key: request.form.getlist(key) for key in request.form.keys() if key in model_columns}
         data.pop('archivo', None)
         data = sanitize_data(model, data)
@@ -371,7 +430,7 @@ def add(table_name):
                 relationship_data[key] = value  # Store for later processing
             else:
                 # Normal field (use first value if it's a list with one element)
-                normal_data[key] = value[0] if isinstance(value, list) and len(value) == 1 else value
+                normal_data[key] = value
         # Create new record with only normal fields first
         new_record = model(**normal_data)
         new_record.id_usuario = Usuarios.query.get(session["id_usuario"]).id
@@ -398,10 +457,12 @@ def add(table_name):
         # Process many-to-many relationships
         for key, value in relationship_data.items():
             related_model = getattr(model, key).property.mapper.class_
-            # Convert IDs to actual objects
-            selected_items = db.session.query(related_model).filter(related_model.id.in_([int(v) for v in value if v])).all()
-            # Assign relationship
-            getattr(new_record, key).extend(selected_items)
+            relationship_name=getattr(model, key).key
+            selected_ids = [UUID(v) for v in value if v] if value else []
+            selected_items = db.session.query(related_model).filter(related_model.id.in_(selected_ids)).all()
+            relationship = getattr(new_record, relationship_name)
+            relationship.clear()
+            relationship.extend(selected_items)              
         # archivos
         archivos = [file for key, file in request.files.items() if key.startswith("id_archivo")]
         if archivos:
@@ -512,16 +573,17 @@ def edit(table_name):
                         # Check if the field is a relationship (Many-to-Many)
                         if isinstance(attr, InstrumentedAttribute) and hasattr(attr.property, 'mapper'):
                             related_model = attr.property.mapper.class_
+                            relationship_name=attr.key
                             # Convert selected IDs to integers
-                            selected_ids = [int(v) for v in value if v] if value else []
+                            selected_ids = [UUID(v) for v in value if v] if value else []
                             # Query related objects and update relationship
                             selected_items = db.session.query(related_model).filter(related_model.id.in_(selected_ids)).all()
-                            getattr(record, key).clear()  # Clear existing relationships
-                            getattr(record, key).extend(selected_items)  # Add new selections
-
+                            relationship = getattr(record, relationship_name)
+                            relationship.clear()
+                            relationship.extend(selected_items)                          
                         else:
                             # Assign normal fields
-                            setattr(record, key, value[0] if isinstance(value, list) and len(value) == 1 else value)
+                            setattr(record, key, value)
             # archivos
             archivos = [file for key, file in request.files.items() if key.startswith("id_archivo")]
             if archivos:
@@ -565,6 +627,68 @@ def record_data(table_name,id_record):
         return jsonify({"error": f"La tabla '{table_name}' no existe."}), 404
     # Iniciar la consulta
     query = model.query
+    mapper = inspect(model)
+    for rel in mapper.relationships:
+        if rel.secondary is None:
+            continue  # only many-to-many
+
+        related_model = rel.mapper.class_
+        secondary = rel.secondary
+
+        # --- Detect FK columns ---
+        base_pk = model.__mapper__.primary_key[0]
+        related_pk = related_model.__mapper__.primary_key[0]
+
+        base_fk_col = None
+        related_fk_col = None
+
+        for col in secondary.c:
+            for fk in col.foreign_keys:
+                if fk.column is base_pk:
+                    base_fk_col = col
+                elif fk.column is related_pk:
+                    related_fk_col = col
+
+        if base_fk_col is None or related_fk_col is None:
+            continue  # safety
+
+        # --- Choose display column dynamically ---
+        display_col_name = next(
+            (c.key for c in related_model.__table__.columns
+            if c.key in ("nombre", "name", "descripcion")),
+            related_pk.key
+        )
+
+        display_col = getattr(related_model, display_col_name)
+
+        # --- Build aggregation subquery ---
+        subq = (
+            db.session.query(
+                base_fk_col.label("parent_id"),
+                func.string_agg(
+                    func.cast(display_col, db.String),
+                    ", "
+                ).label(rel.key)
+            )
+            .outerjoin(
+                related_model,
+                related_pk == related_fk_col
+            )
+            .group_by(base_fk_col)
+            .subquery()
+        )
+
+        subq_alias = aliased(subq, name=f"{rel.key}_agg")
+
+        # --- Join subquery to main query ---
+        query = query.outerjoin(
+            subq_alias,
+            subq_alias.c.parent_id == base_pk
+        )
+
+        # --- Expose aggregated column ---
+        agg_col = subq_alias.c[rel.key]
+        query = query.add_columns(agg_col)
     # Agregar joins condicionales
     joins = get_joins()
     filtered_joins = {field: val for field, val in joins.items() if field in model.__table__.columns}

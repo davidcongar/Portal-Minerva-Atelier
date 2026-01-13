@@ -59,7 +59,7 @@
                                 {% for field, data in multiple_choice_data.items() %}
                                     <select id="{{ field }}" name="{{ field }}" class="js-example-basic-multiple"  multiple {% if column in required_fields %} required {% endif %}>
                                         {% for option in data.options %}
-                                            <option value="{{ option }}" {% if option.id in data.selected %} selected {% endif %}>
+                                            <option value="{{ option }}" {% if option in record[field] %} selected {% endif %}>
                                                 {{ option }}
                                             </option>
                                         {% endfor %}

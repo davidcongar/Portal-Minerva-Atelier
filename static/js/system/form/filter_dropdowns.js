@@ -1,3 +1,4 @@
+// filter
 Object.entries(filters).forEach(([childColumn, parentColumn]) => {
 	const $parent = $(`#${parentColumn}`);
 	const $child = $(`#${childColumn}`);
@@ -29,3 +30,29 @@ Object.entries(filters).forEach(([childColumn, parentColumn]) => {
 	// Run once at page load
 	filterChildOptions();
 });
+
+// filter from multi select
+function filterSelectOptionsByIds(selectElement, allowedIds) {
+    const allowedSet = new Set(allowedIds.map(String));
+	const $select = $(selectElement);
+	const allOptions = $select.find("option").not('[value=""]').clone();
+	$select.empty();
+	$select.append('<option value="">Selecciona una opción</option>');
+    allOptions.each(function () {
+        const value = String($(this).val() || "");
+
+        if (!value) return;
+
+        if (allowedSet.has(value)) {
+            $select.append($(this).clone());
+        }
+    });
+    $select.val(null);
+
+    // Refresh Select2
+    if ($select.hasClass("select2-hidden-accessible")) {
+        $select.trigger("change.select2");
+    } else {
+        $select.trigger("change");
+    }
+}

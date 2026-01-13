@@ -46,7 +46,6 @@ def sanitize_data(model, data):
         # 🧩 1. Si viene como lista con un solo valor, tomar el primero
         if isinstance(value, list) and len(value) == 1:
             value = value[0]
-
         # 🧩 2. Normaliza booleans
         col_type_str = str(col.type).lower()
         if "bool" in col_type_str:
@@ -60,21 +59,6 @@ def sanitize_data(model, data):
                     value = None
         elif "time" in col_type_str:
             value=datetime.fromisoformat(value)+timedelta(hours=6)
-        elif "date" in col_type_str:
-            if not value:
-                value = None
-            elif isinstance(value, (datetime, date)):
-                value = value if isinstance(value, date) else value.date()
-            else:
-                try:
-                    # Try DD/MM/YYYY (SAT / MX)
-                    value = datetime.strptime(value, "%d/%m/%Y").date()
-                except ValueError:
-                    try:
-                        # Try ISO YYYY-MM-DD
-                        value = date.fromisoformat(value)
-                    except ValueError:
-                        value = None
         # 🧩 3. Convierte cadenas vacías según tipo
         elif value == "" or value is None:
             if any(t in col_type_str for t in ["date", "time", "timestamp", "uuid", "json"]):
@@ -95,12 +79,15 @@ def sanitize_data(model, data):
                     value = float(value)
             except (ValueError, TypeError):
                 value = None  # fallback seguro
-        if isinstance(value, float) and math.isnan(value):
-            value = None                
+        if col_type_str=='array':
+            if value is None:
+                value=[]
+            elif isinstance(value, str):
+                value=[value]
+            else:
+                value=list(value)     
         data[col.name] = value
-
     return data
-
 
 # Función auxiliar para convertir cada registro a diccionario
 def record_to_dict(record):
@@ -140,9 +127,11 @@ def hour_format(value):
     return new_value
 
 
-def search_table(query, model, search, related_name_columns):
+def search_table(query, model, search, related_name_columns,aggregated_columns):
     filters = []
-    extra_filters = []
+
+    related_name_columns = related_name_columns or []
+    aggregated_columns = aggregated_columns or []
 
     # try to parse number
     try:
@@ -150,23 +139,39 @@ def search_table(query, model, search, related_name_columns):
     except ValueError:
         search_number = None
 
-    # filters on BASE model columns
     for col in model.__table__.columns:
         col_attr = getattr(model, col.name)
+
         if isinstance(col.type, (String, Text)):
             filters.append(col_attr.ilike(f"%{search}%"))
-        elif search_number is not None and isinstance(col.type, (Integer, Float, Numeric)):
+
+        elif (
+            search_number is not None
+            and isinstance(col.type, (Integer, Float, Numeric))
+        ):
             filters.append(col_attr == search_number)
 
-    # filters on RELATED (ALIASED) columns
-    for name_col in related_name_columns:
-        if isinstance(name_col.type, (String, Text)):
-            extra_filters.append(name_col.ilike(f"%{search}%"))
-        elif search_number is not None and isinstance(name_col.type, (Integer, Float, Numeric)):
-            extra_filters.append(name_col == search_number)
+    for col in related_name_columns:
+        try:
+            col_type = col.type
+        except AttributeError:
+            continue
 
-    if filters or extra_filters:
-        query = query.filter(or_(*(filters + extra_filters)))
+        if isinstance(col_type, (String, Text)):
+            filters.append(col.ilike(f"%{search}%"))
+
+        elif (
+            search_number is not None
+            and isinstance(col_type, (Integer, Float, Numeric))
+        ):
+            filters.append(col == search_number)
+
+    for col in aggregated_columns:
+        # aggregated columns are ALWAYS text
+        filters.append(col.ilike(f"%{search}%"))
+
+    if filters:
+        query = query.filter(or_(*filters))
 
     return query
 
