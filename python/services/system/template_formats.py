@@ -12,16 +12,13 @@ def commafy(value):
 # Filtro para formatear nombres de bases
 def title_format(value):
     replacements = TITLE_FORMATS
-    
     # First check for exact match
     if value=='id_visualizacion':
         return "ID"
     if value in replacements:
         if 'id' in value:
             return replacements[value]  
-        return replacements[value].capitalize()
-    # Replace underscores with spaces
-    
+        return replacements[value]    
     formatted = value.replace("_id_visualizacion","").replace("_", " ")
     # Remove "id " prefix if present
     if formatted.startswith("id "):

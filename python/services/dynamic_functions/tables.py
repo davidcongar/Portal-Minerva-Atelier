@@ -51,286 +51,285 @@ def get_joins():
 def get_columns(table_name,section):
     columns={
         "logs_auditoria": {
-            "main_page": ["tabla", "id_registro","usuario","accion","datos_anteriores","datos_nuevos","fecha"],
-            "modal": ["tabla", "id_registro","usuario","accion","datos_anteriores","datos_nuevos","fecha"],
+            "main_page": ["tabla", "id_registro",'usuario','accion','datos_anteriores','datos_nuevos','fecha'],
+            "modal": {"informacion_general":["tabla","id_registro","usuario","accion","fecha"],"detalles":["datos_anteriores","datos_nuevos"]},
             "pdf": []
         },
         "rutas": {
-            "main_page": ["categoria", "nombre","ruta"],
-            "modal": ["id", "categoria","nombre","ruta", "fecha_de_creacion", "fecha_de_actualizacion"],
+            "main_page": ['categoria', "nombre",'ruta'],
+            "modal": {"informacion_general":["id","categoria","nombre","ruta"],"sistema":["fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": []
         },
         "roles": {
             "main_page": ["id_visualizacion", "nombre", "estatus"],
-            "modal": ["id", "id_visualizacion", "nombre", "estatus", "estatus", "fecha_de_creacion", "fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","nombre","estatus"],"sistema":["fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": []
         },
         "usuarios": {
-            "main_page": ["id_visualizacion", "nombre", "correo_electronico","intentos_de_inicio_de_sesion","ultima_sesion","ultimo_cambio_de_contrasena", "estatus"],
-            "modal": ["id", "id_visualizacion", "nombre", "correo_electronico", "contrasena_api", "estatus", "fecha_de_creacion", "fecha_de_actualizacion"],
+            "main_page": ["id_visualizacion", "nombre", "correo_electronico",'intentos_de_inicio_de_sesion','ultima_sesion','ultimo_cambio_de_contrasena', "estatus"],
+            "modal": {"informacion_general":["id","id_visualizacion","nombre","correo_electronico","estatus"],"seguridad":["contrasena_api"],"sistema":["fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": []
         },
         "categorias_de_reportes": {
             "main_page": ["id_visualizacion", "nombre", "estatus"],
-            "modal": ["id", "id_visualizacion", "nombre", "estatus"],
+            "modal": {"informacion_general":["id","id_visualizacion","nombre","estatus"],"sistema":["fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": []
         },
         "reportes": {
-            "main_page": ["id_categoria_de_reporte_nombre", "nombre", "descripcion"],
-            "modal": ["id", "id_categoria_de_reporte_nombre", "nombre", "descripcion"],
+            "main_page": ["id_visualizacion", "id_categoria_de_reporte_nombre", "nombre", "descripcion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_categoria_de_reporte_nombre","nombre","descripcion"],"detalles":["ruta_sql"],"sistema":["fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": []
         },
         "archivos": {
-            "main_page": ["tabla_origen", "nombre"],
-            "modal": ["id", "tabla_origen", "nombre", "ruta_s3", "en_servidor", "fecha_de_creacion"],
+            "main_page": ["tabla_origen","nombre_del_archivo", "nombre"],
+            "modal": {"informacion_general":["id","tabla_origen","nombre"],"detalles":["ruta_s3","en_servidor"],"sistema":["fecha_de_creacion"]},
             "pdf": []
         },
         "gastos": {
             "main_page": ["id_visualizacion","id_categoria_de_gasto_nombre","id_proveedor_nombre","id_cuenta_de_banco_nombre","importe","importe_pagado","fecha_de_gasto","estatus"],
-            "modal": ["id","id_visualizacion","id_categoria_de_gasto_nombre","id_proveedor_nombre","id_cuenta_de_banco_nombre","importe","importe_pagado","fecha_de_gasto","folio_fiscal_uuid","fecha_de_comprobante","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_categoria_de_gasto_nombre","id_proveedor_nombre","id_cuenta_de_banco_nombre","fecha_de_gasto","folio_fiscal_uuid","fecha_de_comprobante","estatus"],"financiero":["importe","importe_pagado"],"detalles":["notas"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_categoria_de_gasto_nombre","id_proveedor_nombre","id_cuenta_de_banco_nombre","importe","importe_pagado","fecha_de_gasto","folio_fiscal_uuid","fecha_de_comprobante","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "gastos_recurrentes": {
             "main_page": ["id_visualizacion","id_categoria_de_gasto_nombre","id_proveedor_nombre","importe","estatus"],
-            "modal": ["id","id_categoria_de_gasto","id_proveedor","id_cuenta_de_banco","id_visualizacion","id_categoria_de_gasto_nombre","id_proveedor_nombre","id_cuenta_de_banco_nombre","importe","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_categoria_de_gasto","id_categoria_de_gasto_nombre","id_proveedor","id_proveedor_nombre","id_cuenta_de_banco","id_cuenta_de_banco_nombre","estatus"],"financiero":["importe"],"detalles":["notas"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_categoria_de_gasto_nombre","id_proveedor_nombre","id_cuenta_de_banco_nombre","importe","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "pagos_administrativos": {
             "main_page": ["id_visualizacion","id_proveedor_nombre","id_cuenta_de_banco_nombre","fecha_pago","importe","estatus"],
-            "modal": ["id","id_visualizacion","id_proveedor_nombre","id_cuenta_de_banco_nombre","fecha_pago","importe","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_proveedor_nombre","id_cuenta_de_banco_nombre","fecha_pago","estatus"],"financiero":["importe"],"detalles":["notas"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_proveedor_nombre","id_cuenta_de_banco_nombre","fecha_pago","importe","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "gastos_y_compras_en_pagos": {
             "main_page": ["id_pago_id_visualizacion","id_gasto_id_visualizacion","id_compra_id_visualizacion","importe"],
-            "modal": ["id","id_pago_id_visualizacion","id_gasto_id_visualizacion","id_compra_id_visualizacion","importe","notas","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_pago_id_visualizacion","id_gasto_id_visualizacion","id_compra_id_visualizacion"],"financiero":["importe"],"detalles":["notas"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_pago_id_visualizacion","id_gasto_id_visualizacion","id_compra_id_visualizacion","importe","notas","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "transferencias_de_dinero": {
             "main_page": ["id_visualizacion","id_cuenta_de_banco_salida_nombre","id_cuenta_de_banco_entrada_nombre","importe","fecha_de_transferencia","estatus"],
-            "modal": ["id","id_visualizacion","id_cuenta_de_banco_salida_nombre","id_cuenta_de_banco_entrada_nombre","importe","fecha_de_transferencia","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_cuenta_de_banco_salida_nombre","id_cuenta_de_banco_entrada_nombre","fecha_de_transferencia","estatus"],"financiero":["importe"],"detalles":["notas"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_cuenta_de_banco_salida_nombre","id_cuenta_de_banco_entrada_nombre","importe","fecha_de_transferencia","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "ajustes_de_dinero": {
             "main_page": ["id_visualizacion","id_cuenta_de_banco_nombre","tipo_de_ajuste","importe","fecha_de_ajuste","estatus"],
-            "modal": ["id","id_visualizacion","id_cuenta_de_banco_nombre","tipo_de_ajuste","importe","fecha_de_ajuste","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_cuenta_de_banco_nombre","tipo_de_ajuste","fecha_de_ajuste","estatus"],"financiero":["importe"],"detalles":["notas"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_cuenta_de_banco_nombre","tipo_de_ajuste","importe","fecha_de_ajuste","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "facturas": {
             "main_page": ["id_visualizacion","id_cliente_nombre","id_venta_id_visualizacion","fecha_de_expedicion","importe_total","importe_cobrado","estatus"],
-            "modal": ["id","id_visualizacion","id_cliente_nombre","id_venta_id_visualizacion","uso_de_cfdi","metodo_de_pago","forma_de_pago","folio_fiscal_uuid","fecha_de_expedicion","subtotal","impuestos","importe_total","importe_cobrado","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_cliente_nombre","id_venta_id_visualizacion","uso_de_cfdi","metodo_de_pago","forma_de_pago","folio_fiscal_uuid","fecha_de_expedicion","estatus"],"financiero":["subtotal","impuestos","importe_total","importe_cobrado"],"detalles":["notas"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_cliente_nombre","id_venta_id_visualizacion","uso_de_cfdi","metodo_de_pago","forma_de_pago","folio_fiscal_uuid","fecha_de_expedicion","subtotal","impuestos","importe_total","importe_cobrado","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "proveedores": {
             "main_page": ["id_visualizacion","nombre","telefono","correo_electronico","estatus"],
-            "modal": ["id","id_visualizacion","nombre","razon_social","rfc","direccion","codigo_postal","telefono","correo_electronico","persona_contacto","telefono_contacto","correo_electronico_contacto","condiciones_pago","sitio_web","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","nombre","razon_social","rfc","direccion","codigo_postal","estatus","condiciones_pago"],"contacto":["telefono","correo_electronico","persona_contacto","telefono_contacto","correo_electronico_contacto","sitio_web"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","nombre","razon_social","rfc","direccion","codigo_postal","telefono","correo_electronico","persona_contacto","telefono_contacto","correo_electronico_contacto","condiciones_pago","sitio_web","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "precios_de_proveedores": {
             "main_page": ["id_visualizacion","id_proveedor_nombre","id_producto_nombre","id_producto_unidad_de_medida","precio_unitario","estatus"],
-            "modal": ["id","id_visualizacion","id_proveedor_nombre","id_producto_nombre","id_producto_unidad_de_medida","precio_unitario","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_proveedor_nombre","id_producto_nombre","id_producto_unidad_de_medida","estatus"],"financiero":["precio_unitario"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_proveedor_nombre","id_producto_nombre","id_producto_unidad_de_medida","precio_unitario","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "categorias_de_gastos": {
             "main_page": ["id_visualizacion","nombre","estatus"],
-            "modal": ["id","id_visualizacion","nombre","descripcion","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","nombre","descripcion","estatus"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","nombre","descripcion","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "categorias_de_productos": {
             "main_page": ["id_visualizacion","nombre","estatus"],
-            "modal": ["id","id_visualizacion","nombre","descripcion","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","nombre","descripcion","estatus"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","nombre","descripcion","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "compras": {
             "main_page": ["id_visualizacion","id_almacen_nombre","id_proveedor_nombre","fecha_orden","fecha_entrega_estimada","importe_total","importe_pagado","estatus","estatus_de_pago"],
-            "modal": ["id","id_visualizacion","id_almacen_nombre","id_proveedor_nombre","fecha_orden","fecha_entrega_estimada","subtotal","costos_adicionales","descuentos","importe_total","importe_pagado","notas","estatus","estatus_de_pago","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_almacen_nombre","id_proveedor_nombre","fecha_orden","fecha_entrega_estimada","estatus","estatus_de_pago"],"financiero":["subtotal","costos_adicionales","descuentos","importe_total","importe_pagado"],"detalles":["notas"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_almacen_nombre","id_proveedor_nombre","fecha_orden","fecha_entrega_estimada","subtotal","costos_adicionales","descuentos","importe_total","importe_pagado","notas","estatus","estatus_de_pago","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "productos_en_compras": {
             "main_page": ["id_compra_id_visualizacion","id_producto_nombre","cantidad_ordenada","cantidad_recibida","precio_unitario","importe_total","estatus"],
-            "modal": ["id","id_compra_id_visualizacion","id_producto_nombre","cantidad_ordenada","cantidad_recibida","precio_unitario","subtotal","descuento_porcentaje","importe_total","fecha_entrega_estimada","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_compra_id_visualizacion","id_producto_nombre","cantidad_ordenada","cantidad_recibida","fecha_entrega_estimada","estatus"],"financiero":["precio_unitario","subtotal","descuento_porcentaje","importe_total"],"detalles":["notas"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_compra_id_visualizacion","id_producto_nombre","cantidad_ordenada","cantidad_recibida","precio_unitario","importe_total","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "servicios": {
             "main_page": ["id_visualizacion","nombre","estatus"],
-            "modal": ["id","id_visualizacion","nombre","descripcion","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","nombre","descripcion","estatus"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","nombre","descripcion","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "precios_de_servicios": {
             "main_page": ["id_visualizacion","id_servicio_nombre","precio_unitario","estatus"],
-            "modal": ["id","id_visualizacion","id_servicio_nombre","precio_unitario","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_servicio_nombre","estatus"],"financiero":["precio_unitario"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_servicio_nombre","precio_unitario","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "cotizaciones": {
             "main_page": ["id_visualizacion","id_cliente_nombre","id_servicio_nombre","fecha_de_cotizacion","importe_total","estatus"],
-            "modal": ["id","id_visualizacion","id_cliente_nombre","id_servicio_nombre","fecha_de_cotizacion","descripcion","importe_total","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_cliente_nombre","id_servicio_nombre","fecha_de_cotizacion","estatus"],"financiero":["importe_total"],"detalles":["descripcion"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_cliente_nombre","id_servicio_nombre","fecha_de_cotizacion","descripcion","importe_total","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "detalle_de_cotizaciones": {
             "main_page": ["id_visualizacion","id_cotizacion_id_visualizacion","descripcion","precio_unitario","cantidad"],
-            "modal": ["id","id_visualizacion","id_cotizacion_id_visualizacion","descripcion","precio_unitario","cantidad","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_cotizacion_id_visualizacion","descripcion","cantidad"],"financiero":["precio_unitario"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_cotizacion_id_visualizacion","descripcion","precio_unitario","cantidad","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "almacenes": {
             "main_page": ["id_visualizacion","nombre","estatus"],
-            "modal": ["id","id_visualizacion","nombre","descripcion","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","nombre","descripcion","estatus"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","nombre","descripcion","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "productos": {
             "main_page": ["id_visualizacion","id_categoria_de_producto_nombre","nombre","inventariable","unidad_de_medida","estatus"],
-            "modal": ["id","id_visualizacion","id_categoria_de_producto_nombre","nombre","inventariable","unidad_de_medida","descripcion","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_categoria_de_producto_nombre","nombre","inventariable","unidad_de_medida","descripcion","estatus"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_categoria_de_producto_nombre","nombre","inventariable","unidad_de_medida","descripcion","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "inventario": {
             "main_page": ["id_almacen_nombre","id_producto_nombre","cantidad","cantidad_en_transito"],
-            "modal": ["id","id_almacen_nombre","id_producto_nombre","cantidad","cantidad_en_transito","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_almacen_nombre","id_producto_nombre","cantidad","cantidad_en_transito"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_almacen_nombre","id_producto_nombre","cantidad","cantidad_en_transito","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "recepciones_de_compras": {
             "main_page": ["id_visualizacion","id_almacen_nombre","id_compra_id_visualizacion","fecha_entrega","estatus"],
-            "modal": ["id","id_visualizacion","id_almacen_nombre","id_compra_id_visualizacion","fecha_entrega","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_almacen_nombre","id_compra_id_visualizacion","fecha_entrega","estatus"],"detalles":["notas"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_almacen_nombre","id_compra_id_visualizacion","fecha_entrega","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "productos_en_recepciones_de_compras": {
             "main_page": ["id_recepcion_de_compra_id_visualizacion","id_producto_nombre","cantidad"],
-            "modal": ["id","id_recepcion_de_compra_id_visualizacion","id_producto_nombre","cantidad","notas","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_recepcion_de_compra_id_visualizacion","id_producto_nombre","cantidad"],"detalles":["notas"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_recepcion_de_compra_id_visualizacion","id_producto_nombre","cantidad","notas","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "ajustes_de_inventario": {
             "main_page": ["id_visualizacion","id_almacen_nombre","id_producto_nombre","fecha_de_ajuste","tipo_de_ajuste","cantidad","estatus"],
-            "modal": ["id","id_visualizacion","id_almacen_nombre","id_producto_nombre","fecha_de_ajuste","tipo_de_ajuste","cantidad","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_almacen_nombre","id_producto_nombre","fecha_de_ajuste","tipo_de_ajuste","cantidad","estatus"],"detalles":["notas"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_almacen_nombre","id_producto_nombre","fecha_de_ajuste","tipo_de_ajuste","cantidad","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "transferencias_de_inventario": {
             "main_page": ["id_visualizacion","id_almacen_salida_nombre","id_almacen_entrada_nombre","fecha_de_transferencia","estatus"],
-            "modal": ["id","id_visualizacion","id_almacen_salida_nombre","id_almacen_entrada_nombre","fecha_de_transferencia","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_almacen_salida_nombre","id_almacen_entrada_nombre","fecha_de_transferencia","estatus"],"detalles":["notas"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_almacen_salida_nombre","id_almacen_entrada_nombre","fecha_de_transferencia","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "productos_en_transferencias_de_inventario": {
             "main_page": ["id_visualizacion","id_transferencia_de_inventario_visualizacion","id_producto_nombre","cantidad"],
-            "modal": ["id","id_visualizacion","id_transferencia_de_inventario_visualizacion","id_producto_nombre","cantidad","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_transferencia_de_inventario_visualizacion","id_producto_nombre","cantidad"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_transferencia_de_inventario_visualizacion","id_producto_nombre","cantidad","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "envios": {
             "main_page": ["id_visualizacion","id_almacen_nombre","id_cliente_nombre","id_proyecto_nombre","id_proveedor_nombre","guia_de_envio","fecha_envio","estatus"],
-            "modal": ["id","id_visualizacion","id_almacen_nombre","id_cliente_nombre","id_proyecto_nombre","id_proveedor_nombre","guia_de_envio","fecha_envio","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_almacen_nombre","id_cliente_nombre","id_proyecto_nombre","id_proveedor_nombre","guia_de_envio","fecha_envio","estatus"],"detalles":["notas"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_almacen_nombre","id_cliente_nombre","id_proyecto_nombre","id_proveedor_nombre","guia_de_envio","fecha_envio","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "productos_en_envios": {
             "main_page": ["id_visualizacion","id_envio_id_visualizacion","id_producto_nombre","cantidad"],
-            "modal": ["id","id_visualizacion","id_envio_id_visualizacion","id_producto_nombre","cantidad","notas","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_envio_id_visualizacion","id_producto_nombre","cantidad"],"detalles":["notas"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_envio_id_visualizacion","id_producto_nombre","cantidad","notas","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "clientes": {
             "main_page": ["id_visualizacion","nombre_completo","telefono","correo_electronico","estatus"],
-            "modal": ["id","id_visualizacion","nombre_completo","rfc","direccion","codigo_postal","telefono","correo_electronico","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","nombre_completo","rfc","direccion","codigo_postal","estatus"],"contacto":["telefono","correo_electronico"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","nombre_completo","rfc","direccion","codigo_postal","telefono","correo_electronico","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "briefs": {
             "main_page": ["id_visualizacion","id_servicio_nombre","nombre","estatus"],
-            "modal": ["id","id_visualizacion","id_servicio_nombre","nombre","descripcion","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_servicio_nombre","nombre","descripcion","estatus"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_servicio_nombre","nombre","descripcion","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "preguntas_de_briefs": {
             "main_page": ["id_visualizacion","id_brief_nombre","orden","pregunta","estatus"],
-            "modal": ["id","id_visualizacion","id_brief_nombre","orden","pregunta","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_brief_nombre","orden","pregunta","estatus"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_brief_nombre","orden","pregunta","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "agenda": {
             "main_page": ["id_visualizacion","id_cliente_nombre_completo","id_integrante_nombre_completo","fecha","hora_inicio","hora_fin","estatus"],
-            "modal": ["id","id_visualizacion","id_cliente_nombre_completo","id_integrante_nombre_completo","fecha","hora_inicio","hora_fin","notas","motivo_de_cancelacion","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_cliente_nombre_completo","id_integrante_nombre_completo","fecha","hora_inicio","hora_fin","estatus"],"detalles":["notas","motivo_de_cancelacion"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_cliente_nombre_completo","id_integrante_nombre_completo","fecha","hora_inicio","hora_fin","notas","motivo_de_cancelacion","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "proyectos": {
             "main_page": ["id_visualizacion","id_venta_id_visualizacion","fecha_inicio","fecha_fin","estatus"],
-            "modal": ["id","id_visualizacion","id_venta_id_visualizacion","fecha_inicio","fecha_fin","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_venta_id_visualizacion","fecha_inicio","fecha_fin","estatus"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_venta_id_visualizacion","fecha_inicio","fecha_fin","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "actividades_base": {
             "main_page": ["id_visualizacion","id_servicio_nombre","nombre","horas_estimadas","estatus"],
-            "modal": ["id","id_visualizacion","id_servicio_nombre","nombre","descripcion","entregable","horas_estimadas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_servicio_nombre","nombre","entregable","horas_estimadas","estatus"],"detalles":["descripcion"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_servicio_nombre","nombre","descripcion","entregable","horas_estimadas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "actividades": {
             "main_page": ["id_visualizacion","id_proyecto_nombre","id_integrante_nombre_completo","id_actividad_base_nombre","fecha_inicio","fecha_estimada","fecha_fin","estatus"],
-            "modal": ["id","id_visualizacion","id_proyecto_nombre","id_integrante_nombre_completo","id_actividad_base_nombre","fecha_inicio","fecha_estimada","fecha_fin","prioridad","horas","notas","notas_cierre","comentarios_supervisor","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_proyecto_nombre","id_integrante_nombre_completo","id_actividad_base_nombre","fecha_inicio","fecha_estimada","fecha_fin","prioridad","horas","estatus"],"detalles":["notas","notas_cierre","comentarios_supervisor"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_proyecto_nombre","id_integrante_nombre_completo","id_actividad_base_nombre","fecha_inicio","fecha_estimada","fecha_fin","prioridad","horas","notas","comentarios_supervisor","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "preguntas_de_calidad_de_servicio": {
             "main_page": ["id_visualizacion","id_servicio_nombre","orden","pregunta","tipo_de_respuesta"],
-            "modal": ["id","id_visualizacion","id_servicio_nombre","orden","pregunta","tipo_de_respuesta","opciones","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_servicio_nombre","orden","pregunta","tipo_de_respuesta","estatus"],"detalles":["opciones"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_servicio_nombre","orden","pregunta","tipo_de_respuesta","opciones","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "calidad_de_servicio_de_proyectos": {
             "main_page": ["id_visualizacion","id_cliente_nombre","id_proyecto_nombre","fecha_cierre","estatus"],
-            "modal": ["id","id_visualizacion","id_cliente_nombre","id_proyecto_nombre","fecha_cierre","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_cliente_nombre","id_proyecto_nombre","fecha_cierre","estatus"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_cliente_nombre","id_proyecto_nombre","fecha_cierre","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "respuestas_calidad_de_servicio": {
             "main_page": ["id_visualizacion","id_calidad_de_servicio_de_proyecto_id_visualizacion","id_pregunta_de_calidad_de_servicio_visualizacion","respuesta"],
-            "modal": ["id","id_visualizacion","id_calidad_de_servicio_de_proyecto_id_visualizacion","id_pregunta_de_calidad_de_servicio_visualizacion","respuesta","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_calidad_de_servicio_de_proyecto_id_visualizacion","id_pregunta_de_calidad_de_servicio_visualizacion","respuesta"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_calidad_de_servicio_de_proyecto_id_visualizacion","id_pregunta_de_calidad_de_servicio_visualizacion","respuesta","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "preguntas_de_encuesta_de_satisfaccion": {
             "main_page": ["id_visualizacion","id_servicio_nombre","orden","pregunta","tipo_de_respuesta"],
-            "modal": ["id","id_visualizacion","id_servicio_nombre","orden","pregunta","tipo_de_respuesta","opciones","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_servicio_nombre","orden","pregunta","tipo_de_respuesta","estatus"],"detalles":["opciones"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_servicio_nombre","orden","pregunta","tipo_de_respuesta","opciones","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "encuesta_de_satisfaccion_de_proyectos": {
             "main_page": ["id_visualizacion","id_cliente_nombre","id_proyecto_nombre","fecha_cierre","estatus"],
-            "modal": ["id","id_visualizacion","id_cliente_nombre","id_proyecto_nombre","fecha_cierre","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_cliente_nombre","id_proyecto_nombre","fecha_cierre","estatus"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_cliente_nombre","id_proyecto_nombre","fecha_cierre","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "respuestas_encuesta_de_satisfaccion": {
             "main_page": ["id_visualizacion","id_encuesta_de_satisfaccion_de_proyecto_id_visualizacion","id_pregunta_de_encuesta_de_satisfaccion_visualizacion","respuesta"],
-            "modal": ["id","id_visualizacion","id_encuesta_de_satisfaccion_de_proyecto_id_visualizacion","id_pregunta_de_encuesta_de_satisfaccion_visualizacion","respuesta","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_encuesta_de_satisfaccion_de_proyecto_id_visualizacion","id_pregunta_de_encuesta_de_satisfaccion_visualizacion","respuesta"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_encuesta_de_satisfaccion_de_proyecto_id_visualizacion","id_pregunta_de_encuesta_de_satisfaccion_visualizacion","respuesta","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "puestos": {
             "main_page": ["id_visualizacion","nombre","estatus"],
-            "modal": ["id","id_visualizacion","nombre","descripcion","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","nombre","descripcion","estatus"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","nombre","descripcion","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "integrantes": {
             "main_page": ["id_visualizacion","id_puesto_nombre","nombre_completo","telefono","correo_electronico","estatus"],
-            "modal": ["id","id_visualizacion","id_puesto_nombre","nombre_completo","fecha_nacimiento","genero","estado_civil","direccion","codigo_postal","telefono","correo_electronico","fecha_contratacion","fecha_terminacion","numero_seguridad_social","rfc","curp","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_puesto_nombre","nombre_completo","fecha_nacimiento","genero","estado_civil","fecha_contratacion","fecha_terminacion","estatus"],"contacto":["direccion","codigo_postal","telefono","correo_electronico"],"documentos":["numero_seguridad_social","rfc","curp"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_puesto_nombre","nombre_completo","fecha_nacimiento","genero","estado_civil","direccion","codigo_postal","telefono","correo_electronico","fecha_contratacion","fecha_terminacion","numero_seguridad_social","rfc","curp","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "pagos_de_nomina": {
             "main_page": ["id_visualizacion","id_cuenta_de_banco_nombre","fecha","importe_total","estatus"],
-            "modal": ["id","id_visualizacion","id_cuenta_de_banco_nombre","fecha","importe_total","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_cuenta_de_banco_nombre","fecha","estatus"],"financiero":["importe_total"],"detalles":["notas"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_cuenta_de_banco_nombre","fecha","importe_total","notas","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "sueldos_pagados_en_nomina": {
             "main_page": ["id_visualizacion","id_pago_de_nomina_id_visualizacion","id_integrante_nombre","importe","importe_ajuste","importe_total"],
-            "modal": ["id","id_visualizacion","id_pago_de_nomina_id_visualizacion","id_integrante_nombre","importe","importe_ajuste","importe_total","notas","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_pago_de_nomina_id_visualizacion","id_integrante_nombre"],"financiero":["importe","importe_ajuste","importe_total"],"detalles":["notas"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_pago_de_nomina_id_visualizacion","id_integrante_nombre","importe","importe_ajuste","importe_total","notas","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "sueldo_de_integrantes": {
             "main_page": ["id_visualizacion","id_integrante_nombre","sueldo","estatus"],
-            "modal": ["id","id_visualizacion","id_integrante_nombre","sueldo","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_integrante_nombre","estatus"],"financiero":["sueldo"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_integrante_nombre","sueldo","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
-       "ventas": {
+        "ventas": {
             "main_page": ["id_visualizacion","id_servicio_nombre","id_cliente_nombre_completo","importe","iva","importe_total","estatus"],
-            "modal": ["id","id_visualizacion","id_servicio_nombre","id_cliente_nombre_completo","id_stripe","espacio_de_proyecto","importe","tipo_de_iva","iva","importe_total","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_servicio_nombre","id_cliente_nombre_completo","id_stripe","espacio_de_proyecto","tipo_de_iva","estatus"],"financiero":["importe","iva","importe_total"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_servicio_nombre","id_cliente_nombre_completo","id_stripe","espacio_de_proyecto","importe","tipo_de_iva","iva","importe_total","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "cuentas_de_banco": {
             "main_page": ["id_visualizacion","id_integrante_nombre","banco","tipo_de_cuenta","nombre","balance","estatus"],
-            "modal": ["id","id_visualizacion","id_integrante_nombre","banco","tipo_de_cuenta","nombre","numero_de_cuenta","clabe","balance","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_integrante_nombre","banco","tipo_de_cuenta","nombre","estatus"],"financiero":["balance"],"detalles":["numero_de_cuenta","clabe"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_integrante_nombre","banco","tipo_de_cuenta","nombre","numero_de_cuenta","clabe","balance","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "briefs_de_clientes": {
             "main_page": ["id_visualizacion","id_cliente_nombre_completo","id_proyecto_nombre","fecha_cierre","estatus"],
-            "modal": ["id","id_visualizacion","id_cliente_nombre_completo","id_proyecto_nombre","fecha_cierre","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_cliente_nombre_completo","id_proyecto_nombre","fecha_cierre","estatus"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_cliente_nombre_completo","id_proyecto_nombre","fecha_cierre","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         "respuestas_briefs_de_clientes": {
             "main_page": ["id_visualizacion","id_brief_de_cliente_id_visualizacion","id_pregunta_de_brief_visualizacion","respuesta"],
-            "modal": ["id","id_visualizacion","id_brief_de_cliente_id_visualizacion","id_pregunta_de_brief_visualizacion","respuesta","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_brief_de_cliente_id_visualizacion","id_pregunta_de_brief_visualizacion","respuesta"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
             "pdf": ["id_visualizacion","id_brief_de_cliente_id_visualizacion","id_pregunta_de_brief_visualizacion","respuesta","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
-        },
-
+        }
     }
     columns=columns.get(table_name).get(section)
     return columns

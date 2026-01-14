@@ -1,21 +1,21 @@
 <div class="flex justify-end items-center gap-2" x-data x-show="true">
-    <template x-if="$store.modalData.record.estatus === 'En proceso'">
+    <template x-if="$store.modalData.getField('estatus') === 'En proceso'">
         <button type="submit"
-            @click.stop.prevent="window.location.href = `/dynamic/briefs_de_clientes/input_table/view/${encodeURIComponent($store.modalData.record.id)}`"
+            @click.stop.prevent="window.location.href = `/dynamic/briefs_de_clientes/input_table/view/${encodeURIComponent($store.modalData.getField('id'))}`"
             class="btn border text-primary border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-primary bg-primary/10">
             Preguntas
         </button>
     </template>
-    <template x-if="$store.modalData.record.estatus === 'En proceso'">
+    <template x-if="$store.modalData.getField('estatus') === 'En proceso'">
         <button type="submit"
-            @click.stop.prevent="window.location.href = `/briefs_de_clientes/contestar/${encodeURIComponent($store.modalData.record.id)}`"
+            @click.stop.prevent="window.location.href = `/briefs_de_clientes/contestar/${encodeURIComponent($store.modalData.getField('id'))}`"
             class="btn border text-primary border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-primary bg-primary/10">
             Contestado
         </button>
     </template>
-    <template x-if="['En revisión', 'Aprobada'].includes($store.modalData.record.estatus) && $store.modalData.record.estatus_de_pago === 'Sin pagar'">
+    <template x-if="['En revisión', 'Aprobada'].includes($store.modalData.getField('estatus')) && $store.modalData.getField('estatus')_de_pago === 'Sin pagar'">
         <button type="submit"
-            @click.stop.prevent="window.location.href = `/briefs_de_clientes/cancelar/${encodeURIComponent($store.modalData.record.id)}`"
+            @click.stop.prevent="window.location.href = `/briefs_de_clientes/cancelar/${encodeURIComponent($store.modalData.getField('id'))}`"
             class="btn border text-danger border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-danger bg-primary/10">
             Cancelar
         </button>

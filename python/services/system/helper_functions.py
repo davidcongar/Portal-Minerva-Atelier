@@ -288,6 +288,120 @@ def record_to_ordered_list(model, joins, record, columns_order):
 
     return ordered_fields
 
+def record_to_ordered_dict(model, record, columns_order):
+    """
+    Returns an ORDER-SAFE payload:
+    [
+        {
+            "section": "informacion_general",
+            "fields": [
+                {"key": "id", "value": 1},
+                {"key": "periodo", "value": "2025"}
+            ]
+        },
+        ...
+    ]
+    """
+
+    # ---------------------------
+    # Handle Row vs Model instance
+    # ---------------------------
+    if hasattr(record, "_mapping"):
+        record_mapping = record._mapping
+        model_instance = record_mapping.get(model, record)
+    else:
+        record_mapping = {}
+        model_instance = record
+
+    mapper = inspect(model_instance.__class__)
+    fk_map = {}
+
+    for column in mapper.columns:
+        for fk in column.foreign_keys:
+            fk_map[column.name] = fk.column.table.name
+
+    # ---------------------------
+    # Step 1: Base model columns
+    # ---------------------------
+    base_data = {}
+
+    for col in model.__table__.columns.keys():
+        val = getattr(model_instance, col)
+
+        if isinstance(val, datetime):
+            if "fecha" in col.lower():
+                val = (val - timedelta(hours=6)).strftime('%Y-%m-%d %H:%M:%S')
+        elif isinstance(val, date):
+            val = val.strftime('%Y-%m-%d')
+
+        base_data[col] = val
+
+    # ---------------------------
+    # Step 2: Join columns
+    # ---------------------------
+    for key, value in record_mapping.items():
+        if key == model:
+            continue
+
+        if isinstance(value, datetime):
+            value = value.strftime('%Y-%m-%d %H:%M:%S')
+        elif isinstance(value, date):
+            value = value.strftime('%Y-%m-%d')
+        elif hasattr(value, "__table__"):
+            continue
+
+        base_data[key] = value
+
+    # ---------------------------
+    # Step 3: ORDER-SAFE payload
+    # ---------------------------
+    payload = []
+
+    for section, columns in columns_order.items():
+        fields = []
+
+        for col in columns:
+            # dotted notation
+            if "." in col:
+                table_alias, column_name = col.split(".")
+                alias_field = f"id_{table_alias.lower()}_{column_name}"
+                value = base_data.get(alias_field)
+
+            else:
+                # FK formatted fields
+                if (
+                    col.startswith("id_")
+                    and col not in (
+                        "id_visualizacion",
+                        "id_usuario_correo_electronico",
+                        "id_categoria_de_gasto",
+                        "id_proveedor",
+                        "id_cuenta_de_banco",
+                    )
+                ):
+                    id_col = re.sub(
+                        r'_(nombre|descripcion|nombre_completo|id_visualizacion).*$', 
+                        '', 
+                        col
+                    )
+                    value = f'{base_data.get(col)}__{base_data.get(id_col)}__{fk_map.get(id_col)}'
+                else:
+                    value = base_data.get(col)
+
+            if value is not None and value != 'None__None':
+                fields.append({
+                    "key": col,
+                    "value": value
+                })
+
+        payload.append({
+            "section": section,
+            "fields": fields
+        })
+
+    return payload
+
+
 def get_query_variables_values(base_query):
     variables_query = extract_param_names(base_query)
     variables_request = {k: v for k, v in request.values.items() if k in variables_query and v != ""}

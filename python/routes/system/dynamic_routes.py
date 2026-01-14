@@ -715,11 +715,20 @@ def record_data(table_name,id_record):
     query=query.filter(model.id == id_record)
     records = query.all()
     columns_order= get_columns(table_name,'modal')
-    record = [record_to_ordered_list(model,joins,record,columns_order) for record in records]
+    record = [record_to_ordered_dict(model,record,columns_order) for record in records]
     relationships=get_table_relationships(table_name)
-    if relationships!='':
-        for i in relationships:
-            record[0].append((i,'/dynamic/'+i+'/view?parent_table='+table_name+'&id_parent_record='+id_record))
+    if relationships and record:
+        relationships_section = {
+            "section": "registros_relacionados",
+            "fields": [
+                {
+                    "key": i,
+                    "value": f"/dynamic/{i}/view?parent_table={table_name}&id_parent_record={id_record}"
+                }
+                for i in relationships
+            ]
+        }
+        record[0].append(relationships_section)
     return jsonify(record)
 
 ###################

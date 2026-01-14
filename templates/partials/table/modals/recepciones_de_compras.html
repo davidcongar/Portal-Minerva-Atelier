@@ -1,28 +1,28 @@
 <div class="flex justify-end items-center gap-2" x-data x-show="true">
-    <template x-if="$store.modalData.record.estatus === 'En revisión'">
+    <template x-if="$store.modalData.getField('estatus') === 'En revisión'">
         <button type="submit"
-            @click.stop.prevent="window.location.href = `/dynamic/recepciones_de_compras/double_table/view/${encodeURIComponent($store.modalData.record.id)}`"
+            @click.stop.prevent="window.location.href = `/dynamic/recepciones_de_compras/double_table/view/${encodeURIComponent($store.modalData.getField('id'))}`"
             class="btn border text-primary border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-primary bg-primary/10">
             Productos
         </button>
     </template>
-    <template x-if="$store.modalData.record.estatus === 'En revisión'">
+    <template x-if="$store.modalData.getField('estatus') === 'En revisión'">
         <button type="submit"
-            @click.stop.prevent="window.location.href = `/recepciones_de_compras/aprobar/${encodeURIComponent($store.modalData.record.id)}`"
+            @click.stop.prevent="window.location.href = `/recepciones_de_compras/aprobar/${encodeURIComponent($store.modalData.getField('id'))}`"
             class="btn border text-primary border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-primary bg-primary/10">
             Aprobar
         </button>
     </template>
-    <template x-if="['Aprobada'].includes($store.modalData.record.estatus)">
+    <template x-if="['Aprobada'].includes($store.modalData.getField('estatus'))">
         <button type="submit"
-            @click.stop.prevent="window.location.href = `/recepciones_de_compras/finalizar/${encodeURIComponent($store.modalData.record.id)}`"
+            @click.stop.prevent="window.location.href = `/recepciones_de_compras/finalizar/${encodeURIComponent($store.modalData.getField('id'))}`"
             class="btn border text-primary border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-primary bg-primary/10">
             Finalizar
         </button>
     </template>
-    <template x-if="['En revisión', 'Aprobada'].includes($store.modalData.record.estatus)">
+    <template x-if="['En revisión', 'Aprobada'].includes($store.modalData.getField('estatus'))">
         <button type="submit"
-            @click.stop.prevent="window.location.href = `/recepciones_de_compras/cancelar/${encodeURIComponent($store.modalData.record.id)}`"
+            @click.stop.prevent="window.location.href = `/recepciones_de_compras/cancelar/${encodeURIComponent($store.modalData.getField('id'))}`"
             class="btn border text-danger border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-danger bg-primary/10">
             Cancelar
         </button>
