@@ -18,7 +18,9 @@ def title_format(value):
     if value in replacements:
         if 'id' in value:
             return replacements[value]  
-        return replacements[value]    
+        if replacements[value].isupper():
+            return replacements[value]    
+        return replacements[value].capitalize()
     formatted = value.replace("_id_visualizacion","").replace("_", " ")
     # Remove "id " prefix if present
     if formatted.startswith("id "):

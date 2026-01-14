@@ -383,7 +383,7 @@ def form(table_name):
     form_filters=get_form_filters(table_name)
     parent_record=get_parent_record(table_name)
     columns = list(many_to_many_data.keys()) + columns
-    required_fields = list(many_to_many_data.keys()) + columns
+    required_fields = list(many_to_many_data.keys()) + required_fields
 
     return render_template(
         "system/dynamic_form.html",
