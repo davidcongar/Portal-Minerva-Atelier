@@ -167,7 +167,7 @@
                         class="btn border text-primary border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-primary bg-primary/10">
                         Guardar
                     </button>
-                    <a href="{{ url_for('dynamic.table_view', table_name=table_name) }}"
+                <a href="{{ session.get('return_url', url_for('dynamic.table_view', table_name=table_name)) }}"
                     class="btn border text-danger border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-danger bg-danger/10">
                         Cancelar
                     </a>
@@ -178,11 +178,40 @@
 </div>
 <script>
     const filters = {{ form_filters | tojson }};
+    const allow_new_value_dropdowns={{ vars.allow_new_value_dropdowns | tojson }};
 </script>
 <script src="/static/js/system/form/filter_dropdowns.js"></script>
 <script src="/static/js/system/form/fill_inputs_url.js"></script>
 <script src="/static/js/system/form/upload_files.js"></script>
 <script>
+   function rebindSelect2(root = document) {
+        root.querySelectorAll('select.searchable-select').forEach(el => {
+            if (!el.isConnected) return;
+            if ($(el).data('select2')) return;
+
+            const options = {
+                width: '100%',
+                dropdownParent: $(el).parent()
+            };
+
+            if (allow_new_value_dropdowns.includes(el.name)) {
+            options.tags = true;
+            options.createTag = params => {
+                const term = $.trim(params.term);
+                if (!term) return null;
+                return { id: term, text: term };
+            };
+            options.insertTag = (data, tag) => data.unshift(tag);
+            }
+
+            $(el)
+            .off('change.select2sync')
+            .select2(options)
+        });
+    } 
+    document.addEventListener('DOMContentLoaded', () => {
+        rebindSelect2();
+    });        
     $(document).ready(function () {
         $("form").on("submit", function () {
             $(this)
@@ -195,12 +224,7 @@
             width: '100%',
             dropdownAutoWidth: true,
         });
-    });
-    $(document).ready(function() {
-        $('.searchable-select').select2({
-        width: '100%'
-        });
-    });
+    });    
 </script>
 {% if record %}
     <script>

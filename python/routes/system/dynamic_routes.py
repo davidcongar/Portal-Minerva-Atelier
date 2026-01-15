@@ -7,6 +7,7 @@ from flask import Blueprint, flash, jsonify, redirect, render_template, request,
 from python.models import db
 from python.models.modelos import *
 from python.services.system.helper_functions import *
+from python.services.system.template_formats import *
 from python.services.form_workflows.edit_on_success import *
 from python.services.form_workflows.on_success import *
 from python.services.system.authentication import *
@@ -33,6 +34,7 @@ dynamic_bp = Blueprint("dynamic", __name__, url_prefix="/dynamic")
 @login_required
 @roles_required()
 def table_view(table_name):
+    session.pop("return_url", None)
     parent_table=request.args.get("parent_table")
     id_parent_record=request.args.get("id_parent_record")
     """
@@ -50,31 +52,16 @@ def table_view(table_name):
         columns = model.__table__.columns.keys()
 
     # Datos para resaltar el menú activo en el sidebar
-    if parent_table:
-        parent_model = get_model_by_name(parent_table)
-        module,active_menu=get_breadcrumbs(parent_table)
-        parent_record=parent_model.query.get(id_parent_record)
-        parent_record_name = getattr(parent_record, "nombre", None) or getattr(parent_record, "nombre_completo", None) or getattr(parent_record, "id_visualizacion", None)
-        if module==parent_table.replace('_', ' ').capitalize():
-            breadcrumbs=[{"name":parent_table.replace('_', ' ').capitalize(),"url":f"/dynamic/{parent_table}/view"},{"name":parent_record_name,"url":""},{"name":table_name.replace('_', ' ').capitalize(),"url":""}]
-        else:
-            breadcrumbs=[{"name":module,"url":""},{"name":parent_table.replace('_', ' ').capitalize(),"url":f"/dynamic/{parent_table}/view"},{"name":parent_record_name,"url":""},{"name":table_name.replace('_', ' ').capitalize(),"url":""}]
-        context = {
-                "activeMenu": active_menu, 
-                "activeItem": parent_table,
-                "breadcrumbs": breadcrumbs
-            }
+    module,active_menu=get_breadcrumbs(table_name)
+    if module==table_name.replace('_', ' ').capitalize():
+        breadcrumbs=[{"name":table_name.replace('_', ' ').capitalize(),"url":""}]
     else:
-        module,active_menu=get_breadcrumbs(table_name)
-        if module==table_name.replace('_', ' ').capitalize():
-            breadcrumbs=[{"name":table_name.replace('_', ' ').capitalize(),"url":""}]
-        else:
-            breadcrumbs=[{"name":module,"url":""},{"name":table_name.replace('_', ' ').capitalize(),"url":""}]
-        context = {
-                "activeMenu": active_menu, 
-                "activeItem": table_name,
-                "breadcrumbs": breadcrumbs
-            }
+        breadcrumbs=[{"name":module,"url":""},{"name":table_name.replace('_', ' ').capitalize(),"url":""}]
+    context = {
+            "activeMenu": active_menu, 
+            "activeItem": table_name,
+            "breadcrumbs": breadcrumbs
+        }
     number_buttons=get_table_buttons().get(table_name,0)
     date_variable=get_calendar_date_variable(table_name)
     javascript = os.path.exists(f'static/js/table_logic/{table_name}.js')
@@ -98,7 +85,7 @@ def table_view(table_name):
         **context
     )
 
-@dynamic_bp.route("/<table_name>/data", methods=["GET"])
+@dynamic_bp.route("/<table_name>/data/", methods=["GET"])
 @login_required
 @roles_required()
 def data(table_name):
@@ -218,7 +205,7 @@ def data(table_name):
         query = search_table(query, model, search, aliased_name_columns,m2m_search_columns)
 
     if table_name=='archivos':
-        query=query.filter(Archivos.id_registro==session['id_registro_tabla_origen'])
+        query=query.filter(Archivos.id_registro==id_parent_record)
         
     if parent_table:
         for rel in model.__mapper__.relationships.values():
@@ -309,7 +296,7 @@ def data(table_name):
 @login_required
 @roles_required()
 def form(table_name):
-    parent_table=request.args.get("parent_table")
+    parent_table=request.args.get("parent_table")        
     id_parent_record=request.args.get("id_parent_record")    
     model = get_model_by_name(table_name)
     if not model:
@@ -345,8 +332,7 @@ def form(table_name):
             }
     # Add Multiple choice fields
     multiple_choice_data=get_multiple_choice_data()
-
-    modulo,active_menu=get_breadcrumbs(table_name)
+    modulo,active_menu=get_breadcrumbs(parent_table) if parent_table else get_breadcrumbs(table_name)
     default_variable_values={}
     # edicion
     if record_id!=None:
@@ -361,7 +347,7 @@ def form(table_name):
         if not record:
             flash(f"Registro con ID {record_id} no encontrado en '{table_name}'.", "danger")
             return redirect(request.referrer or url_for("dynamic.table_view", table_name=table_name))
-        if record.estatus in get_non_edit_status(table_name) or table_name in get_no_edit_access():
+        if (record.estatus in get_non_edit_status(table_name) or table_name in get_no_edit_access()) and flujo==None:
             flash(f"Registro ya no se puede editar.", "info")
             return redirect(request.referrer or url_for("dynamic.table_view", table_name=table_name))
         javascript = os.path.exists(f'static/js/form_logic/edit/{table_name}.js')
@@ -374,17 +360,20 @@ def form(table_name):
         accion="Registrar"
         record=None
         javascript = os.path.exists(f'static/js/form_logic/add/{table_name}.js')
+    if parent_table:
+        breadcrumbs=[{"name":modulo,"url":""},{"name":parent_table.replace('_', ' ').capitalize(),"url":url_for("dynamic.table_view", table_name=parent_table)},{"name":table_name.replace('_', ' ').capitalize(),"url":url_for("dynamic.table_view", table_name=table_name)},{"name":accion,"url":""}]
+    else:
+        breadcrumbs=[{"name":modulo,"url":""},{"name":table_name.replace('_', ' ').capitalize(),"url":url_for("dynamic.table_view", table_name=table_name)},{"name":accion,"url":""}]
     context = {
         "activeMenu": active_menu,
-        "activeItem": table_name,
+        "activeItem": parent_table if parent_table else table_name,
         "foreign_options": foreign_options,
-        "breadcrumbs": [{"name":modulo,"url":""},{"name":table_name.replace('_', ' ').capitalize(),"url":url_for("dynamic.table_view", table_name=table_name)},{"name":accion,"url":""}]
+        "breadcrumbs": breadcrumbs
     }
     form_filters=get_form_filters(table_name)
-    parent_record=get_parent_record(table_name)
+    parent_record=get_parent_record(table_name,parent_table)
     columns = list(many_to_many_data.keys()) + columns
     required_fields = list(many_to_many_data.keys()) + required_fields
-
     return render_template(
         "system/dynamic_form.html",
         columns=columns,
@@ -438,9 +427,8 @@ def add(table_name):
             new_record.id_visualizacion=get_id_visualizacion(table_name)
         if table_name=='archivos':
             new_record.tabla_origen=session['tabla_origen']
-            new_record.id_registro=session['id_registro_tabla_origen']
+            new_record.id_registro=id_parent_record
             new_record.ruta_s3=''
-            new_record.nombre=''
         if table_name=='usuarios':
             alphabet = string.ascii_letters + string.digits
             contrasena = ''.join(secrets.choice(alphabet) for i in range(20))
@@ -453,7 +441,7 @@ def add(table_name):
             archivo = request.files.get("archivo")
             s3_service.upload_file(archivo, new_record.id,session['tabla_origen'])
             new_record.ruta_s3=f"{session['tabla_origen']}/{ new_record.id}_{archivo.filename}"
-            new_record.nombre=archivo.filename
+            new_record.nombre_del_archivo=archivo.filename
         # Process many-to-many relationships
         for key, value in relationship_data.items():
             related_model = getattr(model, key).property.mapper.class_
@@ -464,24 +452,23 @@ def add(table_name):
             relationship.clear()
             relationship.extend(selected_items)              
         # archivos
-        archivos = [file for key, file in request.files.items() if key.startswith("id_archivo")]
+        archivos = [file for key, file in request.files.items()]
         if archivos:
             for archivo in archivos:
                 if archivo.filename:
                     # create file in archivos
                     new_file=Archivos(
-                        nombre_del_archivo=archivo.name,
+                        nombre_del_archivo=archivo.filename,
                         tabla_origen=table_name,
                         id_registro=new_record.id,
                         ruta_s3='',
-                        nombre='',
+                        nombre=archivo.name,
                         id_usuario=session['id_usuario']
-                    )      
+                    )
                     db.session.add(new_file)
                     db.session.flush()
                     s3_service.upload_file(archivo, new_file.id,table_name)
                     new_file.ruta_s3=f"{table_name}/{new_file.id}_{archivo.filename}"
-                    new_file.nombre=archivo.filename
                     db.session.add(new_file)
                     setattr(new_record, archivo.name, f'{new_file.id}__{archivo.filename}')       
         # Commit transaction
@@ -492,8 +479,10 @@ def add(table_name):
         db.session.rollback()
         flash(f"Error al crear el registro: {str(e)}", "danger")
         return(request.referrer or "/")
-    if table_name=='archivos':
-        return redirect(url_for("dynamic.table_view_files", table_name=session['tabla_origen'],id=session['id_registro_tabla_origen']))
+    return_url = session.get('return_url')
+    if return_url:
+        session.pop("return_url", None)
+        return redirect(return_url)
     else:
         url=get_url_after_add(table_name)
         if 'double_table_view' in url:
@@ -585,28 +574,27 @@ def edit(table_name):
                             # Assign normal fields
                             setattr(record, key, value)
             # archivos
-            archivos = [file for key, file in request.files.items() if key.startswith("id_archivo")]
+            archivos = [file for key, file in request.files.items()]
             if archivos:
                 for archivo in archivos:
                     if archivo.filename:
-                        old_file=Archivos.query.filter_by(id_registro=record.id,nombre_del_archivo=archivo.name,tabla_origen=table_name).first()
+                        old_file=Archivos.query.filter_by(id_registro=record.id,nombre=archivo.name,tabla_origen=table_name).first()
                         if old_file:
                             s3_service.delete_file(old_file.ruta_s3)
                             db.session.delete(old_file)
                         # create file in archivos
                         new_record=Archivos(
-                            nombre_del_archivo=archivo.name,
+                            nombre_del_archivo=archivo.filename,
                             tabla_origen=table_name,
                             id_registro=record.id,
                             ruta_s3='',
-                            nombre='',
+                            nombre=archivo.name,
                             id_usuario=session['id_usuario']
                         )      
                         db.session.add(new_record)
                         db.session.flush()
                         s3_service.upload_file(archivo, new_record.id,table_name)
                         new_record.ruta_s3=f"{table_name}/{new_record.id}_{archivo.filename}"
-                        new_record.nombre=archivo.filename
                         db.session.add(new_record)
                         setattr(record, archivo.name, f'{new_record.id}__{archivo.filename}')   
             db.session.flush()
@@ -616,7 +604,12 @@ def edit(table_name):
         except Exception as e:
             db.session.rollback()
             flash(f"Error al actualizar el registro: {str(e)}", "danger")
-        return redirect(url_for("dynamic.table_view", table_name=table_name))
+        return_url = session.get('return_url')
+        if return_url:
+            session.pop("return_url", None)
+            return redirect(return_url)
+        else:
+            return redirect(url_for("dynamic.table_view", table_name=table_name))
 
 @dynamic_bp.route("/<table_name>/data/<id_record>", methods=["GET"])
 @login_required
@@ -722,12 +715,11 @@ def record_data(table_name,id_record):
             "section": "registros_relacionados",
             "fields": [
                 {
-                    "key": i,
-                    "value": f"/dynamic/{i}/view?parent_table={table_name}&id_parent_record={id_record}"
+                    "key": 'detalle',
+                    "value": f"/dynamic/{table_name}/related/{id_record}/{relationships[0]}?parent_table={table_name}&id_parent_record={id_record}"
                 }
-                for i in relationships
             ]
-        }
+        } 
         record[0].append(relationships_section)
     return jsonify(record)
 
@@ -1044,45 +1036,6 @@ def double_table_view_confirm(table_name,id):
     url_confirm=variables.get('url_confirm')
     return redirect(url_for(url_confirm, id=id))
 
-###################
-# Files View
-###################
-
-@dynamic_bp.route("/<string:table_name>/files/<id>", methods=["GET"])
-@login_required
-@roles_required()
-def table_view_files(table_name,id):
-    model = get_model_by_name(table_name)
-    module,active_menu=get_breadcrumbs(table_name)
-    record=model.query.get(id)
-    try:
-        name=record.nombre 
-    except:
-        name=record.id_visualizacion
-    context = {
-            "activeMenu": active_menu, 
-            "activeItem": table_name,
-            "breadcrumbs": [{"name":module,"url":""},{"name":table_name.replace('_', ' ').capitalize(),"url":url_for("dynamic.table_view", table_name=table_name)},{"name":name,"url":""},{"name":"Archivos","url":""}]
-        }
-    # Obtener las columnas definidas en el modelo
-    columns = get_columns('archivos','main_page')
-    
-    session['tabla_origen']=table_name
-    session['id_registro_tabla_origen']=record.id
-    date_variable=''
-    buttons_modal_exits = os.path.exists(f'templates/partials/table/modals/archivos.html')
-    return render_template(
-        "system/dynamic_table.html",
-        buttons_modal_exits=buttons_modal_exits,
-        table_buttons=True,
-        number_buttons=1,
-        columns=columns,
-        id_registro_padre=record.id,
-        table_name='archivos',
-        title_formats=TITLE_FORMATS,
-        date_variable=date_variable,
-        **context
-    )
 
 ###################
 # Import data 
@@ -1162,7 +1115,7 @@ def import_data(table_name):
         return jsonify({'alert':'error','message': f"Error en la importación: {e}"})
 
 ###################
-# Upload specific files
+# Upload specific files (double table/input table)
 ###################
 
 @dynamic_bp.route("/upload_file/<string:table_name>/<id>/<column>", methods=["POST"])
@@ -1170,26 +1123,65 @@ def import_data(table_name):
 def upload_file(table_name,id,column):
     model=get_model_by_name(table_name)
     record=model.query.get(id)
-    old_file=Archivos.query.filter_by(id_registro=id,nombre_del_archivo=column,tabla_origen=table_name).first()
+    old_file=Archivos.query.filter_by(id_registro=id,nombre=column,tabla_origen=table_name).first()
     if old_file:
         s3_service.delete_file(old_file.ruta_s3)
         db.session.delete(old_file)
     # create file in archivos
+    archivo = request.files.get("archivo")
     new_record=Archivos(
-        nombre_del_archivo=column,
+        nombre_del_archivo=archivo.filename,
         tabla_origen=table_name,
         id_registro=id,
         ruta_s3='',
-        nombre='',
+        nombre=column,
         id_usuario=session['id_usuario']
     )
-    archivo = request.files.get("archivo")
     db.session.add(new_record)
     db.session.flush()
     s3_service.upload_file(archivo, new_record.id,table_name)
     new_record.ruta_s3=f"{table_name}/{new_record.id}_{archivo.filename}"
-    new_record.nombre=archivo.filename
     db.session.add(new_record)
     setattr(record, column, f'{new_record.id}__{archivo.filename}')
     db.session.commit()
     return jsonify({'alert':'success','message': f"El archivo se cargo exitosamente."})
+
+###################
+# Related tables view
+###################
+
+@dynamic_bp.route("/<parent_table>/related/<id>/<table_name>", methods=["GET"])
+@login_required
+def related(id,parent_table,table_name):
+    session['return_url'] = request.url
+    model=get_model_by_name(parent_table)
+    id_parent_record=id
+    record=model.query.get(id)
+    modulo,active_menu=get_breadcrumbs(parent_table)
+    parent_record_name = getattr(record, "nombre", None) or getattr(record, "nombre_completo", None) or getattr(record, "id_visualizacion", None)    
+    breadcrumbs=[{"name":modulo,"url":""},{"name":title_format(parent_table),"url":url_for("dynamic.table_view", table_name=parent_table)},{"name":parent_record_name,"url":""}]
+    context = {
+        "activeMenu": active_menu,
+        "activeItem": parent_table,
+        "breadcrumbs": breadcrumbs
+    }
+    number_buttons=get_table_buttons().get(table_name,0)
+    date_variable=get_calendar_date_variable(table_name)
+    javascript = os.path.exists(f'static/js/table_logic/{table_name}.js')
+    checkbox=get_checkbox(table_name)    
+    return render_template(
+        "system/dynamic_detail.html",
+        record=record,
+        title_formats=TITLE_FORMATS,
+        table_name=table_name,
+        columns=get_columns(table_name,'main_page'),
+        parent_table=parent_table,
+        id_parent_record=id_parent_record,
+        activeDefTab=table_name,
+        tabs=get_table_relationships(parent_table),
+        number_buttons=number_buttons,
+        date_variable=date_variable,
+        checkbox=checkbox,
+        javascript=javascript,
+        **context        
+    )

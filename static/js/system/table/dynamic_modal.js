@@ -198,27 +198,28 @@ async function get_record(form, recordId) {
                 // ---- Relationships ----
                 if (sectionName==='registros_relacionados') {
                     tr.innerHTML = `
-                        <td style="border-right:1px solid #ccc; padding:8px;">
+                        <td style="white-space:normal;border-bottom:1px solid ; padding:8px;" class="bg-gray/10">
                             ${titleFormat(key)}
                         </td>
-                        <td style="text-align:center;">
+                        <td style="white-space:normal;border-bottom:1px solid ; padding:8px;text-align:center;">
                             <button type="submit"
+                                
                                 class="btn border text-primary border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-primary bg-primary/10"
                                 onclick="window.location.href='${value}'">
                                 Ver
                             </button>
                         </td>
                     `;
-                } else if (!['id', 'id_proveedor', 'id_categoria_de_gasto', 'id_cuenta_de_banco'].includes(key)) {
+                } else if (!['id'].includes(key)) {
                     // ---- File ----
                     if (key.includes('archivo')) {
                         const [uuid, name] = value.split("__");
                         tr.innerHTML = `
-                            <td style="white-space:normal;border-right:1px solid #ccc; padding:8px;">
+                            <td style="white-space:normal;border-right:1px solid padding:8px;" class="bg-gray/10">
                                 ${titleFormat(key)}
                             </td>
                             <td class="clickable-td"
-                                style="word-break:break-word; white-space:normal; overflow-wrap:anywhere; max-width:300px;">
+                                style="white-space:normal;border-bottom:1px solid ; padding:8px;">
                                 <a href="#"
                                    style="display:block; width:100%; height:100%; text-decoration:none; color:inherit;"
                                    onclick="downloadFile('${uuid}','view')">
@@ -232,11 +233,11 @@ async function get_record(form, recordId) {
                     else if (typeof value === 'string' && value.includes('__')) {
                         const [before, id, table_name] = value.split("__");
                         tr.innerHTML = `
-                            <td style="white-space:normal;border-right:1px solid #ccc; padding:8px;">
+                            <td style="white-space:normal;border-bottom:1px solid ; padding:8px;" class="bg-gray/10">
                                 ${titleFormat(key)}
                             </td>
                             <td class="clickable-td"
-                                style="word-break:break-word; white-space:normal; overflow-wrap:anywhere; max-width:300px;">
+                                style="white-space:normal;border-bottom:1px solid ; padding:8px;">
                                 <a href="#"
                                    style="display:block; width:100%; height:100%; text-decoration:none; color:inherit;"
                                    onclick="openActions('${table_name}', '${id}', '')">
@@ -249,10 +250,10 @@ async function get_record(form, recordId) {
                     // ---- Normal value ----
                     else {
                         tr.innerHTML = `
-                            <td style="border-right:1px solid #ccc; padding:8px;">
+                            <td style="white-space:normal;border-bottom:1px solid ; padding:8px;" class="bg-gray/10">
                                 ${titleFormat(key)}
                             </td>
-                            <td style="word-break:break-word; white-space:normal; overflow-wrap:anywhere; max-width:300px;">
+                            <td style="white-space:normal;border-bottom:1px solid ; padding:8px;">
                                 ${value}
                             </td>
                         `;

@@ -59,6 +59,21 @@ def sanitize_data(model, data):
                     value = None
         elif "time" in col_type_str:
             value=datetime.fromisoformat(value)+timedelta(hours=6)
+        elif "date" in col_type_str:
+            if not value:
+                value = None
+            elif isinstance(value, (datetime, date)):
+                value = value if isinstance(value, date) else value.date()
+            else:
+                try:
+                    # Try DD/MM/YYYY (SAT / MX)
+                    value = datetime.strptime(value, "%d/%m/%Y").date()
+                except ValueError:
+                    try:
+                        # Try ISO YYYY-MM-DD
+                        value = date.fromisoformat(value)
+                    except ValueError:
+                        value = None
         # 🧩 3. Convierte cadenas vacías según tipo
         elif value == "" or value is None:
             if any(t in col_type_str for t in ["date", "time", "timestamp", "uuid", "json"]):

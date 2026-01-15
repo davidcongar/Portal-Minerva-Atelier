@@ -81,8 +81,8 @@ def get_columns(table_name,section):
             "pdf": []
         },
         "archivos": {
-            "main_page": ["tabla_origen","nombre_del_archivo", "nombre"],
-            "modal": {"informacion_general":["id","tabla_origen","nombre"],"detalles":["ruta_s3","en_servidor"],"sistema":["fecha_de_creacion"]},
+            "main_page": ["nombre","nombre_del_archivo"],
+            "modal": {"informacion_general":["id","tabla_origen","nombre"],"detalles":["nombre_del_archivo","ruta_s3"],"sistema":["fecha_de_creacion"]},
             "pdf": []
         },
         "gastos": {
@@ -449,7 +449,9 @@ def get_table_relationships(table_name):
         "clientes":["briefs_de_clientes"],
 
     }
-    relationships=relationships.get(table_name,'')
+    relationships = relationships.get(table_name, [])
+    if table_name != 'archivos':
+        relationships.append('archivos')
     return relationships
 
 def get_calendar_date_variable(table_name):

@@ -1,4 +1,9 @@
 <!-- templates/partials/table_modal.html -->
+<style>
+    tbody tr:last-child td {
+        border-bottom: none !important;
+    }
+</style>
 <div id="modal" class="hidden fixed inset-0 bg-dark/90 dark:bg-white/5 backdrop-blur-sm z-[99999] hidden overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen px-4">
         <div class="bg-white dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 rounded-lg overflow-hidden my-8 w-full max-w-xl">
@@ -21,7 +26,7 @@
                     <div class="flex justify-end items-center ml-auto p-3" id="buttons_modal_exits">
                         {% include 'partials/table/modals/' ~ table_name ~ '.html' ignore missing %}
                     </div>                       
-                    <table class="overflow-auto w-full table-striped" id="modal_content"></table>
+                    <table class="overflow-auto w-full" id="modal_content"></table>
                 </div>
                 <div class="flex justify-start items-center gap-4 p-3">
                     <!-- Botón para descargar -->
@@ -59,17 +64,7 @@
                                     fill="currentColor" />
                             </svg>
                         </button>
-                    {% endif %} 
-                    {% if table_name in vars.files_button_functionality %}
-                        <div class="flex justify-end items-center gap-2" x-data x-show="true">
-                            <template x-if="!['Cancelada'].includes($store.modalData.getField('estatus'))">
-                                <button data-action="files" type="button"
-                                    class="btn border text-primary border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-primary bg-primary/10">
-                                    Archivos
-                                </button>
-                            </template>   
-                        </div>         
-                    {% endif %}                      
+                    {% endif %}                  
                 </div>                  
             </div>
         </div>

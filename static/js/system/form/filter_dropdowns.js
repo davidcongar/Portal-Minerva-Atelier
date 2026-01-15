@@ -15,15 +15,6 @@ Object.entries(filters).forEach(([childColumn, parentColumn]) => {
 		allOptions
 		.filter((_, opt) => $(opt).data("filter") == selectedValue)
 		.each((_, opt) => $child.append($(opt).clone()));
-		// Refresh Select2
-		$child.trigger("change");
-	}
-	// Init Select2 (if not already)
-	if (!$child.data("select2")) {
-		$child.select2({
-		placeholder: "Selecciona una opción",
-		allowClear: true
-		});
 	}
 	// Attach listener
 	$parent.on("change", filterChildOptions);

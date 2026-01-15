@@ -72,7 +72,7 @@ def get_ignored_columns(table_name):
     columnas_generales = {'fecha_de_creacion', 'estatus', 'id_usuario', 'id_visualizacion', 'fecha_de_actualizacion'}
     columns = {
         "usuarios":{'codigo_unico','id_rol','contrasena','contrasena_api','intentos_de_inicio_de_sesion','ultima_sesion','ultimo_cambio_de_contrasena','codigo_unico_expira'},
-        "archivos":{'tabla_origen','id_registro','nombre','ruta_s3'},
+        "archivos":{'tabla_origen','id_registro','nombre_del_archivo','ruta_s3'},
         "proyectos":{'importe_cobrado','fecha_fin'},
         "gastos": {'importe_pagado'},
         "compras": {'importe_total','subtotal','descuentos','estatus_de_pago','importe_pagado'},
@@ -95,7 +95,7 @@ def get_ignored_columns_edit(table_name,estatus):
     columnas_generales = {'default':{'fecha_de_creacion', 'id_usuario', 'id_visualizacion', 'fecha_de_actualizacion'}}
     tables = {
         "usuarios":{'default':{'codigo_unico','id_rol','contrasena','contrasena_api','intentos_de_inicio_de_sesion','ultima_sesion','ultimo_cambio_de_contrasena','codigo_unico_expira','estatus'}},
-        "archivos":{'default':{'tabla_origen','id_registro','nombre','ruta_s3'}},
+        "archivos":{'default':{'tabla_origen','id_registro','nombre_del_archivo','ruta_s3'}},
         "proyectos":{'default':{'importe_cobrado','fecha_fin','estatus'}},   
         "gastos": {'default':{'importe_pagado','estatus'}},
         "pagos": {'default':{'importe','estatus'}},
@@ -195,4 +195,11 @@ def get_parent_record(table_name):
         "preguntas_de_briefs":'id_brief',
     }
     parent_record=parent_record.get(table_name,'')
+    return parent_record
+
+def get_parent_record(table_name,parent_table):
+    parent_record={
+        "preguntas_de_briefs":{'briefs':'id_brief'},
+    }
+    parent_record=parent_record.get(table_name,{'':''}).get(parent_table,'')
     return parent_record
