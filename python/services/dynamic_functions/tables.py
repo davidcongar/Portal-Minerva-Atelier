@@ -503,3 +503,24 @@ def get_checkbox(table_name):
     }
     checkbox=checkbox.get(table_name, False)
     return checkbox
+
+def get_summary_data(table_name):
+    data={
+        'table_name': {
+                        'primary':["column_name"],
+                        'data':{"section_name":["column_name"],"section_name":["variacolumn_namebles"]}
+                        },
+    }
+    data=data.get(table_name,'')
+    return data
+
+def get_summary_kpis(table_name,id_parent_record):
+    data = {
+        "table_name": {
+            "section_name": {
+                "kp_name": get_kpi(table_name,"sql_name",{"variable": id_parent_record})
+            },
+        }
+    }
+    data=data.get(table_name,'')
+    return data

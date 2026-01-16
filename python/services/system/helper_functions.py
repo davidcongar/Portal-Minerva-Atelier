@@ -1,12 +1,11 @@
 
 from python.models.modelos import *
-from sqlalchemy import String, Text, or_,func,Integer, Float, Numeric
+from sqlalchemy import String, Text, or_,func,Integer, Float, Numeric,text
 from sqlalchemy.sql import case
 from flask import session,flash,request
 import re
 import json
 from datetime import date, datetime,timedelta
-from decimal import Decimal
 import random
 from sqlalchemy import inspect
 from config import *
@@ -94,6 +93,8 @@ def sanitize_data(model, data):
                     value = float(value)
             except (ValueError, TypeError):
                 value = None  # fallback seguro
+        if isinstance(value, float) and math.isnan(value):
+            value = None                  
         if col_type_str=='array':
             if value is None:
                 value=[]
@@ -220,7 +221,7 @@ def parse_money(value):
     if value is None:
         return None
     if isinstance(value, (int, float, Decimal)):
-        return Decimal(str(value))
+        return float(str(value))
     if isinstance(value, str):
         s = value.strip()
         # remove everything except digits, decimal separators, minus sign
@@ -235,7 +236,7 @@ def parse_money(value):
             s = s.replace(',', '')
 
         try:
-            return Decimal(s)
+            return float(s)
         except InvalidOperation:
             raise ValueError(f"importe value '{value}' is not a valid number")
 
@@ -560,3 +561,25 @@ def detect_table_from_columns(df_columns):
             best_score = score
 
     return best_match if best_score > 0 else None
+
+def deep_getattr(obj, attr, default=None):
+    try:
+        for part in attr.split('.'):
+            obj = getattr(obj, part)
+        return obj
+    except AttributeError:
+        return default
+    
+def get_kpi(table_name, sql_name, variables):
+    path = f'./static/sql/summary_kpis/{table_name}/{sql_name}.sql'
+    base_query = open(path, "r", encoding="utf-8").read()
+    variables_query = extract_param_names(base_query)
+    variables_request = {
+        k: v for k, v in variables.items()
+        if k in variables_query and v != ""
+    }
+    result = db.session.execute(text(base_query), variables_request).fetchone()
+    if not result:
+        return None  # or 0, or {}
+    row = dict(result._mapping)
+    return next(iter(row.values()))

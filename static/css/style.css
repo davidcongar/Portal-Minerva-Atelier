@@ -2339,6 +2339,9 @@ table .invoice-table tr td:last-child{
 .w-32{
   width: 8rem;
 }
+.w-50{
+  width: 15rem;
+}
 
 
 .w-3{
@@ -3703,6 +3706,10 @@ table .invoice-table tr td:last-child{
 
 .pl-1{
   padding-left: 0.25rem;
+}
+
+.pl-2{
+  padding-left: 1rem;
 }
 
 .pl-1\.5{

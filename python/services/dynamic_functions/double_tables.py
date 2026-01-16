@@ -16,7 +16,7 @@ def get_variables_double_table_view(table_name):
             "query_second_table":"productos_en_compras",
             "model_first_table":"productos",
             "model_second_table":"productos_en_compras",
-            "details":["id_visualizacion","proveedor",'importe_total'],
+            "details":["id_visualizacion","proveedor.nombre",'importe_total'],
             "edit_fields":['cantidad_ordenada','descuento_porcentaje','subtotal','fecha_entrega_estimada'],
             "required_fields":[''],
             "url_confirm":"compras.confirm"                   
@@ -58,7 +58,7 @@ def get_variables_double_table_view(table_name):
             "query_second_table":"compras_gastos_pago",
             "model_first_table":"gastos",
             "model_second_table":"gastos_y_compras_en_pagos",
-            "details":["id_visualizacion","proveedor","importe"],
+            "details":["id_visualizacion","proveedor.nombre","importe"],
             "edit_fields":['notas','importe'],
             "required_fields":[''],
             "url_confirm":"pagos_administrativos.confirm"  
@@ -159,4 +159,4 @@ def on_delete_double_table(table_name,id):
         inventario.cantidad_en_transito=inventario.cantidad_en_transito-record.cantidad
     elif table_name=='pagos_administrativos':
         pago=PagosAdministrativos.query.get(id)
-        calcular_importe_pago(pago)        
+        calcular_importe_pago(pago)

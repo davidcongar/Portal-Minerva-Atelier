@@ -26,7 +26,7 @@ def title_format(value):
     if formatted.startswith("id "):
         formatted = formatted[3:]
     # Capitalize first letter
-    formatted = formatted.capitalize()
+    formatted = formatted.capitalize().replace('.',' ')
     # Replace words with their accented versions if they exist
     for k, v in replacements.items():
         if k in formatted.lower():

@@ -748,24 +748,8 @@ def double_table_view(table_name,id):
     details = []
     
     for detail in variables.get('details', []): 
-        value = getattr(record, detail)
-
-        # Handle related objects
-        if hasattr(value, "nombre"):
-            value = value.nombre
-        if hasattr(value, "nombre_completo"):
-            value = value.nombre_completo
-
-        # Format money fields
-        if any(word in detail.lower() for word in ["importe", "monto", "precio"]):
-            try:
-                # Safely cast to Decimal/float and format as money
-                value = f"${float(value):,.2f}"
-            except Exception:
-                # fallback if value is not numeric
-                value = str(value)
-
-        result = f"{detail.replace('_',' ').capitalize().replace('Id visualizacion','ID')}: {value}"
+        value = deep_getattr(record, detail)
+        result = f"{title_format(detail)}: {value}"
         details.append(result)
 
     module,active_menu=get_breadcrumbs(table_name)
@@ -932,26 +916,12 @@ def table_view_input(main_table_name,id):
     form_options=get_form_options(table_name)
     foreign_options = {**foreign_options, **form_options}
     details = []
+    
     for detail in variables.get('details', []): 
-        value = getattr(record, detail)
-
-        # Handle related objects
-        if hasattr(value, "nombre"):
-            value = value.nombre
-        if hasattr(value, "nombre_completo"):
-            value = value.nombre_completo
-
-        # Format money fields
-        if any(word in detail.lower() for word in ["importe", "monto", "precio"]):
-            try:
-                # Safely cast to Decimal/float and format as money
-                value = f"${float(value):,.2f}"
-            except Exception:
-                # fallback if value is not numeric
-                value = str(value)
-
-        result = f"{detail.replace('_',' ').capitalize().replace('Id visualizacion','ID')}: {value}"
+        value = deep_getattr(record, detail)
+        result = f"{title_format(detail)}: {value}"
         details.append(result)
+    
     module,active_menu=get_breadcrumbs(table_name)
     context = {
                 "activeMenu": active_menu, 
@@ -1158,30 +1128,57 @@ def related(id,parent_table,table_name):
     id_parent_record=id
     record=model.query.get(id)
     modulo,active_menu=get_breadcrumbs(parent_table)
-    parent_record_name = getattr(record, "nombre", None) or getattr(record, "nombre_completo", None) or getattr(record, "id_visualizacion", None)    
+    parent_record_name = getattr(record, "nombre", None) or getattr(record, "nombre_completo", None) or getattr(record, "id_visualizacion", None)   
     breadcrumbs=[{"name":modulo,"url":""},{"name":title_format(parent_table),"url":url_for("dynamic.table_view", table_name=parent_table)},{"name":parent_record_name,"url":""}]
     context = {
         "activeMenu": active_menu,
         "activeItem": parent_table,
         "breadcrumbs": breadcrumbs
-    }
-    number_buttons=get_table_buttons().get(table_name,0)
-    date_variable=get_calendar_date_variable(table_name)
-    javascript = os.path.exists(f'static/js/table_logic/{table_name}.js')
-    checkbox=get_checkbox(table_name)    
-    return render_template(
-        "system/dynamic_detail.html",
-        record=record,
-        title_formats=TITLE_FORMATS,
-        table_name=table_name,
-        columns=get_columns(table_name,'main_page'),
-        parent_table=parent_table,
-        id_parent_record=id_parent_record,
-        activeDefTab=table_name,
-        tabs=get_table_relationships(parent_table),
-        number_buttons=number_buttons,
-        date_variable=date_variable,
-        checkbox=checkbox,
-        javascript=javascript,
-        **context        
-    )
+    }    
+    if table_name=='resumen':
+        variables=get_summary_data(parent_table)
+        primary = variables.get('primary') or []
+        primary_info = [ deep_getattr(record, detail) for detail in primary]
+        record_data = {}
+        data = variables.get('data', {})
+        for section, details in data.items():
+            record_data[section] = {
+                detail: deep_getattr(record, detail)
+                for detail in details
+            }
+        kpis=get_summary_kpis(parent_table,id_parent_record)
+        return render_template(
+            "system/dynamic_summary.html",
+            record=record,
+            title_formats=TITLE_FORMATS,
+            parent_table=parent_table,
+            id_parent_record=id_parent_record,
+            activeDefTab=table_name,
+            tabs=get_table_relationships(parent_table), 
+            primary_info=primary_info,  
+            record_data=record_data,
+            kpis=kpis,
+            nombre=getattr(record,variables.get('primary', [])[0]),
+            **context
+        )
+    else:
+        number_buttons=get_table_buttons().get(table_name,0)
+        date_variable=get_calendar_date_variable(table_name)
+        javascript = os.path.exists(f'static/js/table_logic/{table_name}.js')
+        checkbox=get_checkbox(table_name)    
+        return render_template(
+            "system/dynamic_related_data.html",
+            record=record,
+            title_formats=TITLE_FORMATS,
+            table_name=table_name,
+            columns=get_columns(table_name,'main_page'),
+            parent_table=parent_table,
+            id_parent_record=id_parent_record,
+            activeDefTab=table_name,
+            tabs=get_table_relationships(parent_table),
+            number_buttons=number_buttons,
+            date_variable=date_variable,
+            checkbox=checkbox,
+            javascript=javascript,
+            **context        
+        )
