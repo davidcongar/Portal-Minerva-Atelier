@@ -426,7 +426,7 @@ def add(table_name):
         if hasattr(model, 'id_visualizacion'):
             new_record.id_visualizacion=get_id_visualizacion(table_name)
         if table_name=='archivos':
-            new_record.tabla_origen=session['tabla_origen']
+            new_record.tabla_origen=parent_table
             new_record.id_registro=id_parent_record
             new_record.ruta_s3=''
         if table_name=='usuarios':
@@ -439,8 +439,8 @@ def add(table_name):
         db.session.flush()
         if table_name=='archivos':
             archivo = request.files.get("archivo")
-            s3_service.upload_file(archivo, new_record.id,session['tabla_origen'])
-            new_record.ruta_s3=f"{session['tabla_origen']}/{ new_record.id}_{archivo.filename}"
+            s3_service.upload_file(archivo, new_record.id,parent_table)
+            new_record.ruta_s3=f"{parent_table}/{ new_record.id}_{archivo.filename}"
             new_record.nombre_del_archivo=archivo.filename
         # Process many-to-many relationships
         for key, value in relationship_data.items():
@@ -453,7 +453,7 @@ def add(table_name):
             relationship.extend(selected_items)              
         # archivos
         archivos = [file for key, file in request.files.items()]
-        if archivos:
+        if archivos and table_name!='archivos':
             for archivo in archivos:
                 if archivo.filename:
                     # create file in archivos
