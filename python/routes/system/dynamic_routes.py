@@ -85,7 +85,7 @@ def table_view(table_name):
         **context
     )
 
-@dynamic_bp.route("/<table_name>/data/", methods=["GET"])
+@dynamic_bp.route("/<table_name>/data", methods=["GET"])
 @login_required
 @roles_required()
 def data(table_name):
