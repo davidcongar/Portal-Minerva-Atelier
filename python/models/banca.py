@@ -38,7 +38,7 @@ class PagosAdministrativos(db.Model,BaseMixin,AuditMixin):
 
     @validates('importe')
     def validate_non_negative(self, key, value):
-        if Decimal(value) < 0:
+        if float(value) < 0:
             raise ValueError(f"{key.replace('_',' ').capitalize()} no puede ser negativo")
         return value
 
@@ -58,7 +58,7 @@ class GastosYComprasEnPagos(db.Model,BaseMixin,AuditMixin):
 
     @validates('importe')
     def validate_non_negative(self, key, value):
-        if Decimal(value) < 0:
+        if float(value) < 0:
             raise ValueError(f"{key.replace('_',' ').capitalize()} no puede ser negativo")
         return value
 
@@ -77,7 +77,7 @@ class TransferenciasDeDinero(db.Model,BaseMixin,AuditMixin):
 
     @validates('importe')
     def validate_non_negative(self, key, value):
-        if Decimal(value) < 0:
+        if float(value) < 0:
             raise ValueError(f"{key.replace('_',' ').capitalize()} no puede ser negativo")
         return value
 
@@ -96,7 +96,7 @@ class AjustesDeDinero(db.Model,BaseMixin,AuditMixin):
 
     @validates('importe')
     def validate_non_negative(self, key, value):
-        if Decimal(value) < 0:
+        if float(value) < 0:
             raise ValueError(f"{key.replace('_',' ').capitalize()} no puede ser negativo")
         return value
 class PagosDeNomina(db.Model,BaseMixin,AuditMixin):
@@ -124,6 +124,6 @@ class SueldosPagadosEnNomina(db.Model,BaseMixin,AuditMixin):
 
     @validates('importe')
     def validate_non_negative(self, key, value):
-        if Decimal(value) < 0:
+        if float(value) < 0:
             raise ValueError(f"{key.replace('_',' ').capitalize()} no puede ser negativo")
         return value

@@ -6,7 +6,6 @@ from flask import session,flash
 import re
 import json
 from datetime import date, datetime
-from decimal import Decimal
 from python.services.dynamic_functions.general_functions import *
 
 

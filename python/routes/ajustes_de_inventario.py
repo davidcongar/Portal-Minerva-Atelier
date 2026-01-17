@@ -84,7 +84,7 @@ def cancelar(id):
 def revision_salida(id_almacen,id_producto,cantidad):
     inventario=Inventario.query.filter_by(id_almacen=id_almacen,id_producto=id_producto).first()
     if inventario:
-        if Decimal(cantidad)>inventario.cantidad:
+        if float(cantidad)>inventario.cantidad:
             status='warning'
             message="La cantidad disponible, "+str(inventario.cantidad)+", es menor a la cantidad ingresada, "+cantidad
         else:

@@ -5,7 +5,6 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from python.models import db
 from sqlalchemy.orm import validates
-from decimal import Decimal
 from sqlalchemy.types import TypeDecorator, String
 from cryptography.fernet import Fernet
 import os

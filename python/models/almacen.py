@@ -82,7 +82,7 @@ class AjustesDeInventario(db.Model,BaseMixin,AuditMixin):
 
     @validates('cantidad')
     def validate_non_negative(self, key, value):
-        if Decimal(value) < 0:
+        if float(value) < 0:
             raise ValueError(f"{key.replace('_',' ').capitalize()} no puede ser negativo")
         return value
 
@@ -111,7 +111,7 @@ class ProductosEnTransferenciasDeInventario(db.Model,BaseMixin,AuditMixin):
 
     @validates('cantidad')
     def validate_non_negative(self, key, value):
-        if Decimal(value) < 0:
+        if float(value) < 0:
             raise ValueError(f"{key.replace('_',' ').capitalize()} no puede ser negativo")
         return value
 
