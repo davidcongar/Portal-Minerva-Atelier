@@ -29,7 +29,7 @@ def get_foreign_options():
         'id_cliente':Clientes.query.filter_by(estatus='Activo'),
         'id_cliente': Clientes.query.filter(Clientes.estatus.in_(['Perfect match','Swipe', 'Activo'])),
         'id_proyecto':Proyectos.query.filter_by(estatus='Activo'),
-        'id_espacio_de_proyecto':EspaciosDeProyectos.query.filter_by(estatus='Activo'),
+        'id_espacio':Espacios.query.filter_by(estatus='Activo'),
         'id_venta':Ventas.query.filter_by(estatus='Pendiente'),
 
         # --- Campos con opciones fijas ---
@@ -99,22 +99,24 @@ def get_ignored_columns_edit(table_name,estatus):
     tables = {
         'usuarios':{'default':{'codigo_unico','id_rol','contrasena','contrasena_api','intentos_de_inicio_de_sesion','ultima_sesion','ultimo_cambio_de_contrasena','codigo_unico_expira','estatus'}},
         'archivos':{'default':{'tabla_origen','id_registro','nombre_del_archivo','ruta_s3'}},
-        'proyectos':{'default':{'importe_cobrado','fecha_fin','estatus'}},   
+        'proyectos':{'default':{'importe_cobrado','fecha_fin','estatus','id_venta','id_cliente','id_servicio','id_espacio','metros_cuadrados','fecha_inicio'}},   
         'gastos': {'default':{'importe_pagado','estatus'}},
         'pagos': {'default':{'importe','estatus'}},
+        'integrantes': {'default':{'fecha_terminacion','estatus'}},
         'compras': {'default':{'importe_total','subtotal','descuentos','estatus_de_pago','estatus'}},
         'ajustes_de_inventario': {'default':{'cantidad','tipo_de_ajuste','id_almacen','id_producto','estatus'}},
         'transferencias_de_inventario': {'default':{'id_almacen_salida','id_almacen_entrada','estatus'}},
         'pagos_administrativos':{'default':{'importe','estatus'}},
         'preguntas_de_briefs':{'default':{'id_brief'}},
+        'actividades_base':{'default':{'id_servicio'}},
+        'cuentas_de_banco': {'default':{'balance'}},
         'agenda':{'default':{'id_integrante','hora_fin','motivo_de_cancelacion','notas','estatus','id_cliente'},
                   'Confirmar':{'hora_fin','motivo_de_cancelacion','notas','estatus','id_cliente'}},
         'cuentas_de_banco': {'default':{'balance'}},
         'facturas': {'default':{'importe_total','impuestos','subtotal','importe_cobrado'},'Aprobada':{'id_cliente','id_proyecto','importe_total','impuestos','subtotal','importe_cobrado'}},
         'actividades': {'default':{''},
-                        'En proceso':{'id_cliente','notas_cambios','id_proyecto','id_integrante','actividad','id_categoria_de_actividad','fecha_solicitud','fecha_realizado','fecha_cerrado'},                        
-                        'Con cambios':{'id_cliente','notas_cambios','prioridad','comentarios','id_proyecto','id_integrante','actividad','id_categoria_de_actividad','fecha_solicitud','fecha_realizado','fecha_cerrado'},
-                        'Realizada':{'id_cliente','notas_cierre','prioridad','horas','comentarios','id_proyecto','id_integrante','actividad','id_categoria_de_actividad','fecha_solicitud','fecha_realizado','fecha_cerrado'}},
+                        'Asignar':{'id_cliente','id_actividad_base','fecha_inicio','fecha_fin','horas','notas_cierre','comentarios_supervisor','estatus','notas_cambios','id_proyecto',},                                                
+                        },
     }
     table_dict = tables.get(table_name, columnas_generales)
     if not estatus or estatus not in table_dict:
@@ -176,6 +178,7 @@ def get_non_edit_status(table_name):
     status_to_remove = {
         'facturas': {'Aprobada'},
         'actividades': {'En proceso','Realizada'},
+        'proyectos': {'En proceso'},
 
     }
     status=general_status-status_to_remove.get(table_name,{''})
@@ -216,6 +219,7 @@ def get_parent_record(table_name,parent_table):
         'facturas':{'clientes':'id_cliente'},
         'respuestas_de_preguntas_de_briefs':{'preguntas_de_briefs':'id_pregunta_de_brief'},
         'precios_de_servicios':{'servicios':'id_servicio'},
+        'actividades_base':{'servicios':'id_servicio'},
         'servicios_en_ventas':{'ventas':'id_venta'},
 
     }

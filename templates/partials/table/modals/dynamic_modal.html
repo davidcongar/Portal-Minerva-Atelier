@@ -42,7 +42,7 @@
                         </svg>
                     </button>
                     <!-- Botón para actualizar -->
-                    {% if table_name not in vars.no_edit_button and not parent_table and can_access('/dynamic/' ~ table_name ~ '/edit') %}
+                    {% if table_name not in vars.no_edit_button and can_access('/dynamic/' ~ table_name ~ '/edit') %}
                         <button data-action="actualizar" type="button"
                             class="bg-gray/10 w-10 h-10 flex items-center justify-center hover:bg-dark hover:text-white dark:hover:bg-white dark:hover:text-dark border border-transparent rounded-md transition-all duration-300">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">

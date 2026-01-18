@@ -68,7 +68,8 @@ TITLE_FORMATS = {
     "id_brief_nombre":"Brief",
     "id_integrante_nombre_completo":"Integrante",
     "id_servicio_nombre":"Servicio",
-    "id_espacio_de_proyecto_nombre":"Espacio",
+    "id_espacio_nombre":"Espacio",
+    "id_actividad_base_nombre":"Actividad",
 
     "proveedor.nombre":"Proveedor",
     "compras.proveedor.nombre":"Proveedor",
@@ -77,6 +78,8 @@ TITLE_FORMATS = {
 
 }
 BRIEFS_CREACION_CLIENTE = {'¿Hacemos match?'}
+BRIEFS_GLOW_UP = {'Brief 0','Brief 1'}
+
 # column names for data imports
 TABLE_COLUMN_MAPS = {
     "table_name": {

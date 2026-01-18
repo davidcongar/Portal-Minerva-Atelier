@@ -1,23 +1,23 @@
 <!--Dynamic tables variables-->
 {% set no_tabs= ['logs_auditoria','archivos','inventario','productos_en_recepciones_de_compras','servicios_en_facturas','facturas_en_ingresos','gastos_y_compras_en_pagos'] %}
 {% set no_tab_count = ['No transferible','Cobrada','Cerrado','Cerrada','Finalizada','Finalizado','Cancelado','Cancelada','Pagado','Pagada','Realizada','Realizado','Perdido','Inactivo'] %}
-{% set no_add_button = ['servicios_en_facturas','facturas_en_ingresos','logs_auditoria','inventario'] %}
-{% set no_edit_button = ['logs_auditoria','inventario','servicios_en_facturas','gastos_en_pagos','facturas_en_ingresos','ventas','servicios_en_ventas'] %}
+{% set no_add_button = ['servicios_en_facturas','briefs_de_clientes','facturas_en_ingresos','logs_auditoria','inventario'] %}
+{% set no_edit_button = ['logs_auditoria','inventario','actividades','briefs_de_clientes','servicios_en_facturas','gastos_en_pagos','facturas_en_ingresos','ventas','servicios_en_ventas'] %}
 {% set date_range_search = ['fecha_venta','fecha_orden','fecha_de_gasto','fecha_de_transferencia','fecha','fecha_hora']  %}
 {% set percentage_format_columns = [] %}
 {% set money_format_columns=['balance','importe_pagado','importe_total','importe','precio_unitario','iva'] %}
 
-{% set purple_badge_values = ['En revisión','Pendiente','En proceso','Swipe'] %}
-{% set primary_badge_values = ['Recibida parcial','Perfect match'] %}
-{% set success_badge_values = ['Aprobada','Aprobado','Activo','Confirmada'] %}
+{% set purple_badge_values = ['En revisión','Pendiente','Swipe','Sin iniciar'] %}
+{% set primary_badge_values = ['Recibida parcial','En proceso'] %}
+{% set success_badge_values = ['Aprobada','Aprobado','Activo','Confirmada','Perfect match'] %}
 {% set warning_badge_values = [] %}
 {% set danger_badge_values = [] %}
 {% set gray_badge_values = ['Cancelada','Recibida','Inactivo','Contestado','Finalizada','Cobrada'] %}
 
-{% set calendar_titles = {'table_name':['column_name','column_name']} %}
+{% set calendar_titles = {'agenda':['hora_inicio']} %}
 
 <!--Dynamic form variables-->
-{% set columns_foreign_options= ['espacio_de_proyecto','regimen_fiscal','tipo_de_iva','unidad_de_medida','inventariable','prioridad','estatus', 'genero','estado_civil','tipo_de_cuenta','tipo_de_ajuste','forma_de_pago','uso_de_cfdi','metodo_de_pago'] %}
+{% set columns_foreign_options= ['espacio','regimen_fiscal','tipo_de_iva','unidad_de_medida','inventariable','prioridad','estatus', 'genero','estado_civil','tipo_de_cuenta','tipo_de_ajuste','forma_de_pago','uso_de_cfdi','metodo_de_pago'] %}
 {% set date_time_columns=[] %}
 {% set date_columns=['fecha_entrega_estimada'] %}
 {% set time_columns=['hora_inicio','hora_fin'] %}

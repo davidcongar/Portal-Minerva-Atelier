@@ -7,7 +7,7 @@ import re
 import json
 from datetime import date, datetime
 from python.services.dynamic_functions.general_functions import *
-
+from python.services.system.email import *
 from python.services.system.helper_functions import *
 from config import *
 
@@ -67,9 +67,7 @@ def servicios_en_ventas(id):
     record=ServiciosEnVentas.query.get(id)
     precio = PreciosDeServicios.query.filter(
         PreciosDeServicios.id_servicio == record.id_servicio,
-        PreciosDeServicios.id_espacio_de_proyecto == record.id_espacio_de_proyecto,
-        PreciosDeServicios.metros_cuadrados_minimos <= record.metros_cuadrados,
-        PreciosDeServicios.metros_cuadrados_maximos >= record.metros_cuadrados
+        PreciosDeServicios.id_espacio == record.id_espacio
     ).first()
     if precio:
         record.precio_unitario = precio.precio_unitario

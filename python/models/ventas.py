@@ -12,7 +12,7 @@ class Servicios(db.Model,BaseMixin,AuditMixin):
     descripcion = db.Column(db.Text)
     estatus = db.Column(db.String(255),default="Activo")
 
-class EspaciosDeProyectos(db.Model,BaseMixin,AuditMixin):
+class Espacios(db.Model,BaseMixin,AuditMixin):
 
     nombre = db.Column(db.String(100))
     descripcion = db.Column(db.Text)
@@ -21,19 +21,17 @@ class EspaciosDeProyectos(db.Model,BaseMixin,AuditMixin):
 class PreciosDeServicios(db.Model,BaseMixin,AuditMixin):
 
     id_servicio = db.Column(db.UUID, db.ForeignKey("servicios.id"), nullable=False)
-    id_espacio_de_proyecto = db.Column(db.UUID, db.ForeignKey("espacios_de_proyectos.id"), nullable=False)
+    id_espacio = db.Column(db.UUID, db.ForeignKey("espacios.id"), nullable=False)
 
     precio_unitario = db.Column(db.Float, nullable=False)
-    metros_cuadrados_minimos = db.Column(db.Float, nullable=False)
-    metros_cuadrados_maximos = db.Column(db.Float, nullable=False)
 
     estatus = db.Column(db.String(255),default="Activo")
     id_stripe = db.Column(db.String(255))
 
     servicio = db.relationship('Servicios', backref='precios_de_servicios', lazy=True)
-    espacio_de_proyecto = db.relationship('EspaciosDeProyectos', backref='precios_de_servicios', lazy=True)
+    espacio = db.relationship('Espacios', backref='precios_de_servicios', lazy=True)
 
-    @validates('precio_unitario','metros_cuadrados_minimos','metros_cuadrados_maximos')
+    @validates('precio_unitario')
     def validate_non_negative(self, key, value):
         if float(value) < 0:
             raise ValueError(f"{key.replace('_',' ').capitalize()} no puede ser negativo")
@@ -45,7 +43,9 @@ class Ventas(db.Model,BaseMixin,AuditMixin):
     id_cuenta_de_banco = db.Column(db.UUID, db.ForeignKey("cuentas_de_banco.id"))
 
     fecha_de_venta = db.Column(db.Date, nullable=False)
+    codigo_de_descuento = db.Column(db.String(255))
     importe = db.Column(db.Float, nullable=False, default=0.00)
+    descuento = db.Column(db.Float, nullable=False, default=0.00)
     tipo_de_iva = db.Column(db.String(255))
     iva = db.Column(db.Float, default=0.00)
     importe_total = db.Column(db.Float, default=0.00)
@@ -66,7 +66,7 @@ class ServiciosEnVentas(db.Model,BaseMixin,AuditMixin):
 
     id_venta = db.Column(db.UUID, db.ForeignKey("ventas.id"),nullable=False)
     id_servicio=db.Column(db.UUID, db.ForeignKey("servicios.id"),nullable=False)
-    id_espacio_de_proyecto = db.Column(db.UUID, db.ForeignKey("espacios_de_proyectos.id"), nullable=False)    
+    id_espacio = db.Column(db.UUID, db.ForeignKey("espacios.id"), nullable=False)    
 
     metros_cuadrados= db.Column(db.Float, nullable=False, default=0.00)
     cantidad = db.Column(db.Float, nullable=False, default=1)
@@ -75,7 +75,7 @@ class ServiciosEnVentas(db.Model,BaseMixin,AuditMixin):
     id_precio_stripe = db.Column(db.String(255))
 
     venta = db.relationship('Ventas', backref='servicios_en_ventas',lazy=True)
-    espacio_de_proyecto = db.relationship('EspaciosDeProyectos', backref='servicios_en_ventas', lazy=True)
+    espacio = db.relationship('Espacios', backref='servicios_en_ventas', lazy=True)
     servicio = db.relationship('Servicios', backref='servicios_en_ventas',lazy=True)
 
     @validates('importe','precio_unitario')

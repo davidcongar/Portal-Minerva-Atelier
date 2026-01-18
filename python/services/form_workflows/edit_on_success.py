@@ -74,3 +74,25 @@ def agenda(id,changed_fields):
             )    
             record.estatus='Confirmada'          
             flash(f"La cita ha sido Confirmada.", "success")
+
+@handler_edit_on_success('actividades')
+def actividades(id,changed_fields):
+    record=Actividades.query.get(id)
+    if record.estatus=='Sin iniciar' and record.id_integrante:
+        record.estatus='En proceso'
+        record.fecha_inicio=datetime.today()
+        send_html_email(
+            subject="Minerva Atelier - Asignación de actividad",
+            recipient_email=record.integrante.correo_electronico,
+            template="partials/system/email_template.html",
+            sender_name="Minerva Atelier",
+            body_content = (
+                "Se acaba de asignar una actividad nueva en el portal de <strong>Minerva Atelier</strong>.<br>"
+            ),
+            details_list=[
+                f"Fecha: {record.fecha_inicio}",
+                f"Proyecto: {record.proyecto.id_visualizacion}",
+                f"Cliente: {record.proyecto.cliente.nombre_completo}",
+                f"Actividad: {record.actividad_base.nombre}",
+            ]
+        )    

@@ -43,8 +43,9 @@ def get_joins():
         'id_pago_de_nomina': (PagosDeNomina, PagosDeNomina.id, PagosDeNomina.id_visualizacion),   
         'id_proveedor': (Proveedores, Proveedores.id, Proveedores.nombre),   
         'id_categoria_de_gasto': (CategoriasDeGastos, CategoriasDeGastos.id, CategoriasDeGastos.nombre),   
-        'id_espacio_de_proyecto': (EspaciosDeProyectos, EspaciosDeProyectos.id, EspaciosDeProyectos.nombre),   
+        'id_espacio': (Espacios, Espacios.id, Espacios.nombre),   
         'id_venta': (Ventas, Ventas.id, Ventas.id_visualizacion),
+        'id_proyecto': (Proyectos, Proyectos.id, Proyectos.id_visualizacion),   
 
     }
     return joins
@@ -151,7 +152,7 @@ def get_columns(table_name,section):
             'modal': {'informacion_general':['id','id_compra_id_visualizacion','id_producto_nombre','cantidad_ordenada','cantidad_recibida','fecha_entrega_estimada','estatus'],'financiero':['precio_unitario','subtotal','descuento_porcentaje','importe_total'],'detalles':['notas'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
             'pdf': ['id_compra_id_visualizacion','id_producto_nombre','cantidad_ordenada','cantidad_recibida','precio_unitario','importe_total','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
-        'espacios_de_proyectos': {
+        'espacios': {
             'main_page': ['id_visualizacion','nombre','estatus'],
             'modal': {'informacion_general':['id','id_visualizacion','nombre','descripcion','estatus'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
             'pdf': ['id_visualizacion','nombre','descripcion','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
@@ -162,8 +163,8 @@ def get_columns(table_name,section):
             'pdf': ['id_visualizacion','nombre','descripcion','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'precios_de_servicios': {
-            'main_page': ['id_visualizacion','id_servicio_nombre','id_espacio_de_proyecto_nombre','metros_cuadrados_minimos','metros_cuadrados_maximos','precio_unitario','estatus'],
-            'modal': {'informacion_general':['id','id_visualizacion','id_servicio_nombre','id_espacio_de_proyecto_nombre','metros_cuadrados_minimos','metros_cuadrados_maximos','estatus'],'financiero':['precio_unitario'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
+            'main_page': ['id_visualizacion','id_servicio_nombre','id_espacio_nombre','precio_unitario','estatus'],
+            'modal': {'informacion_general':['id','id_visualizacion','id_servicio_nombre','id_espacio_nombre','estatus'],'financiero':['precio_unitario'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
             'pdf': ['id_visualizacion','id_servicio_nombre','precio_unitario','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'cotizaciones': {
@@ -217,9 +218,9 @@ def get_columns(table_name,section):
             'pdf': ['id_visualizacion','id_transferencia_de_inventario_visualizacion','id_producto_nombre','cantidad','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'envios': {
-            'main_page': ['id_visualizacion','id_almacen_nombre','id_cliente_nombre','id_proyecto_nombre','id_proveedor_nombre','guia_de_envio','fecha_envio','estatus'],
-            'modal': {'informacion_general':['id','id_visualizacion','id_almacen_nombre','id_cliente_nombre','id_proyecto_nombre','id_proveedor_nombre','guia_de_envio','fecha_envio','estatus'],'detalles':['notas'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
-            'pdf': ['id_visualizacion','id_almacen_nombre','id_cliente_nombre','id_proyecto_nombre','id_proveedor_nombre','guia_de_envio','fecha_envio','notas','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
+            'main_page': ['id_visualizacion','id_almacen_nombre','id_cliente_nombre','id_proyecto_id_visualizacion','id_proveedor_nombre','guia_de_envio','fecha_envio','estatus'],
+            'modal': {'informacion_general':['id','id_visualizacion','id_almacen_nombre','id_cliente_nombre','id_proyecto_id_visualizacion','id_proveedor_nombre','guia_de_envio','fecha_envio','estatus'],'detalles':['notas'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
+            'pdf': ['id_visualizacion','id_almacen_nombre','id_cliente_nombre','id_proyecto_id_visualizacion','id_proveedor_nombre','guia_de_envio','fecha_envio','notas','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'productos_en_envios': {
             'main_page': ['id_visualizacion','id_envio_id_visualizacion','id_producto_nombre','cantidad'],
@@ -252,9 +253,9 @@ def get_columns(table_name,section):
             'pdf': ['id_visualizacion','id_cliente_nombre_completo','id_integrante_nombre_completo','fecha','hora_inicio','hora_fin','notas','motivo_de_cancelacion','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'proyectos': {
-            'main_page': ['id_visualizacion','id_venta_id_visualizacion','id_servicio_nombre','id_espacio_de_proyecto_nombre','id_integrante_nombre_completo','metros_cuadrados','fecha_inicio','fecha_fin','estatus'],
-            'modal': {'informacion_general':['id','id_visualizacion','id_venta_id_visualizacion','id_servicio_nombre','id_espacio_de_proyecto_nombre','id_integrante_nombre_completo','metros_cuadrados','fecha_inicio','fecha_fin','estatus'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
-            'pdf': ['id_visualizacion','id_venta_id_visualizacion','id_servicio_nombre','id_espacio_de_proyecto_nombre','id_integrante_nombre_completo','metros_cuadrados','fecha_inicio','fecha_fin','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
+            'main_page': ['id_visualizacion','id_venta_id_visualizacion','id_servicio_nombre','id_espacio_nombre','id_integrante_nombre_completo','metros_cuadrados','fecha_inicio','fecha_fin','estatus'],
+            'modal': {'informacion_general':['id','id_visualizacion','id_venta_id_visualizacion','id_servicio_nombre','id_espacio_nombre','id_integrante_nombre_completo','metros_cuadrados','fecha_inicio','fecha_fin','estatus'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
+            'pdf': ['id_visualizacion','id_venta_id_visualizacion','id_servicio_nombre','id_espacio_nombre','id_integrante_nombre_completo','metros_cuadrados','fecha_inicio','fecha_fin','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'actividades_base': {
             'main_page': ['id_visualizacion','id_servicio_nombre','nombre','horas_estimadas','estatus'],
@@ -262,9 +263,9 @@ def get_columns(table_name,section):
             'pdf': ['id_visualizacion','id_servicio_nombre','nombre','descripcion','entregable','horas_estimadas','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'actividades': {
-            'main_page': ['id_visualizacion','id_proyecto_nombre','id_integrante_nombre_completo','id_actividad_base_nombre','fecha_inicio','fecha_estimada','fecha_fin','estatus'],
-            'modal': {'informacion_general':['id','id_visualizacion','id_proyecto_nombre','id_integrante_nombre_completo','id_actividad_base_nombre','fecha_inicio','fecha_estimada','fecha_fin','prioridad','horas','estatus'],'detalles':['notas','notas_cierre','comentarios_supervisor'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
-            'pdf': ['id_visualizacion','id_proyecto_nombre','id_integrante_nombre_completo','id_actividad_base_nombre','fecha_inicio','fecha_estimada','fecha_fin','prioridad','horas','notas','comentarios_supervisor','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
+            'main_page': ['id_visualizacion','id_proyecto_id_visualizacion','id_integrante_nombre_completo','id_actividad_base_nombre','fecha_inicio','fecha_estimada','fecha_fin','calificacion_cliente','notas_cliente','aceptacion_de_cliente','estatus'],
+            'modal': {'informacion_general':['id','id_visualizacion','id_proyecto_id_visualizacion','id_integrante_nombre_completo','id_actividad_base_nombre','prioridad','horas','estatus'],'cliente':['calificacion_cliente','notas_cliente','aceptacion_de_cliente'],'fechas':['fecha_inicio','fecha_estimada','fecha_fin'],'detalles':['notas','notas_cierre','comentarios_supervisor'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
+            'pdf': ['id_visualizacion','id_proyecto_id_visualizacion','id_integrante_nombre_completo','id_actividad_base_nombre','fecha_inicio','fecha_estimada','fecha_fin','prioridad','horas','notas','comentarios_supervisor','calificacion_cliente','notas_cliente','aceptacion_de_cliente','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'preguntas_de_calidad_de_servicio': {
             'main_page': ['id_visualizacion','id_servicio_nombre','orden','pregunta','tipo_de_respuesta'],
@@ -272,9 +273,9 @@ def get_columns(table_name,section):
             'pdf': ['id_visualizacion','id_servicio_nombre','orden','pregunta','tipo_de_respuesta','opciones','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'calidad_de_servicio_de_proyectos': {
-            'main_page': ['id_visualizacion','id_cliente_nombre','id_proyecto_nombre','fecha_cierre','estatus'],
-            'modal': {'informacion_general':['id','id_visualizacion','id_cliente_nombre','id_proyecto_nombre','fecha_cierre','estatus'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
-            'pdf': ['id_visualizacion','id_cliente_nombre','id_proyecto_nombre','fecha_cierre','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
+            'main_page': ['id_visualizacion','id_cliente_nombre','id_proyecto_id_visualizacion','fecha_cierre','estatus'],
+            'modal': {'informacion_general':['id','id_visualizacion','id_cliente_nombre','id_proyecto_id_visualizacion','fecha_cierre','estatus'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
+            'pdf': ['id_visualizacion','id_cliente_nombre','id_proyecto_id_visualizacion','fecha_cierre','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'respuestas_calidad_de_servicio': {
             'main_page': ['id_visualizacion','id_calidad_de_servicio_de_proyecto_id_visualizacion','id_pregunta_de_calidad_de_servicio_visualizacion','respuesta'],
@@ -287,9 +288,9 @@ def get_columns(table_name,section):
             'pdf': ['id_visualizacion','id_servicio_nombre','orden','pregunta','tipo_de_respuesta','opciones','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'encuesta_de_satisfaccion_de_proyectos': {
-            'main_page': ['id_visualizacion','id_cliente_nombre','id_proyecto_nombre','fecha_cierre','estatus'],
-            'modal': {'informacion_general':['id','id_visualizacion','id_cliente_nombre','id_proyecto_nombre','fecha_cierre','estatus'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
-            'pdf': ['id_visualizacion','id_cliente_nombre','id_proyecto_nombre','fecha_cierre','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
+            'main_page': ['id_visualizacion','id_cliente_nombre','id_proyecto_id_visualizacion','fecha_cierre','estatus'],
+            'modal': {'informacion_general':['id','id_visualizacion','id_cliente_nombre','id_proyecto_id_visualizacion','fecha_cierre','estatus'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
+            'pdf': ['id_visualizacion','id_cliente_nombre','id_proyecto_id_visualizacion','fecha_cierre','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'respuestas_encuesta_de_satisfaccion': {
             'main_page': ['id_visualizacion','id_encuesta_de_satisfaccion_de_proyecto_id_visualizacion','id_pregunta_de_encuesta_de_satisfaccion_visualizacion','respuesta'],
@@ -323,13 +324,13 @@ def get_columns(table_name,section):
         },
         'ventas': {
             'main_page': ['id_visualizacion','id_cliente_nombre_completo','importe','iva','importe_total','estatus'],
-            'modal': {'informacion_general':['id','id_visualizacion','id_cliente_nombre_completo','espacio_de_proyecto','tipo_de_iva','estatus'],'financiero':['importe','iva','importe_total'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
-            'pdf': ['id_visualizacion','id_cliente_nombre_completo','espacio_de_proyecto','importe','tipo_de_iva','iva','importe_total','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
+            'modal': {'informacion_general':['id','id_visualizacion','id_cliente_nombre_completo','espacio','tipo_de_iva','estatus'],'financiero':['importe','iva','importe_total'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
+            'pdf': ['id_visualizacion','id_cliente_nombre_completo','espacio','importe','tipo_de_iva','iva','importe_total','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         "servicios_en_ventas": {
-            "main_page": ["id_visualizacion","id_venta_id_visualizacion","id_servicio_nombre","id_espacio_de_proyecto_nombre","metros_cuadrados","cantidad","precio_unitario","importe"],
-            "modal": {"informacion_general":["id","id_visualizacion","id_venta_id_visualizacion","id_servicio_nombre","id_espacio_de_proyecto_nombre"],"detalles":["metros_cuadrados","cantidad","precio_unitario","importe"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
-            "pdf": ["id_visualizacion","id_venta_id_visualizacion","id_servicio_nombre","id_espacio_de_proyecto_nombre","metros_cuadrados","cantidad","precio_unitario","importe","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
+            "main_page": ["id_visualizacion","id_venta_id_visualizacion","id_servicio_nombre","id_espacio_nombre","metros_cuadrados","cantidad","precio_unitario","importe"],
+            "modal": {"informacion_general":["id","id_visualizacion","id_venta_id_visualizacion","id_servicio_nombre","id_espacio_nombre"],"detalles":["metros_cuadrados","cantidad","precio_unitario","importe"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
+            "pdf": ["id_visualizacion","id_venta_id_visualizacion","id_servicio_nombre","id_espacio_nombre","metros_cuadrados","cantidad","precio_unitario","importe","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
         },
         'cuentas_de_banco': {
             'main_page': ['id_visualizacion','id_integrante_nombre','banco','tipo_de_cuenta','nombre','balance','estatus'],
@@ -337,9 +338,9 @@ def get_columns(table_name,section):
             'pdf': ['id_visualizacion','id_integrante_nombre','banco','tipo_de_cuenta','nombre','numero_de_cuenta','clabe','balance','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'briefs_de_clientes': {
-            'main_page': ['id_visualizacion','id_cliente_nombre_completo','id_proyecto_nombre','id_brief_nombre','fecha_cierre','estatus'],
-            'modal': {'informacion_general':['id','id_visualizacion','id_cliente_nombre_completo','id_proyecto_nombre','fecha_cierre','estatus'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
-            'pdf': ['id_visualizacion','id_cliente_nombre_completo','id_proyecto_nombre','fecha_cierre','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
+            'main_page': ['id_visualizacion','id_cliente_nombre_completo','id_proyecto_id_visualizacion','id_brief_nombre','fecha_cierre','estatus'],
+            'modal': {'informacion_general':['id','id_visualizacion','id_cliente_nombre_completo','id_proyecto_id_visualizacion','fecha_cierre','estatus'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
+            'pdf': ['id_visualizacion','id_cliente_nombre_completo','id_proyecto_id_visualizacion','fecha_cierre','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'respuestas_briefs_de_clientes': {
             'main_page': ['id_visualizacion','id_brief_de_cliente_id_visualizacion','id_pregunta_de_brief_visualizacion','respuesta'],
@@ -368,7 +369,7 @@ def get_estatus_options(table_name):
         'compras': ['En revisión','Aprobada','Recibida parcial','Recibida','Cancelada'],
         'productos_en_compras': ['Pendiente','Recibido','Recibido parcial','Cancelado'],
         'recepciones_de_compras': ['En revisión','Aprobada','Finalizada','Cancelada'],
-        'actividades': ['Pendiente','En proceso','Realizada','Con cambios','Cerrada','Cancelada'],
+        'actividades': ['Sin iniciar','En proceso','Realizada','Con cambios','Cerrada','Cancelada'],
         'ajustes_de_inventario': ['En revisión','Aprobado','Finalizado','Cancelado'],
         'transferencias_de_inventario': ['En revisión','Aprobada','Finalizada','Cancelado'],
         'briefs_de_clientes': ['En proceso','Contestado','Cancelado'],
@@ -395,6 +396,7 @@ def get_open_status(table_name):
         'briefs_de_clientes': ['En proceso'],
         'agenda': ['Pendiente','Confirmada'],
         'ventas': ['Pendiente'],
+        'actividades': ['Sin iniciar','En proceso','Realizada','Con cambios'],
     }
     status=status.get(table_name,['Activo'])
     return status
@@ -408,7 +410,7 @@ def get_breadcrumbs(table_name):
         'reportes':['Reportes','reportes'],
         'archivos':[session['tabla_origen'].replace('_',' ').capitalize(),session['tabla_origen']],
 
-        'almacenes':['Almacén','almacen'],
+        '':['Almacén','almacen'],
         'categorias_de_productos':['Almacén','almacen'],
         'productos':['Almacén','almacen'],
         'inventario':['Almacén','almacen'],
@@ -447,7 +449,7 @@ def get_breadcrumbs(table_name):
         'integrantes':['Recursos Humanos','recursos_humanos'],
         'sueldos_de_integrantes':['Recursos Humanos','recursos_humanos'],
 
-        'espacios_de_proyectos':['Ventas','ventas'],
+        'espacios':['Ventas','ventas'],
         'servicios':['Ventas','ventas'],
         'ventas':['Ventas','ventas'],
         'facturas':['Ventas','ventas'],
@@ -468,8 +470,9 @@ def get_table_relationships(table_name):
         'clientes':['resumen','briefs_de_clientes','agenda','ventas','facturas','proyectos','envios','calidad_de_servicio_de_proyectos'],
         'briefs':['preguntas_de_briefs'],
         'preguntas_de_briefs':['respuestas_de_preguntas_de_briefs'],
-        'servicios':['precios_de_servicios'],
+        'servicios':['precios_de_servicios','actividades_base'],
         'ventas':['servicios_en_ventas'],
+        'proyectos':['resumen','actividades'],
 
         'pagos_administrativos':['gastos_y_compras_en_pagos'],
         'compras':['productos_en_compras'],
@@ -537,6 +540,10 @@ def get_summary_data(table_name):
                         'primary':['nombre_completo','estatus','correo_electronico'],
                         'data':{'información general':['telefono']}
                         },
+        'proyectos': {
+                        'primary':['cliente.nombre_completo','servicio.nombre','espacio.nombre','fecha_inicio'],
+                        'data':{'información general':['id_integrante.nombre_completo']}
+                        },                        
     }
     data=data.get(table_name,'')
     return data
@@ -547,7 +554,12 @@ def get_summary_kpis(table_name,id_parent_record):
             'generales': {
                 'proyectos': 5
             },
-        }
+        },
+        'proyectos': {
+            'generales': {
+                'actividades': '3/5',
+            },
+        }        
     }
     data=data.get(table_name,'')
     return data

@@ -42,7 +42,7 @@ def activar(id):
     except Exception as e:
         db.session.rollback()
         flash(f"Error al activar el cliente: {str(e)}", "danger")
-        return redirect(url_for('dynamic.table_view', table_name='clientes'))
+    return redirect(url_for('dynamic.table_view', table_name='clientes'))
 
 @clientes_bp.route("/perdido/<id>", methods=["GET","POST"])
 @login_required

@@ -10,8 +10,9 @@ from python.models.sistema import *
 class Proyectos(db.Model,BaseMixin,AuditMixin):
 
     id_venta=db.Column(db.UUID, db.ForeignKey("ventas.id"),nullable=False)
+    id_cliente = db.Column(db.UUID, db.ForeignKey("clientes.id"),nullable=False)
     id_servicio=db.Column(db.UUID, db.ForeignKey("servicios.id"),nullable=False)
-    id_espacio_de_proyecto = db.Column(db.UUID, db.ForeignKey("espacios_de_proyectos.id"), nullable=False)    
+    id_espacio = db.Column(db.UUID, db.ForeignKey("espacios.id"), nullable=False)    
     id_integrante = db.Column(db.UUID, db.ForeignKey("integrantes.id"))    
 
     metros_cuadrados= db.Column(db.Float, nullable=False, default=0.00)
@@ -20,6 +21,10 @@ class Proyectos(db.Model,BaseMixin,AuditMixin):
     estatus = db.Column(db.String(100),nullable=False, default="En proceso") # activo,finalizado, cancelado
 
     venta = db.relationship('Ventas', backref='proyectos',lazy=True)
+    cliente = db.relationship('Clientes', backref='proyectos',lazy=True)
+    servicio = db.relationship('Servicios', backref='proyectos',lazy=True)
+    espacio = db.relationship('Espacios', backref='proyectos',lazy=True)
+    integrante = db.relationship('Integrantes', backref='proyectos',lazy=True)
 
 
 class ActividadesBase(db.Model,BaseMixin,AuditMixin):
@@ -38,19 +43,24 @@ class Actividades(db.Model,BaseMixin,AuditMixin):
 
     id_actividad_base = db.Column(db.UUID, db.ForeignKey("actividades_base.id"),nullable=False)
     id_proyecto=db.Column(db.UUID, db.ForeignKey("proyectos.id"),nullable=False)
-    id_integrante=db.Column(db.UUID, db.ForeignKey("integrantes.id"),nullable=False)
+    id_integrante=db.Column(db.UUID, db.ForeignKey("integrantes.id"))
 
-    fecha_inicio = db.Column(db.Date,nullable=False)
+    fecha_inicio = db.Column(db.Date)
     fecha_estimada = db.Column(db.Date)
     fecha_fin = db.Column(db.Date)
 
     prioridad = db.Column(db.String(20))
-    horas = db.Column(db.Float, nullable=False, default=0.00)
+    horas = db.Column(db.Float, default=0.00)
     notas = db.Column(db.Text)
+
+    calificacion_cliente = db.Column(db.Integer)
+    notas_cliente = db.Column(db.Text)
+    aceptacion_de_cliente = db.Column(db.String(100), default="Sin aceptar") 
+
     notas_cierre = db.Column(db.Text)
     comentarios_supervisor = db.Column(db.Text)
 
-    estatus = db.Column(db.String(100),nullable=False, default="Pendiente") 
+    estatus = db.Column(db.String(100),nullable=False, default="Sin iniciar") 
 
     proyecto = db.relationship('Proyectos', backref='actividades',lazy=True)
     integrante = db.relationship('Integrantes', backref='actividades',lazy=True)

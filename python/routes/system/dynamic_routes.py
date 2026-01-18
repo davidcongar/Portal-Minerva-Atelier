@@ -1158,7 +1158,7 @@ def related(id,parent_table,table_name):
             primary_info=primary_info,  
             record_data=record_data,
             kpis=kpis,
-            nombre=getattr(record,variables.get('primary', [])[0]),
+            nombre=deep_getattr(record, variables.get('primary', [])[0]),
             **context
         )
     else:

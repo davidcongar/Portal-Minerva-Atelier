@@ -16,7 +16,6 @@ agenda_bp = Blueprint("agenda", __name__,url_prefix="/agenda")
 @agenda_bp.route("/confirmar/<id>", methods=["GET","POST"])
 @login_required
 @roles_required()
-@return_url_redirect
 def confirmar(id):
     try:
         record=Agenda.query.get(id)
@@ -26,7 +25,7 @@ def confirmar(id):
     except Exception as e:
         db.session.rollback()
         flash(f"Error al finalizar la Agenda: {str(e)}", "danger")
-        return redirect(url_for('dynamic.table_view', table_name='agenda'))
+    return redirect(url_for('dynamic.table_view', table_name='agenda'))
 
 @agenda_bp.route("/finalizar/<id>", methods=["GET","POST"])
 @login_required
