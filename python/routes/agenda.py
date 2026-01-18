@@ -13,25 +13,41 @@ from python.services.system.helper_functions import *
 
 agenda_bp = Blueprint("agenda", __name__,url_prefix="/agenda")
 
-@agenda_bp.route("/finalizar/<id>", methods=["GET","POST"])
+@agenda_bp.route("/confirmar/<id>", methods=["GET","POST"])
 @login_required
 @roles_required()
-def finalizar(id):
+@return_url_redirect
+def confirmar(id):
     try:
         record=Agenda.query.get(id)
         if record.estatus in ('Pendiente'):
-            record.estatus='Finalizada'
-            db.session.commit()
-            flash(f"La Agenda fue Finalizada.", "success")
-            return redirect(url_for('dynamic.table_view', table_name='agenda'))
+            session['return_url']=request.args.get("return_url", "")
+            return redirect(url_for('dynamic.form', table_name='agenda',id=id,accion='Confirmar'))
     except Exception as e:
         db.session.rollback()
         flash(f"Error al finalizar la Agenda: {str(e)}", "danger")
         return redirect(url_for('dynamic.table_view', table_name='agenda'))
 
+@agenda_bp.route("/finalizar/<id>", methods=["GET","POST"])
+@login_required
+@roles_required()
+@return_url_redirect
+def finalizar(id):
+    try:
+        record=Agenda.query.get(id)
+        if record.estatus in ('Confirmada'):
+            record.estatus='Finalizada'
+            db.session.commit()
+            flash(f"La Agenda fue Finalizada.", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error al finalizar la Agenda: {str(e)}", "danger")
+    return redirect(url_for('dynamic.table_view', table_name='agenda'))
+
 @agenda_bp.route("/cancelar/<id>", methods=["GET","POST"])
 @login_required
 @roles_required()
+@return_url_redirect
 def cancelar(id):
     try:
         record=Agenda.query.get(id)
@@ -39,11 +55,10 @@ def cancelar(id):
             record.estatus='Cancelada'
             db.session.commit()
             flash(f"La Agenda fue Cancelada.", "success")
-            return redirect(url_for('dynamic.table_view', table_name='agenda'))
     except Exception as e:
         db.session.rollback()
         flash(f"Error al cerrar la Agenda: {str(e)}", "danger")
-        return redirect(url_for('dynamic.table_view', table_name='agenda'))
+    return redirect(url_for('dynamic.table_view', table_name='agenda'))
 
 
 @agenda_bp.route("/validate_availability/<fecha>/<hora_inicio>", methods=["GET","POST"])

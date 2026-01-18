@@ -24,7 +24,7 @@
         .header {
             text-align: center;
             padding-bottom: 20px;
-            border-bottom: 3px solid #4b7cbd;
+            border-bottom: 3px solid #073763;
             margin-bottom: 20px;
         }
 
@@ -33,7 +33,7 @@
         }
 
         .header h1 {
-            color: #4b7cbd;
+            color: #073763;
             margin: 10px 0;
             font-size: 24px;
         }
@@ -56,14 +56,14 @@
         .details-section {
             background-color: #f8f9fa;
             border: 1px solid #e9ecef;
-            border-left: 4px solid #4b7cbd;
+            border-left: 4px solid #073763;
             border-radius: 6px;
             padding: 20px;
-            margin: 25px 0;
+            margin: 25px;
         }
 
         .details-title {
-            color: #4b7cbd;
+            color: #073763;
             font-size: 16px;
             font-weight: bold;
             margin-bottom: 15px;
@@ -72,21 +72,17 @@
         }
 
         .details-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-left: 4px solid #073763;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 25px;
         }
 
 
         .details-list li:last-child {
             margin-bottom: 0;
-        }
-
-        .details-list li:before {
-            content: "▸";
-            color: #4b7cbd;
-            font-weight: bold;
-            margin-right: 8px;
         }
 
         /* Botón de acción mejorado */
@@ -97,13 +93,13 @@
 
         .action-button a {
             display: inline-block;
-            background-color: #4b7cbd;
-            color: white;
-            padding: 12px 30px;
+            background-color: #f0f4ff;
+            color: #2a4d9b;
+            padding: 8px 16px;  
             text-decoration: none;
             border-radius: 6px;
-            font-weight: bold;
-            font-size: 16px;
+            font-weight: 500;
+            font-size: 14px;
             transition: background-color 0.3s ease;
         }
 
@@ -128,7 +124,7 @@
         }
 
         .footer a {
-            color: #4b7cbd;
+            color: #073763;
             text-decoration: none;
         }
 
@@ -154,6 +150,8 @@
                 text-align: center;
             }
         }
+
+        
     </style>
 </head>
 
@@ -162,37 +160,40 @@
         <!-- Header -->
         <div class="header">
             <!--<img src="https://url_app/static/images/logo-light.png">-->
-            <h1>Portal Minerva Atelier</h1>
+            <h1>nombre_app - Snapp Solutions</h1>
         </div>
 
         <!-- Cuerpo del email -->
         <div class="email-body">
             <p>Hola,</p>
-            <p>{{ body_content | safe}}</p>
+            <p>{{ body_content | safe }}</p>
+
+            <div class="action-button">
+                <a href="{{ url }}">Ver interacción</a>
+            </div>    
 
             <!-- Lista de detalles -->
-            {% if details_list %}
+            {% if details_list_a %}
             <div class="details-section">
-                <div class="details-title">Detalles</div>
-                <ul class="details-list">
-                    {% for detail in details_list %}
-                    <li>{{ detail | safe  }}</li>
-                    {% endfor %}
-                </ul>
+                <div class="details-title">Empresas Discutidas</div>
+                {% for detail in details_list_a %}
+                    <div class="details-list">{{ detail | safe }}</div>
+                {% endfor %}
             </div>
             {% endif %}
-
-            <!-- Nuevo bloque para el botón/enlace -->
-            {% if link_url and link_text %}
-            <div class="action-button">
-                <a href="{{ link_url }}">{{ link_text }}</a>
-            </div>            
-            {% endif %}
+            {% if details_list_b %}
+            <div class="details-section">
+                <div class="details-title">Intereses Mostrados</div>
+                    {% for detail in details_list_b %}
+                    <div class="details-list"> {{ detail | safe }}</div>
+                    {% endfor %}
+            </div>
+            {% endif %}            
         </div>
 
         <!-- Footer -->
         <div class="footer">
-            <p><strong>Portal Minerva Atelier</strong></p>
+            <p><strong>nombre_app</strong></p>
             <p>Snapp Solutions</p>
         </div>
     </div>

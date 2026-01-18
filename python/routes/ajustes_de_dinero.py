@@ -18,6 +18,7 @@ ajustes_de_dinero_bp = Blueprint("ajustes_de_dinero", __name__,url_prefix="/ajus
 @ajustes_de_dinero_bp.route("/realizar/<id>", methods=["GET","POST"])
 @login_required
 @roles_required()
+@return_url_redirect
 def realizar(id):
     try:
         record=AjustesDeDinero.query.get(id)
@@ -40,6 +41,7 @@ def realizar(id):
 @ajustes_de_dinero_bp.route("/cancelar/<id>", methods=["GET","POST"])
 @login_required
 @roles_required()
+@return_url_redirect
 def cancelar(id):
     try:
         record=AjustesDeDinero.query.get(id)

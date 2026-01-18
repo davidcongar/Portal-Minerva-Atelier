@@ -7,7 +7,8 @@ import re
 import json
 from datetime import date, datetime
 from python.services.dynamic_functions.general_functions import *
-
+from python.services.system.helper_functions import *
+from python.services.system.email import *
 
 #####
 # funciones de formularios
@@ -22,13 +23,54 @@ def handler_edit_on_success(*tables):
         return fn
     return wrapper
 
-def edit_on_success(table_name, id):
+def edit_on_success(table_name, id,changed_fields):
     handler = HANDLERS.get(table_name)
     if not handler:
         return
-    return handler(id)
+    return handler(id,changed_fields)
 
-@handler_edit_on_success('compras')
-def compras(id):
-    record=Compras.query.get(id)
-    actualizar_compra(record)
+@handler_edit_on_success('agenda')
+def agenda(id,changed_fields):
+    record=Agenda.query.get(id)
+    if record.id_integrante and record.estatus=='Pendiente':
+        fecha_changed, fecha_old, fecha_new = field_changed(changed_fields, "fecha")
+        hora_changed, hora_old, hora_new = field_changed(changed_fields, "hora_inicio")
+        if fecha_changed or hora_changed:
+            send_html_email(
+                subject="Minerva Atelier - Modificación de cita",
+                recipient_email=record.cliente.correo_electronico,
+                template="partials/system/email_template.html",
+                sender_name="Minerva Atelier",
+                body_content = (
+                    "Se tuvo que modificar la cita previamente agendada; disculpa cualquier inconveniente que esto pueda causar.<br>"
+                    "Para confirmar la nueva cita, por favor envía un correo al experto asignado.<br>"
+                    "A continuación se encuentran los detalles de la nueva cita."
+                ),
+                details_list=[
+                    f"Fecha: {record.fecha}",
+                    f"Hora: {record.hora_inicio}",
+                    f"Experto asignado: {record.integrante.nombre_completo}",
+                    f"Correo: {record.integrante.correo_electronico}",
+                ]
+            )    
+            flash(f"Se ha enviado un correo al cliente para confirmar la nueva fecha/horario.", "info")
+        else:
+            send_html_email(
+                subject="Minerva Atelier - Confirmación de cita",
+                recipient_email=record.cliente.correo_electronico,
+                template="partials/system/email_template.html",
+                sender_name="Minerva Atelier",
+                body_content = (
+                    "Se acaba de confirmar tu cita con uno de nuestros expertos de <strong>Minerva Atelier</strong>.<br>"
+                    "Cualquier cambio que requieras, por favor envía un correo al experto asignado.<br>"
+                    "A continuación se encuentran los detalles de la cita."
+                ),
+                details_list=[
+                    f"Fecha: {record.fecha}",
+                    f"Hora: {record.hora_inicio}",
+                    f"Experto asignado: {record.integrante.nombre_completo}",
+                    f"Correo: {record.integrante.correo_electronico}",
+                ]
+            )    
+            record.estatus='Confirmada'          
+            flash(f"La cita ha sido Confirmada.", "success")

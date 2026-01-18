@@ -16,10 +16,11 @@ recepciones_de_compras_bp = Blueprint("recepciones_de_compras", __name__,url_pre
 @recepciones_de_compras_bp.route("/aprobar/<id>", methods=["GET","POST"])
 @login_required
 @roles_required()
+@return_url_redirect
 def aprobar(id):
     try:
         record=RecepcionesDeCompras.query.get(id)
-        if record.estatus=='En revisión':
+        if record.estatuss=='En revisión':
             record.estatus="Aprobada"
             db.session.commit()
             flash('La recepción de recepcion de compra ha sido Aprobada.','success')
@@ -31,6 +32,7 @@ def aprobar(id):
 @recepciones_de_compras_bp.route("/cancelar/<id>", methods=["GET","POST"])
 @login_required
 @roles_required()
+@return_url_redirect
 def cancelar(id):
     try:
         record=RecepcionesDeCompras.query.get(id)
@@ -50,6 +52,7 @@ def cancelar(id):
 @recepciones_de_compras_bp.route("/finalizar/<id>", methods=["GET","POST"])
 @login_required
 @roles_required()
+@return_url_redirect
 def finalizar(id):
     try:
         record=RecepcionesDeCompras.query.get(id)
@@ -83,4 +86,16 @@ def finalizar(id):
     except Exception as e:
         db.session.rollback()
         flash(f"Error al finalizar la recepción de compra: {str(e)}", "danger")
+    return redirect(url_for('dynamic.table_view', table_name='recepciones_de_compras'))
+
+@recepciones_de_compras_bp.route("/confirm/<id>", methods=["GET","POST"])
+@login_required
+@roles_required()
+@return_url_redirect
+def confirm(id):
+    try:
+        record=RecepcionesDeCompras.query.get(id)
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error al confirmar la recepción de compra: {str(e)}", "danger")
     return redirect(url_for('dynamic.table_view', table_name='recepciones_de_compras'))

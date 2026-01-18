@@ -48,6 +48,15 @@ class PreguntasDeBriefs(db.Model,BaseMixin,AuditMixin):
 
     brief = db.relationship("Briefs", backref="preguntas_de_briefs", lazy=True)
 
+class RespuestasDePreguntasDeBriefs(db.Model,BaseMixin,AuditMixin):
+
+    id_pregunta_de_brief = db.Column(db.UUID, db.ForeignKey("preguntas_de_briefs.id"))
+    respuesta=db.Column(db.String(255), nullable=False)
+
+    estatus = db.Column(db.String(255),default="Activo")
+
+    pregunta_de_brief = db.relationship("PreguntasDeBriefs", backref="respuestas_de_preguntas_de_briefs", lazy=True)
+
 class Agenda(db.Model,BaseMixin,AuditMixin):
 
     id_integrante = db.Column(db.UUID, db.ForeignKey("integrantes.id"), nullable=True)

@@ -9,6 +9,7 @@ from datetime import date, datetime
 from python.services.dynamic_functions.general_functions import *
 
 from python.services.system.helper_functions import *
+from config import *
 
 #####
 # funciones de formulariosa
@@ -44,26 +45,35 @@ def ajustes_de_inventario(id):
 
 @handler_on_success('clientes')
 def clientes(id):
-    brief=Briefs.query.filter_by(nombre='Brief general').first()
-    new_record=BriefsDeClientes(
-        id_visualizacion=get_id_visualizacion('briefs_de_clientes'),
-        id_cliente=id,
-        id_brief=brief.id
-    )
-    db.session.add(new_record)
-    db.session.flush()
-    preguntas=PreguntasDeBriefs.query.filter_by(id_brief=brief.id).all()
-    for pregunta in preguntas:
-        new_pregunta=RespuestasBriefsDeClientes(
-            id_brief_de_cliente=new_record.id,
-            id_pregunta_de_brief=pregunta.id
+    briefs = Briefs.query.filter(Briefs.nombre.in_(BRIEFS_CREACION_CLIENTE)).all()
+    for brief in briefs:
+        new_record=BriefsDeClientes(
+            id_visualizacion=get_id_visualizacion('briefs_de_clientes'),
+            id_cliente=id,
+            id_brief=brief.id
         )
-        db.session.add(new_pregunta)
-    db.session.commit()
+        db.session.add(new_record)
+        db.session.flush()
+        preguntas=PreguntasDeBriefs.query.filter_by(id_brief=brief.id).all()
+        for pregunta in preguntas:
+            new_pregunta=RespuestasBriefsDeClientes(
+                id_brief_de_cliente=new_record.id,
+                id_pregunta_de_brief=pregunta.id
+            )
+            db.session.add(new_pregunta)
 
-@handler_on_success('ventas')
-def ventas(id):
-    record=Ventas.query.get(id)
-    record.iva=record.importe*.16
-    record.importe_total=record.importe*1.16
-    db.session.commit()
+@handler_on_success('servicios_en_ventas')
+def servicios_en_ventas(id):
+    record=ServiciosEnVentas.query.get(id)
+    precio = PreciosDeServicios.query.filter(
+        PreciosDeServicios.id_servicio == record.id_servicio,
+        PreciosDeServicios.id_espacio_de_proyecto == record.id_espacio_de_proyecto,
+        PreciosDeServicios.metros_cuadrados_minimos <= record.metros_cuadrados,
+        PreciosDeServicios.metros_cuadrados_maximos >= record.metros_cuadrados
+    ).first()
+    if precio:
+        record.precio_unitario = precio.precio_unitario
+        record.id_precio_stripe=precio.id_stripe
+    record.importe=record.precio_unitario*record.cantidad
+    venta=Ventas.query.get(record.id_venta)
+    actualizar_venta(venta)    

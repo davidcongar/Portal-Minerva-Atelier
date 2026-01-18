@@ -34,16 +34,23 @@
                                 </template>
                                 <!-- Otherwise, use your normal text logic -->
                                 <template x-if="!col.toLowerCase().includes('estatus')">
-                                    <span 
-                                        x-text="record[col] 
-                                            ? (money_format_columns.includes(col)
-                                                ? money_format(record[col]) 
-                                            : percentage_format_columns.includes(col)
-                                                ? record[col] + '%'
-                                            : record[col])
-                                            : '-'">
+                                    <span
+                                        x-text="
+                                            record[col]
+                                                ? (
+                                                    money_format_columns.includes(col)
+                                                        ? money_format(record[col])
+                                                    : percentage_format_columns.includes(col)
+                                                        ? record[col] + '%'
+                                                    : typeof record[col] === 'number'
+                                                        ? commafy(record[col])
+                                                    : record[col]
+                                                )
+                                                : '-'
+                                        ">
                                     </span>
                                 </template>
+
                             </td>
                         </template>
                         {% include 'partials/table/buttons/' ~ table_name ~ '.html' ignore missing %}

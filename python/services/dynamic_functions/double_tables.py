@@ -31,7 +31,7 @@ def get_variables_double_table_view(table_name):
             "model_first_table":"productos_en_compras",
             "model_second_table":"productos_en_recepciones_de_compras",
             "edit_fields":['cantidad','lote','fecha_de_caducidad'],
-            "details":["id_visualizacion"],
+            "details":["id_visualizacion","compras.proveedor.nombre"],
             "required_fields":[''],
             "url_confirm":"recepciones_de_compras.confirm"  
         },  

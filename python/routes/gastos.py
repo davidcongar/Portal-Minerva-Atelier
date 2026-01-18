@@ -18,6 +18,7 @@ gastos_bp = Blueprint("gastos", __name__,url_prefix="/gastos")
 @gastos_bp.route("/aprobar/<id>", methods=["GET","POST"])
 @login_required
 @roles_required()
+@return_url_redirect
 def aprobar(id):
     record=Gastos.query.get(id)
     if record.estatus=='En revisión':
@@ -52,6 +53,7 @@ def aprobar(id):
 @gastos_bp.route("/cancelar/<id>", methods=["GET","POST"])
 @login_required
 @roles_required()
+@return_url_redirect
 def cancelar(id):
     record=Gastos.query.get(id)
     if record.estatus=='En revisión':

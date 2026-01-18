@@ -2,7 +2,7 @@
 from python.models.modelos import *
 from sqlalchemy import String, Text, or_,func,Integer, Float, Numeric,text
 from sqlalchemy.sql import case
-from flask import session,flash,request
+from flask import session,flash,request,redirect
 import re
 import json
 from datetime import date, datetime,timedelta
@@ -10,6 +10,7 @@ import random
 from sqlalchemy import inspect
 from config import *
 import math
+from functools import wraps
 
 #####
 # funciones auxiliares
@@ -57,7 +58,20 @@ def sanitize_data(model, data):
                 else:
                     value = None
         elif "time" in col_type_str:
-            value=datetime.fromisoformat(value)+timedelta(hours=6)
+            if not value:
+                value = None
+            else:
+                try:
+                    # First try HH:MM
+                    t = datetime.strptime(value, "%H:%M").time()
+                except ValueError:
+                    try:
+                        # Then try HH:MM:SS
+                        t = datetime.strptime(value, "%H:%M:%S").time()
+                    except ValueError:
+                        t = None
+
+                value = t
         elif "date" in col_type_str:
             if not value:
                 value = None
@@ -583,3 +597,22 @@ def get_kpi(table_name, sql_name, variables):
         return None  # or 0, or {}
     row = dict(result._mapping)
     return next(iter(row.values()))
+
+def return_url_redirect(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        response = f(*args, **kwargs)  # 👈 run route FIRST
+
+        return_url = session.pop("return_url", None)
+        if return_url:
+            return redirect(return_url)
+
+        return response
+    return wrapper
+
+def field_changed(changed_fields, field_name):
+    if field_name in changed_fields:
+        old = changed_fields[field_name]["old"]
+        new = changed_fields[field_name]["new"]
+        return True, old, new
+    return False, None, None

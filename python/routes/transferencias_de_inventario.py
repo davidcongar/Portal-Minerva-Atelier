@@ -16,6 +16,7 @@ transferencias_de_inventario_bp = Blueprint("transferencias_de_inventario", __na
 @transferencias_de_inventario_bp.route("/aprobar/<id>", methods=["GET","POST"])
 @login_required
 @roles_required()
+@return_url_redirect
 def aprobar(id):
     try:
         record=TransferenciasDeInventario.query.get(id)
@@ -31,6 +32,7 @@ def aprobar(id):
 @transferencias_de_inventario_bp.route("/cancelar/<id>", methods=["GET","POST"])
 @login_required
 @roles_required()
+@return_url_redirect
 def cancelar(id):
     try:
         record=TransferenciasDeInventario.query.get(id)
@@ -51,6 +53,7 @@ def cancelar(id):
 @transferencias_de_inventario_bp.route("/finalizar/<id>", methods=["GET"])
 @login_required
 @roles_required()
+@return_url_redirect
 def finalizar(id):
     try:
         record=TransferenciasDeInventario.query.get(id)

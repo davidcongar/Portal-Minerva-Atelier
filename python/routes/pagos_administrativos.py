@@ -18,6 +18,7 @@ pagos_administrativos_bp = Blueprint("pagos_administrativos", __name__,url_prefi
 @pagos_administrativos_bp.route("/aprobar/<id>", methods=["GET","POST"])
 @login_required
 @roles_required()
+@return_url_redirect
 def aprobar(id):
     pago=PagosAdministrativos.query.get(id)
     if pago.estatus=='En revisión':
@@ -32,6 +33,7 @@ def aprobar(id):
 @pagos_administrativos_bp.route("/pagar/<id>", methods=["GET","POST"])
 @login_required
 @roles_required()
+@return_url_redirect
 def pagar(id):
     pago=PagosAdministrativos.query.get(id)
     if pago.estatus=='Aprobado':
@@ -84,6 +86,7 @@ def pagar(id):
 @pagos_administrativos_bp.route("/cancelar/<id>", methods=["GET","POST"])
 @login_required
 @roles_required()
+@return_url_redirect
 def cancelar(id):
     pago=PagosAdministrativos.query.get(id)
     if pago.estatus in ('En revisión','Aprobado'):

@@ -10,7 +10,11 @@ from python.models.sistema import *
 class Proyectos(db.Model,BaseMixin,AuditMixin):
 
     id_venta=db.Column(db.UUID, db.ForeignKey("ventas.id"),nullable=False)
+    id_servicio=db.Column(db.UUID, db.ForeignKey("servicios.id"),nullable=False)
+    id_espacio_de_proyecto = db.Column(db.UUID, db.ForeignKey("espacios_de_proyectos.id"), nullable=False)    
+    id_integrante = db.Column(db.UUID, db.ForeignKey("integrantes.id"))    
 
+    metros_cuadrados= db.Column(db.Float, nullable=False, default=0.00)
     fecha_inicio = db.Column(db.Date,nullable=False)
     fecha_fin = db.Column(db.Date)
     estatus = db.Column(db.String(100),nullable=False, default="En proceso") # activo,finalizado, cancelado

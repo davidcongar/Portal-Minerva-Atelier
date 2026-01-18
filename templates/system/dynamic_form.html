@@ -178,12 +178,14 @@
 </div>
 <script>
     const filters = {{ form_filters | tojson }};
-    const allow_new_value_dropdowns={{ vars.allow_new_value_dropdowns | tojson }};
+    const allow_new_value_dropdowns={{ vars.allow_new_value_dropdowns | tojson }};  
 </script>
 <script src="/static/js/system/form/filter_dropdowns.js"></script>
 <script src="/static/js/system/form/fill_inputs_url.js"></script>
 <script src="/static/js/system/form/upload_files.js"></script>
 <script src="/static/js/system/form/select2.js"></script>
+<script src="/static/js/system/form/show_alert.js"></script>
+
 {% if record %}
     <script>
         const record_edit = {{ record.id | tojson }};

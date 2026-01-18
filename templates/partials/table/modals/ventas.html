@@ -1,14 +1,14 @@
 <div class="flex justify-end items-center gap-2" x-data x-show="true">
     <template x-if="$store.modalData.getField('estatus') === 'Pendiente'">
         <button type="submit"
-            @click.stop.prevent="window.location.href = `/ventas/create-checkout-session/${encodeURIComponent($store.modalData.getField('id'))}`"
+            @click.stop.prevent="window.location.href = `/ventas/create-checkout-session/${encodeURIComponent($store.modalData.getField('id'))}?return_url=${encodeURIComponent(window.location.href)}`"
             class="btn border text-primary border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-primary bg-primary/10">
             Cobrar
         </button>
     </template>
     <template x-if="['Pendiente'].includes($store.modalData.getField('estatus'))">
         <button type="submit"
-            @click.stop.prevent="window.location.href = `/ventas/cancelar/${encodeURIComponent($store.modalData.getField('id'))}`"
+            @click.stop.prevent="window.location.href = `/ventas/cancelar/${encodeURIComponent($store.modalData.getField('id'))}?return_url=${encodeURIComponent(window.location.href)}`"
             class="btn border text-danger border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-danger bg-primary/10">
             Cancelar
         </button>

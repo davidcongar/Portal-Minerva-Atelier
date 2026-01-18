@@ -78,3 +78,8 @@ def calcular_importe_pago(record):
                 .filter(PagosAdministrativos.estatus != "Cancelado")
                 .scalar()
             ) or 0
+        
+def actualizar_venta(record):
+    record.importe=(db.session.query(func.sum(ServiciosEnVentas.importe)).filter(ServiciosEnVentas.id_venta == record.id).scalar()) or 0    
+    record.iva=record.importe*.16
+    record.importe_total=record.importe*1.16

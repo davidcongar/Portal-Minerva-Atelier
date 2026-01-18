@@ -1,21 +1,21 @@
 <div class="flex justify-end items-center gap-2" x-data x-show="true">
     <template x-if="$store.modalData.getField('estatus') === 'En revisión'">
         <button type="submit"
-            @click.stop.prevent="window.location.href = `/ajustes_de_inventario/aprobar/${encodeURIComponent($store.modalData.getField('id'))}`"
+            @click.stop.prevent="window.location.href = `/ajustes_de_inventario/aprobar/${encodeURIComponent($store.modalData.getField('id'))}?return_url=${encodeURIComponent(window.location.href)}`"
             class="btn border text-primary border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-primary bg-primary/10">
             Aprobar
         </button>
     </template>
     <template x-if="$store.modalData.getField('estatus') === 'Aprobado'">
         <button type="submit"
-            @click.stop.prevent="window.location.href = `/ajustes_de_inventario/finalizar/${encodeURIComponent($store.modalData.getField('id'))}`"
+            @click.stop.prevent="window.location.href = `/ajustes_de_inventario/finalizar/${encodeURIComponent($store.modalData.getField('id'))}?return_url=${encodeURIComponent(window.location.href)}`"
             class="btn border text-primary border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-primary bg-primary/10">
             Finalizar
         </button>
     </template>
     <template x-if="['En revisión','Aprobado'].includes($store.modalData.getField('estatus'))">
         <button type="submit"
-            @click.stop.prevent="window.location.href = `/ajustes_de_inventario/cancelar/${encodeURIComponent($store.modalData.getField('id'))}`"
+            @click.stop.prevent="window.location.href = `/ajustes_de_inventario/cancelar/${encodeURIComponent($store.modalData.getField('id'))}?return_url=${encodeURIComponent(window.location.href)}`"
             class="btn border text-danger border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-danger bg-primary/10">
             Cancelar
         </button>

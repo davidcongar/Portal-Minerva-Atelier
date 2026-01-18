@@ -1,32 +1,45 @@
 <!--Dynamic tables variables-->
 {% set no_tabs= ['logs_auditoria','archivos','inventario','productos_en_recepciones_de_compras','servicios_en_facturas','facturas_en_ingresos','gastos_y_compras_en_pagos'] %}
 {% set no_tab_count = ['No transferible','Cobrada','Cerrado','Cerrada','Finalizada','Finalizado','Cancelado','Cancelada','Pagado','Pagada','Realizada','Realizado','Perdido','Inactivo'] %}
-{% set no_add_button = ['servicios_en_facturas','facturas_en_ingresos'] %}
+{% set no_add_button = ['servicios_en_facturas','facturas_en_ingresos','logs_auditoria','inventario'] %}
+{% set no_edit_button = ['logs_auditoria','inventario','servicios_en_facturas','gastos_en_pagos','facturas_en_ingresos','ventas','servicios_en_ventas'] %}
 {% set date_range_search = ['fecha_venta','fecha_orden','fecha_de_gasto','fecha_de_transferencia','fecha','fecha_hora']  %}
 {% set percentage_format_columns = [] %}
-{% set money_format_columns=['importe','precio_unitario','sub_total','impuesto','importe_total','monto','importe_pagado','importe_total','importe_restante','subtotal'] %}
-{% set purple_badge_values = [] %}
-{% set primary_badge_values = [] %}
-{% set success_badge_values = [] %}
+{% set money_format_columns=['balance','importe_pagado','importe_total','importe','precio_unitario','iva'] %}
+
+{% set purple_badge_values = ['En revisión','Pendiente','En proceso','Swipe'] %}
+{% set primary_badge_values = ['Recibida parcial','Perfect match'] %}
+{% set success_badge_values = ['Aprobada','Aprobado','Activo','Confirmada'] %}
 {% set warning_badge_values = [] %}
 {% set danger_badge_values = [] %}
-{% set gray_badge_values = ['Finalizada'] %}
+{% set gray_badge_values = ['Cancelada','Recibida','Inactivo','Contestado','Finalizada','Cobrada'] %}
 
 {% set calendar_titles = {'table_name':['column_name','column_name']} %}
 
 <!--Dynamic form variables-->
 {% set columns_foreign_options= ['espacio_de_proyecto','regimen_fiscal','tipo_de_iva','unidad_de_medida','inventariable','prioridad','estatus', 'genero','estado_civil','tipo_de_cuenta','tipo_de_ajuste','forma_de_pago','uso_de_cfdi','metodo_de_pago'] %}
 {% set date_time_columns=[] %}
-{% set date_columns=[] %}
-{% set time_columns=[] %}
+{% set date_columns=['fecha_entrega_estimada'] %}
+{% set time_columns=['hora_inicio','hora_fin'] %}
 {% set file_columns=[] %}
 
 {% macro id_proyecto(option) %}
     {{ option.id_visualizacion ~ ' - ' ~ option.nombre }}
 {% endmacro %}
 
+{% macro id_compra(option) %}
+    {{ option.id_visualizacion ~ ' - ' ~ option.proveedor.nombre }}
+{% endmacro %}
+
+{% macro id_pregunta_de_brief(option) %}
+    {{ option.id_visualizacion ~ ' - ' ~ option.pregunta }}
+{% endmacro %}
+
+{% macro id_venta(option) %}
+    {{ option.id_visualizacion ~ ' - ' ~ option.cliente.nombre_completo }}
+{% endmacro %}
 <!--Dynamic two table variables-->
-{% set textarea_columns= ['notas','descripcion','sugerencias','motivo'] %}
-{% set number_colums = ['cantidad','sub_total','importe','importe_ajuste','precio_unitario','cantidad_ordenada','descuento_porcentaje','subtotal','valor_unitario','impuesto'] %}
-{% set text_columns = ['folio_fiscal'] %}
+{% set textarea_columns= [] %}
+{% set number_colums = [] %}
+{% set text_columns = ['respuesta'] %}
 {% set allow_new_value_dropdowns = [] %}

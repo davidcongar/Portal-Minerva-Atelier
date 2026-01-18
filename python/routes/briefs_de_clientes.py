@@ -18,13 +18,19 @@ briefs_de_clientes_bp = Blueprint("briefs_de_clientes", __name__,url_prefix="/br
 @briefs_de_clientes_bp.route("/contestar/<id>", methods=["GET","POST"])
 @login_required
 @roles_required()
+@return_url_redirect
 def contestar(id):
     try:
         record=BriefsDeClientes.query.get(id)
         if record.estatus=='En proceso':
             record.estatus="Contestado"
-            current_time = datetime.today() - timedelta(hours=6)
+            current_time = datetime.today()-timedelta(hours=6)
             record.fecha_cierre=current_time.strftime("%Y-%m-%d")
+            if record.brief.nombre=='¿Hacemos match?':
+                # logica de perfect match
+                cliente=Clientes.query.get(record.id_cliente)
+                cliente.estatus='Swipe'
+                cliente.estatus='Perfect match'
             db.session.commit()
             flash('El Brief ha sido Contestado.','success')
     except Exception as e:
@@ -35,5 +41,6 @@ def contestar(id):
 @briefs_de_clientes_bp.route("/confirmar/<id>", methods=["GET","POST"])
 @login_required
 @roles_required()
+@return_url_redirect
 def confirmar(id):
     return redirect(url_for('dynamic.table_view', table_name='briefs_de_clientes'))

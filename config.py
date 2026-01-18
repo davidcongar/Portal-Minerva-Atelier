@@ -30,14 +30,53 @@ TITLE_FORMATS = {
     "actualizacion": "actualización",
     "ejecucion": "ejecución",
     "dias":"días",
+    "guia":"guía", 
     "transito": "tránsito",
     "interaccion":"interacción",
     "interacciones":"interacciones",
     "ultima":'última',
-    "region":'región',
-    "tipos_de_interacciones":"tipos de interacciones"     
-}
+    "envios":'envios',
+    "envio":'envío',
+    "maximos":'máximos',
+    "minimos":'mínimos',
+    "curp":'CURP',
+    "rfc":'RFC',
+    "rgv":'RGV',
+    "iva":'IVA',
+    "ieps":'IEPS',
+    "isr":'ISR',
+    "ish":'ISH',
+    "uuid":'UUID',
+    
+    "id_pago_id_visualizacion":"ID Pago",
+    "id_gasto_id_visualizacion":"ID Gasto",
+    "id_compra_id_visualizacion":"ID Compra",
+    "id_venta_id_visualizacion":"ID Venta",
+    "id_proyecto_id_visualizacion":"ID Proyecto",
 
+    "id_almacen_nombre":"Almacén",
+    "id_proveedor_nombre":"Proveedor",
+    "id_categoria_de_gasto_nombre":"Categoría",
+    "id_cuenta_de_banco_nombre":"Cuenta de banco",
+    "id_producto_nombre":"Producto",
+    "id_producto_unidad_de_medida":"Unidad de medida",
+    "id_cliente_nombre":"Cliente",
+    "id_cliente_nombre_completo":"Cliente",
+    "id_proyecto_nombre":"Proyecto",
+    "id_puesto_nombre":"Puesto",
+    "id_pregunta_de_brief_pregunta":"Pregunta",
+    "id_brief_nombre":"Brief",
+    "id_integrante_nombre_completo":"Integrante",
+    "id_servicio_nombre":"Servicio",
+    "id_espacio_de_proyecto_nombre":"Espacio",
+
+    "proveedor.nombre":"Proveedor",
+    "compras.proveedor.nombre":"Proveedor",
+    "brief.nombre":"Brief",
+    "cliente.nombre_completo":"Cliente",
+
+}
+BRIEFS_CREACION_CLIENTE = {'¿Hacemos match?'}
 # column names for data imports
 TABLE_COLUMN_MAPS = {
     "table_name": {

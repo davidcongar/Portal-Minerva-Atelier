@@ -11,9 +11,10 @@ def get_variables_table_view_input(table_name):
             "table_title":"Preguntas de Brief",
             "query_table":"respuestas_briefs_de_clientes",
             "table_name":"respuestas_briefs_de_clientes",
+            "edit_fields":['respuesta'],
+            "required_fields":['respuesta'],
+            "details":['cliente.nombre_completo','brief.nombre'],
             "url_confirm":"briefs_de_clientes.confirmar",
-            "details":['cliente','brief'],
-            "edit_fields":['respuesta']
         },
     }
     columns=columns.get(table_name,'')

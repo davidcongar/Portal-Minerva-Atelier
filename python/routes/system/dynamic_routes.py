@@ -213,16 +213,16 @@ def data(table_name):
                 fk = f"id_{rel.key.lower()}"
                 query=query.filter(getattr(model, fk)==id_parent_record)
                 break
+    if not parent_table:
+        status_field = get_variable_tabs(table_name)
 
-    status_field = get_variable_tabs(table_name)
-
-    if status != 'todos':
-        query = query.filter(getattr(model, status_field) == status)
-    else:
-        open_status=get_open_status(table_name)
-        if open_status and hasattr(model,status_field):
-            query = query.filter(getattr(model, status_field).in_(open_status))
-    
+        if status != 'todos':
+            query = query.filter(getattr(model, status_field) == status)
+        else:
+            open_status=get_open_status(table_name)
+            if open_status and hasattr(model,status_field):
+                query = query.filter(getattr(model, status_field).in_(open_status))
+        
 
     fecha_fields = get_date_fields() 
 
@@ -597,8 +597,16 @@ def edit(table_name):
                         new_record.ruta_s3=f"{table_name}/{new_record.id}_{archivo.filename}"
                         db.session.add(new_record)
                         setattr(record, archivo.name, f'{new_record.id}__{archivo.filename}')   
+            state = inspect(record)
+            changed_fields = {
+                attr.key: {
+                    "old": attr.history.deleted[0] if attr.history.deleted else None,
+                    "new": attr.history.added[0] if attr.history.added else None
+                }
+                for attr in state.attrs if attr.history.has_changes()
+            }
             db.session.flush()
-            edit_on_success(table_name,record.id)
+            edit_on_success(table_name, record.id, changed_fields)            
             db.session.commit()
             flash(f"Registro actualizado exitosamente en '{table_name.replace('_', ' ').capitalize()}'.", "success")
         except Exception as e:
@@ -745,12 +753,8 @@ def double_table_view(table_name,id):
     foreign_options = get_foreign_options()
     form_options=get_form_options(table_name)
     foreign_options = {**foreign_options, **form_options}
-    details = []
-    
-    for detail in variables.get('details', []): 
-        value = deep_getattr(record, detail)
-        result = f"{title_format(detail)}: {value}"
-        details.append(result)
+    details = []   
+    details = { detail:deep_getattr(record, detail) for detail in variables.get('details', [])}
 
     module,active_menu=get_breadcrumbs(table_name)
     context = {
@@ -870,7 +874,7 @@ def delete_double_table(main_table_name,table_name,id,id_main_record):
             flash(f"Error al eliminar el registro: {str(e)}", "danger")
         return jsonify({"status": status, "message": message})
 
-@dynamic_bp.route("/<string:table_name>/double_table/update/<string:column>/<id>/", methods=["POST"])
+@dynamic_bp.route("/<string:table_name>/double_table/update/<string:column>/<id>", methods=["POST"])
 @dynamic_bp.route("/<string:table_name>/double_table/update/<string:column>/<id>/<value>", methods=[ "POST"])
 @login_required
 @csrf.exempt
@@ -915,12 +919,8 @@ def table_view_input(main_table_name,id):
     foreign_options = get_foreign_options()
     form_options=get_form_options(table_name)
     foreign_options = {**foreign_options, **form_options}
-    details = []
-    
-    for detail in variables.get('details', []): 
-        value = deep_getattr(record, detail)
-        result = f"{title_format(detail)}: {value}"
-        details.append(result)
+    details = []   
+    details = { detail:deep_getattr(record, detail) for detail in variables.get('details', [])}
     
     module,active_menu=get_breadcrumbs(table_name)
     context = {

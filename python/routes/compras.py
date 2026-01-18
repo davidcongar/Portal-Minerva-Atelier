@@ -18,6 +18,7 @@ compras_bp = Blueprint("compras", __name__,url_prefix="/compras")
 @compras_bp.route("/aprobar/<id>", methods=["GET","POST"])
 @login_required
 @roles_required()
+@return_url_redirect
 def aprobar(id):
     try:
         record=Compras.query.get(id)
@@ -36,6 +37,7 @@ def aprobar(id):
 @compras_bp.route("/cancelar/<id>", methods=["GET","POST"])
 @login_required
 @roles_required()
+@return_url_redirect
 def cancelar(id):
     try:
         record=Compras.query.get(id)
@@ -52,4 +54,16 @@ def cancelar(id):
     except Exception as e:
         db.session.rollback()
         flash(f"Error al cancelar la compra: {str(e)}", "danger")
+    return redirect(url_for('dynamic.table_view', table_name='compras'))
+
+@compras_bp.route("/confirm/<id>", methods=["GET","POST"])
+@login_required
+@roles_required()
+@return_url_redirect
+def confirm(id):
+    try:
+        record=Compras.query.get(id)
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error al confirmar la compra: {str(e)}", "danger")
     return redirect(url_for('dynamic.table_view', table_name='compras'))

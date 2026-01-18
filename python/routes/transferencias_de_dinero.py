@@ -18,6 +18,7 @@ transferencias_de_dinero_bp = Blueprint("transferencias_de_dinero", __name__,url
 @transferencias_de_dinero_bp.route("/aprobar/<id>", methods=["GET","POST"])
 @login_required
 @roles_required()
+@return_url_redirect
 def aprobar(id):
     try:
         record=TransferenciasDeDinero.query.get(id)
@@ -33,6 +34,7 @@ def aprobar(id):
 @transferencias_de_dinero_bp.route("/cancelar/<id>", methods=["GET","POST"])
 @login_required
 @roles_required()
+@return_url_redirect
 def cancelar(id):
     try:
         record=TransferenciasDeDinero.query.get(id)
@@ -48,6 +50,7 @@ def cancelar(id):
 @transferencias_de_dinero_bp.route("/realizar/<id>", methods=["GET"])
 @login_required
 @roles_required()
+@return_url_redirect
 def realizar(id):
     try:
         record=TransferenciasDeDinero.query.get(id)
