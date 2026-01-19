@@ -408,6 +408,7 @@ def get_breadcrumbs(table_name):
         'roles':['Permisos','permisos'],
         'logs_auditoria':['Auditoría','auditoria'],
         'reportes':['Reportes','reportes'],
+        "categorias_de_reportes":['Reportes','reportes'],
         'archivos':[session['tabla_origen'].replace('_',' ').capitalize(),session['tabla_origen']],
 
         '':['Almacén','almacen'],
@@ -480,7 +481,7 @@ def get_table_relationships(table_name):
 
     }
     relationships = relationships.get(table_name, [])
-    if table_name not in ('archivos','usuarios','roles','logs_auditoria','reportes','rutas','puestos','preguntas_de_briefs','categorias_de_reportes','categorias_de_productos','inventario','categorias_de_gastos','gastos_recurrentes'):
+    if table_name not in ('archivos','usuarios','roles','logs_auditoria','rutas','puestos','preguntas_de_briefs','categorias_de_reportes','categorias_de_productos','inventario','categorias_de_gastos','gastos_recurrentes'):
         relationships.append('archivos')
     return relationships
 

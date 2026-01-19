@@ -11,8 +11,8 @@ from flask import (
 from python.services.system.files import ExcelService, PDFService
 from python.services.system.authentication import *
 from python.services.system.helper_functions import *
-from python.services.dynamic_functions.tables import *
 from python.services.dynamic_functions.forms import *
+from python.services.dynamic_functions.tables import *
 from python.services.system.extensions import csrf
 
 files_bp = Blueprint("files", __name__, url_prefix="/files")
@@ -23,17 +23,13 @@ def excel(table,kind):
     """Ruta para generar y descargar un archivo Excel de una table específica."""
     try:
         excel_content, error = ExcelService.generate_excel(table,kind)
-
-
         if error:
             flash(f"No se pudo generar el archivo Excel: {error}", "danger")
-
         response = Response(
             excel_content,
             mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             headers={"Content-Disposition": f"attachment; filename={table}.xlsx"},
         )
-        #flash(f"Se ha descargado el archivo: {table}.xlsx", "success")
         return response
     except Exception as e:
         flash(f"Error inesperado: {str(e)}", "danger")

@@ -16,4 +16,4 @@ def operative_dashboard():
     start_of_week = today - timedelta(days=today.weekday())
     end_of_week = start_of_week + timedelta(days=6)
     date_range = f'{start_of_week} to {end_of_week}'
-    return render_template('main/dashboards/operative/pagina_principal.html', **data,date_range=date_range)
+    return render_template('main/dashboards/operative/pagina_principal.html', **data,date_range=date_range,title_formats=TITLE_FORMATS)

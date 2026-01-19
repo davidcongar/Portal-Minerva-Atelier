@@ -21,7 +21,9 @@ def sql_data(dashboard,sql_name):
     base_query = open(path, "r", encoding="utf-8").read()
     variables_query = extract_param_names(base_query)
     variables_request = {k: v for k, v in request.values.items() if k in variables_query and v != ""}
-    query_variables={}
+    query_variables={
+        "id_usuario":session['id_usuario']
+    }
     for key in query_variables:
         if key in variables_query and query_variables[key] is not None and key not in variables_request:
             variables_request[key] = query_variables[key]
@@ -35,8 +37,8 @@ def sql_data(dashboard,sql_name):
 
 @dashboard_queries_bp.route("/<string:dashboard>/<string:sql_name>", methods=["GET"])
 @login_required
-def tables_queries(sql_name):
-    path = './static/sql/dashboard_queries/{dashboard}/{sql_name}.sql'
+def tables_queries(dashboard,sql_name):
+    path =f'./static/sql/dashboard_queries/{dashboard}/{sql_name}.sql'
     base_query = open(path, "r", encoding="utf-8").read()
 
     rows = db.session.execute(text(base_query)).mappings().all()

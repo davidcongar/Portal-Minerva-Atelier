@@ -9,7 +9,7 @@
 {% import 'variables.html' as vars %}
 <!-- Elemento oculto para pasar data al JS: nombre de tabla y columnas -->
 {% if report %}
-    <div id="table-data" data-table="/report_queries/{{ table_name }}/data" data-columns='{{ columns|tojson }}' hidden></div>
+    <div id="table-data" data-table="/report_queries/data/{{id}}" data-columns='{{ columns|tojson }}' hidden></div>
 {% else %}
     <div id="table-data" data-table="/dynamic/{{ table_name }}/data" data-columns='{{ columns|tojson }}' hidden></div>
 {% endif %}

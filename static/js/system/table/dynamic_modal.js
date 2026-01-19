@@ -59,39 +59,7 @@ function redirectActions(url) {
             window.location.href = url;
         }
 }
-function formatCurrency(value) {
-        // Ensure it's a valid number, then format it as currency
-        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
-}
-function formatNumber(value) {
-        // Format number with commas as thousands separators
-        return new Intl.NumberFormat('en-US').format(value);
-}
-function titleFormat(value) {
-  const replacements = title_formats;
-  // Check for exact match
-  if (replacements[value]) {
-    return replacements[value].charAt(0).toUpperCase() + replacements[value].slice(1);
-  }
 
-  // Replace underscores with spaces
-  let formatted = value.replace(/_/g, " ");
-  // Remove "id " prefix if present
-  if (formatted.startsWith("id ")) {
-    formatted = formatted.slice(3);
-  }
-
-  // Replace words with accented versions if needed
-  for (let k in replacements) {
-    const regex = new RegExp(`\\b${k}\\b`, "i");
-    if (regex.test(formatted)) {
-      formatted = formatted.replace(regex, replacements[k]);
-    }
-  }
-  formatted = formatted.charAt(0).toUpperCase() + formatted.slice(1);
-
-  return formatted;
-}
 async function openActions(form, recordId,estatus) {
         showLoader();
         //document.getElementById('id_registro').textContent=recordId;
