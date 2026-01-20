@@ -2,7 +2,7 @@
 
 {% block content %}
 {% include "./partials/system/alerts.html" %}
-{% include 'partials/table/breadcrumbs.html' %}
+{% include 'partials/table/system/breadcrumbs.html' %}
 <div class="flex flex-col gap-5 min-h-[calc(100vh-188px)] sm:min-h-[calc(100vh-204px)]">
     <div class="grid grid-cols-1 gap-4 flex-1">
         <div class="flex gap-5 items-stretch relative overflow-hidden" x-data="{activeTab:'users'}">
@@ -125,7 +125,7 @@
                                             </tbody>
                                         </table>
                                 </div>
-                                {% include 'partials/table/pagination.html' %}
+                                {% include 'partials/table/system/pagination.html' %}
                             </div>
                         </div>
                     </div>

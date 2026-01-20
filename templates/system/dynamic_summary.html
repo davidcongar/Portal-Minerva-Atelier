@@ -5,7 +5,7 @@
 {% block content %}
 {% include "./partials/system/alerts.html" %}
 <!-- Breadcrumb -->
-{% include 'partials/table/breadcrumbs.html' %}
+{% include 'partials/table/system/breadcrumbs.html' %}
 {% import 'variables.html' as vars %}
 <!-- Elemento oculto para pasar data al JS: nombre de tabla y columnas -->
 <div class="flex flex-col h-[calc(100vh-188px)] sm:h-[calc(100vh-204px)]"  x-data="calendarComponent();" x-init="init()">

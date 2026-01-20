@@ -1,6 +1,6 @@
 <div id="table_view" class="flex-1 overflow-y-auto table-scroll-horizontal" style="max-height: calc(100vh - {{height}}px)">
         <table class="w-full table-hover table-striped">
-            {% include 'partials/table/table_head.html' %}
+            {% include 'partials/table/system/table_head.html' %}
             <tbody>
                 <!-- Se recorre la lista de registros obtenidos dinámicamente -->
                 <template x-for="(record, index) in items" :key="index">
