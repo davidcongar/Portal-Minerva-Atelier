@@ -1066,17 +1066,29 @@ def import_data(table_name):
         if missing_cols:
             return jsonify({'alert':'info','message': f"Faltan columnas requeridas: {', '.join(missing_cols)}"})
 
-        # --- 🔥 Resolve all FKs with 1–N batch queries ---
-        df = resolve_foreign_keys_bulk(model, df)
-        # --- Insert rows ---
-        for _, row in df.iterrows():
-            clean = {c: row[c] for c in df.columns if c in model_columns}
-            clean=sanitize_data(model, clean)
-            record = model(**clean)
-            record.id_visualizacion = get_id_visualizacion(table_name)
-            record.id_usuario = session['id_usuario']
-            db.session.add(record)
+        def chunks(seq, size):
+            for i in range(0, len(seq), size):
+                yield seq[i:i+size]
 
+        df = resolve_foreign_keys_bulk(model, df)
+
+        id_visualizacion = get_id_visualizacion(table_name)
+        id_usuario = session["id_usuario"]
+
+        model_cols = set(model_columns)
+        cols = [c for c in df.columns if c in model_cols]
+
+        rows = list(df[cols].itertuples(index=False, name=None))
+        for batch in chunks(rows, 2000):
+            mappings = []
+            for row in batch:
+                clean = dict(zip(cols, row))
+                clean = sanitize_data(model, clean)
+                clean["id_visualizacion"] = id_visualizacion
+                clean["id_usuario"] = id_usuario
+                mappings.append(clean)
+
+            db.session.bulk_insert_mappings(model, mappings)
         db.session.commit()
         return jsonify({'alert':'success','message': f"Se importaron {len(df)} registros."})
 

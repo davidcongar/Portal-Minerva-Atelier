@@ -43,7 +43,6 @@ RP_NAME = os.getenv('RP_NAME')
 ORIGIN=os.getenv('ORIGIN')
 RP_ID=os.getenv('RP_ID')
 
-
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -172,11 +171,8 @@ def forgotpassword_submit():
         forgot_password_email(correo_electronico,usuario.codigo_unico)
         usuario.intentos_de_inicio_de_sesion=0
         db.session.commit()
-        flash("Se ha enviado un correo electrónico con intrucciones para cambiar la contraseña.", "success")
-        return redirect(url_for('auth.login'))
-    else:
-        flash("Correo electrónico es incorrecto. Inténtalo nuevamente.", "danger")
-        return redirect(url_for('auth.forgot_password'))
+    flash("Si el correo electrónico ingresado esta registrado, recibirás las intrucciones para cambiar la contraseña.", "danger")
+    return redirect(url_for('auth.login'))
 
 @auth_bp.route("/logout")
 def logout():
@@ -242,6 +238,8 @@ def update_password_submit():
         return redirect(request.referrer or url_for('auth.login'))
 
     user.contrasena = generate_password_hash(password)
+    user.codigo_unico = None
+    user.codigo_unico_login = None
     db.session.commit()
     flash("La contraseña ha sido actualizada.", "success")
     return redirect(url_for('auth.login'))
@@ -362,6 +360,8 @@ def passkey_login_verify():
     if not cred:
         return jsonify({"error": "No credential found"}), 404
     user=Usuarios.query.get(cred.id_usuario)
+    if not user or user.estatus != "Activo":
+        return jsonify({"error": "Userio Inactivo"}), 403
     try:
         resp = body["response"]
         for key in ["authenticator_data", "client_data_json", "signature", "user_handle"]:

@@ -26,10 +26,9 @@ load_dotenv()
 app = Flask(__name__)
 
 # Configuración de la Aplicacióna
-app.secret_key = os.urandom(24)
 csrf.init_app(app)
 app.config["SESSION_TYPE"] = "filesystem"
-app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "secret_key")
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
