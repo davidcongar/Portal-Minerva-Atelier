@@ -38,6 +38,8 @@ from webauthn.helpers.exceptions import (
     InvalidAuthenticationResponse
 )
 import base64
+from dotenv import load_dotenv
+load_dotenv()
 
 RP_NAME = os.getenv('RP_NAME')
 ORIGIN=os.getenv('ORIGIN')
