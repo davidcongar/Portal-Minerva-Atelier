@@ -44,9 +44,9 @@
 <div class="h-[60px] bg-white dark:bg-dark dark:border-gray/20 border-b-2 border-lightgray/10 flex items-center justify-between gap-2.5 px-7">
     <div class="flex-auto flex items-center gap-2.5">
         <div class="flex items-center gap-5 w-full">
-            <form id="consultaForm" action="/ai" method="POST"
-                class="hidden min-[420px]:block w-full">
+            <form id="consultaForm" action="{{ url_for('ai.ai_html')}}" method="POST" class="hidden min-[420px]:block w-full">
                 <div class="relative">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <input type="text" id="pregunta" name="question"
                         class="form-input ps-10 h-[42px] dark:border-lightgray/20 dark:text-white dark:bg-lightgray/10 border-2 border-gray/10 bg-gray/[8%] rounded-full text-sm text-dark placeholder:text-lightgray/80 focus:ring-0 focus:border-primary/80 focus:outline-0"
                         placeholder="Consulta con IA..." required>

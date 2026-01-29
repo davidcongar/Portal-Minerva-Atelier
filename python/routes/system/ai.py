@@ -5,7 +5,7 @@ from python.services.system.chat_gpt import QueryService
 from python.models.modelos import *
 from config import *
 
-ai_query_bp = Blueprint("ai_query_bp", __name__, url_prefix="/ai")
+ai_query_bp = Blueprint("ai", __name__, url_prefix="/ai")
 
 def get_service():
     with current_app.app_context():
