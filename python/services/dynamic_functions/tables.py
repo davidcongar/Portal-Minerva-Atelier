@@ -87,6 +87,11 @@ def get_columns(table_name,section):
             'modal': {'informacion_general':['id','tabla_origen','nombre'],'detalles':['nombre_del_archivo','ruta_s3'],'sistema':['fecha_de_creacion']},
             'pdf': []
         },
+        "ai_queries": {
+            "main_page": ["consulta","respuesta"],
+            "modal": {"informacion_general":["consulta"],"respuesta_ai":["sql","respuesta"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion"]},
+            "pdf": []
+        }, 
         'gastos': {
             'main_page': ['id_visualizacion','id_categoria_de_gasto_nombre','id_proveedor_nombre','id_cuenta_de_banco_nombre','importe','importe_pagado','fecha_de_gasto','estatus'],
             'modal': {'informacion_general':['id','id_visualizacion','id_categoria_de_gasto_nombre','id_proveedor_nombre','id_cuenta_de_banco_nombre','fecha_de_gasto','folio_fiscal_uuid','fecha_de_comprobante','estatus'],'financiero':['importe','importe_pagado'],'detalles':['notas'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},

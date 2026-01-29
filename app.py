@@ -18,6 +18,7 @@ from flask_limiter.util import get_remote_address
 from python.services.system.extensions import limiter
 from python.services.system.extensions import csrf
 from python.services.system.template_formats import *
+from config import *
 
 # Cargar variables de entornoa
 load_dotenv()
@@ -133,7 +134,9 @@ from python.routes.system.report_queries import report_queries_bp
 from python.routes.system.access_control import access_control_bp
 from python.routes.system.settings import settings_bp
 from python.routes.system.user_guide import user_guide_bp
+from python.routes.system.ai import ai_query_bp
 
+app.register_blueprint(ai_query_bp)
 app.register_blueprint(user_guide_bp)
 app.register_blueprint(settings_bp)
 app.register_blueprint(errors_bp)
@@ -175,37 +178,10 @@ app.register_blueprint(clientes_bp)
 from python.routes.actividades import actividades_bp
 app.register_blueprint(actividades_bp)
 
-
-
-
-
-
-
-
-
-
-
 from python.services.system.template_formats import *
 
 # Almacenar los nombres de las tablas en caché
 TABLES_CACHE = {}
-
-
-# Definir tablas a omitir
-OMIT_TABLES = [
-    f"alembic_version",
-    f"logs_auditoria",
-    f"archivos",
-    f"logs_auditoria",
-    f"relacion_rutas_usuarios",
-    f"relacion_rutas_roles",
-    f"categorias_de_reportes",
-    f"usuarios",
-    f"roles",
-    f"rutas",
-    f"reportes",
-]
-
 
 def load_table_names():
     """Carga los nombres de las tablas disponibles, excluyendo las especificadas en OMIT_TABLES."""

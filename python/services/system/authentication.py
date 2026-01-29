@@ -14,6 +14,7 @@ from datetime import date, timedelta
 import re
 from python.services.system.extensions import csrf,limiter
 from python.services.system.helper_functions import *
+from python.services.system.template_formats import *
 from webauthn.helpers import options_to_json, base64url_to_bytes,bytes_to_base64url
 import os
 
@@ -141,6 +142,7 @@ def login_submit():
                 session['tabla_origen']=''
                 # Obtener y almacenar rol en sesion
                 routes_accessible_by_user(session['id_usuario'], session['id_rol'])
+                session['table_names'] = sorted([model.__tablename__ for model in get_all_models() if can_access(f'/dynamic/{model.__tablename__}/view') and model.__tablename__ not in OMIT_TABLES])
                 usuario.ultima_sesion=datetime.now()
                 usuario.intentos_de_inicio_de_sesion=0
                 db.session.commit()
@@ -425,6 +427,7 @@ def passkey_login_verify():
         session['nombre_rol'] = user.rol.nombre
         session['tabla_origen']=''
         routes_accessible_by_user(session['id_usuario'], session['id_rol'])
+        session['table_names'] = sorted([model.__tablename__ for model in get_all_models() if can_access(f'/dynamic/{model.__tablename__}/view') and model.__tablename__ not in OMIT_TABLES])
         user.ultima_sesion=datetime.now()
         user.intentos_de_inicio_de_sesion=0
         db.session.commit()        

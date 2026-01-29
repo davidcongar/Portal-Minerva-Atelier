@@ -1,6 +1,68 @@
-<div
-    class="h-[60px] bg-white dark:bg-dark dark:border-gray/20 border-b-2 border-lightgray/10 flex items-center justify-between gap-2.5 px-7">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<style>
+    .select2-container .select2-selection--single {
+        height: 30px;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        padding: 6px 12px;
+        background-color: #f5f4f7;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        display: flex;
+        align-items: center;
+        font-size: 0.875rem;
+    }
+    .dark .select2-container .select2-selection--single {
+        height: 30px;
+        border: 1px solid rgb(90 99 131 / 0.2);        /* subtle dark border */
+        border-radius: 0.5rem;
+        padding: 6px 12px;
+        background-color: rgb(90 99 131 / 0.1);        /* dark gray background */
+        transition: border-color 0.2s, box-shadow 0.2s;
+        display: flex;
+        align-items: center;
+        font-size: 0.875rem;
+    }
+    .dark .select2-container .select2-selection--single .select2-selection__rendered {
+        color: white !important;
+    }    
+    .dark .select2-dropdown {
+        background-color: #1f2937;
+        border-color: #3a3f47;
+    }
+
+    .dark .select2-results__option {
+        color: #e5e7eb;
+        background-color: #1f2937;
+    }
+
+    .dark .select2-results__option--highlighted {
+        background-color: #374151 !important; /* hover/active */
+    }
+</style>
+<div class="h-[60px] bg-white dark:bg-dark dark:border-gray/20 border-b-2 border-lightgray/10 flex items-center justify-between gap-2.5 px-7">
     <div class="flex-auto flex items-center gap-2.5">
+        <div class="flex items-center gap-5 w-full">
+            <form id="consultaForm" action="/ai" method="POST"
+                class="hidden min-[420px]:block w-full">
+                <div class="relative">
+                    <input type="text" id="pregunta" name="question"
+                        class="form-input ps-10 h-[42px] dark:border-lightgray/20 dark:text-white dark:bg-lightgray/10 border-2 border-gray/10 bg-gray/[8%] rounded-full text-sm text-dark placeholder:text-lightgray/80 focus:ring-0 focus:border-primary/80 focus:outline-0"
+                        placeholder="Consulta con IA..." required>
+
+                    <button type="submit"
+                        class="absolute inset-y-0 left-3 flex items-center text-lightgray hover:text-primary">
+                        <svg focusable="false" viewBox="0 -960 960 960" height="24" width="24" fill="currentColor">
+                            <path
+                                d="M480-80q-6,0-11-4t-7-10q-17-67-51-126T328-328T220-411T94-462q-6-2-10-7t-4-11t4-11t10-7q67-17 126-51t108-83t83-108t51-126q2-6 
+                                7-10t11-4t10.5,4t6.5,10q18,67 52,126t83,108t108,83t126,51q6,2 10,7t4,11t-4,11t-10,7q-67,17-126,51T632-328T549-220T498-94q-2,6-7,10t-11,4Z">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+        </div>
         <div class="lg:hidden">
             <button type="button" class="hover:text-primary" @click="$store.app.toggleSidebar()">
                 <svg width="13" height="12" class="rotate-180" viewBox="0 0 13 12" fill="none"
@@ -15,6 +77,15 @@
         </div>
     </div>
     <div class="flex items-center gap-5">
+        <div>
+            <select id="search_module" class="searchable-select">
+                {% for table in session['table_names'] %}
+                    <option value="{{table}}">
+                        {{table | title_format}}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
         <div x-data="{ fullScreen: false }">
             <button class="text-lightgray hover:text-primary block"
                 x-bind:class="{ 'hidden': fullScreen, 'block': !fullScreen }" x-on:click="fullScreen = !fullScreen"
@@ -133,5 +204,3 @@
     </div>
 </div>
 <script src="/static/js/system/header.js"></script>
-
-

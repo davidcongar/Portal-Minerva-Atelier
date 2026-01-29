@@ -165,3 +165,9 @@ class Archivos(db.Model,AuditMixin):
     
     def to_dict(self):
         return {col.name: getattr(self, col.name) for col in self.__table__.columns}
+    
+class AiQueries(db.Model,BaseMixin,AuditMixin):
+
+    consulta = db.Column(db.Text)
+    sql = db.Column(db.Text)
+    respuesta = db.Column(db.Text)

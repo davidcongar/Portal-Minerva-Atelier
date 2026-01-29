@@ -22,7 +22,6 @@ async function addPasskey() {
   publicKey.challenge = base64urlToUint8Array(publicKey.challenge);
   publicKey.user.id = base64urlToUint8Array(publicKey.user.id);
 
-
   const credential = await navigator.credentials.create({ publicKey });
   
     // 5️⃣ Convert binary response → base64
@@ -47,7 +46,6 @@ async function addPasskey() {
       alert("✅ Passkey agregada correctamente");
     } else {
       const msg = await verifyResp.text();
-
       alert("❌ Error al registrar el Passkey: " + msg);
     }
   } catch (err) {
@@ -57,3 +55,20 @@ async function addPasskey() {
 }
 
 document.getElementById("addPasskeyBtn").addEventListener("click", addPasskey);
+
+$('#search_module').select2();
+// 1. Auto-select based on URL
+let currentUrl = window.location.href;
+$('#search_module option').each(function () {
+    let val = $(this).val();
+    if (currentUrl.includes(val)) {
+        $('#search_module').val(val).trigger('change.select2');
+    }
+});
+// 2. Redirect on select
+$('#search_module').on('select2:select', function (e) {
+    const value = e.params.data.id;
+    if (value) {
+        window.location.href = `/dynamic/${value}/view`;
+    }
+});

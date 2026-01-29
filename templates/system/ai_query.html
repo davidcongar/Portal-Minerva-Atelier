@@ -1,0 +1,162 @@
+{% extends './partials/system/layout1.html' %}
+
+{% block content %}
+{% include "./partials/system/alerts.html" %}
+{% include 'partials/table/system/breadcrumbs.html' %}
+{% import 'variables.html' as vars %}
+
+<div class="flex flex-col gap-5 h-[calc(100vh-188px)] sm:h-[calc(100vh-100px)]">
+
+    <div class="grid grid-cols-1 gap-3">
+
+        <!-- QUESTION -->
+        <div id="question_wrapper" class="bg-white dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 p-5 rounded-lg">
+            <div class="flex items-center justify-between gap-3">
+                <h2 class="text-xl font-semibold text-primary">Consulta</h2>
+
+                <button id="sql_button"
+                        type="button"
+                        onclick="openSqlModal()"
+                        class="btn flex items-center gap-2 justify-center text-primary border-transparent rounded-md 
+                        transition-all duration-300 hover:text-white hover:bg-primary bg-primary/10 px-3 py-2 hidden">
+                    Query Generado
+                </button>
+            </div>
+
+            <p id="question_text" class="mt-2">{{question}}</p>
+        </div>
+
+        <!-- AI ANSWER -->
+        <div id="answer_wrapper" class="bg-white dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 p-5 rounded-lg hidden">
+            <h2 class="text-xl font-semibold text-primary">Resumen generado por AI</h2>
+            <h2 class="text-xs text-lightgray">
+                Los cálculos utilizados son generados por inteligencia artificial, la información utilizada es la registrada en el sistema. Estos cálculos pueden contener errores.  
+                Verifíquela antes de tomar decisiones importantes.
+            </h2>
+
+            <div id="answer_html" class="prose prose-sm dark:prose-invert max-w-none mt-2 hidden"></div>
+            <p id="answer_text" class="mt-2 hidden"></p>
+        </div>
+
+        <!-- STATIC RESULT TABLE (SAME FORMAT) -->
+        <div id="table_wrapper"
+             class="sticky top-0 bg-white dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 p-5 rounded-lg hidden">
+
+            <div class="overflow-auto">
+                <div class="flex items-center justify-between mb-2 sticky top-0 z-5">
+                    <h2 class="text-xl font-semibold text-primary">Datos</h2>
+
+                    <button type="button"
+                            onclick="download_ai_data()"
+                            class="border w-10 h-10 flex items-center justify-center text-primary border-transparent rounded-md 
+                               transition-all duration-300 hover:text-white hover:bg-primary bg-primary/10">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 3V16M12 16L16 11.625M12 16L8 11.625" stroke="currentColor" stroke-width="1.5"
+                                stroke-linecap="round" />
+                            <path
+                                d="M3 15C3 17.8284 3 19.2426 3.87868 20.1213C4.75736 21 6.17157 21 9 21H15C17.8284 21 19.2426 21 20.1213 20.1213C21 19.2426 21 17.8284 21 15"
+                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div id="table_view" class="flex-1 overflow-y-auto table-scroll-horizontal" style="max-height: calc(100vh - 600px);">
+                    <table class="w-full table-hover table-striped">
+                        <thead id="table_head" class="text-left bg-white dark:bg-dark sticky top-0 z-5"></thead>
+                        <tbody id="table_body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ERRORS -->
+        <div id="error_wrapper"
+             class="bg-white dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 p-5 rounded-lg hidden">
+            <h2 class="text-xl font-semibold text-primary">Error</h2>
+            <div id="error_text"></div>
+        </div>
+
+    </div>
+</div>
+
+<!-- SQL MODAL -->
+<div id="sqlModalBackdrop"
+     class="fixed inset-0 bg-dark/90 dark:bg-white/5 backdrop-blur-sm hidden z-50"
+     onclick="closeSqlModal()"></div>
+
+<div id="sqlModal" class="fixed inset-0 hidden z-[99999] flex items-center justify-center p-6">
+    <div class="w-full max-w-3xl bg-white dark:bg-dark border-2 border-lightgray/10 rounded-lg shadow-xl"
+         onclick="event.stopPropagation()">
+
+        <div class="flex items-center justify-between px-5 py-4 border-b border-gray/10 dark:border-gray/20">
+            <h3 class="text-lg font-semibold text-primary">Consulta SQL Generada</h3>
+            <button type="button" onclick="closeSqlModal()" class="text-lightgray hover:text-primary transition">
+                ✕
+            </button>
+        </div>
+
+        <div class="p-5">
+            <pre id="sql_pre"
+                 class="bg-white dark:bg-dark dark:border-gray/20 border-2 border-lightgray/10 p-5 rounded-lg overflow-y-auto"
+                 style="max-height: 60vh;"></pre>
+        </div>
+
+        <div class="flex justify-end gap-2 p-2">
+            <button type="button"
+                    onclick="copySqlToClipboard()"
+                    class="btn flex items-center gap-2 justify-center text-white rounded-md transition-all duration-300 bg-primary hover:bg-primary/80 px-3 py-2">
+                Copiar
+            </button>
+        </div>
+    </div>
+</div>
+{% include "./partials/system/loader.html" %}
+<script src="/static/js/system/table/loader.js"></script>
+
+<!-- JS AUTOLOAD -->
+<script>
+    const title_formats = {{ title_formats | tojson }}; 
+    const percentage_format_columns = {{ vars.percentage_format_columns | tojson }};
+    const money_format_columns = {{ vars.money_format_columns | tojson }};
+    const purple_badge_values = {{ vars.purple_badge_values | tojson }};
+    const primary_badge_values = {{ vars.primary_badge_values | tojson }};
+    const success_badge_values = {{ vars.success_badge_values | tojson }};
+    const warning_badge_values = {{ vars.warning_badge_values | tojson }};
+    const danger_badge_values = {{ vars.danger_badge_values | tojson }};
+    const gray_badge_values = {{ vars.gray_badge_values | tojson }};
+    document.addEventListener("DOMContentLoaded", () => {
+        showLoader();
+        const question = "{{ question }}";
+        if (!question) return;
+
+        fetch(`/ai/agent/${encodeURIComponent(question)}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" }
+        })
+        .then(res => res.json())
+        .then(res => {
+            const data = res.data;
+
+            if (data.error) {
+                showError(data.error);
+                hideLoader();
+                return;
+            }
+            window.columns = data.columns;
+            window.rows = data.rows;            
+            fillQuestion(data);
+            fillAnswer(data);
+            fillSQL(data);
+            buildTable(data.columns, data.rows);
+            hideLoader();
+        })
+        .catch(err => showError(err.message));
+    });    
+</script>
+<script src="/static/js/system/ai_query/dynamic_ai.js"></script>
+<script src="/static/js/system/ai_query/download_data.js"></script>
+<script src="/static/js/system/ai_query/open_modal.js"></script>
+{% include "./partials/system/loader.html" %}
+
+{% endblock content %}

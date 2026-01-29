@@ -1,3 +1,14 @@
+OMIT_TABLES = [
+    "alembic_version",
+    "logs_auditoria",
+    "archivos",
+    "logs_auditoria",
+    "relacion_rutas_usuarios",
+    "relacion_rutas_roles",
+    "rutas",
+    "ai_queries",
+    "credenciales_de_usuarios"
+]
 # title format replacements
 TITLE_FORMATS = {
     "id_visualizacion":'ID',
