@@ -8,7 +8,8 @@ from python.models.modelos import db
 from config import OMIT_TABLES
 import os
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+if os.getenv("OPENAI_API_KEY"):
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 class QueryService:
 
