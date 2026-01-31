@@ -42,4 +42,5 @@ def ai_agent(question):
             }
         )
     except Exception as e:
-        return jsonify({"data":{"error":str(e)}})
+        return jsonify({"data":{"error":"La funcionalidad se encuentra en desarrollo."}})        
+        #return jsonify({"data":{"error":str(e)}})

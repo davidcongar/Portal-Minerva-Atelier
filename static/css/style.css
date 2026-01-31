@@ -5410,7 +5410,20 @@ table .invoice-table tr td:last-child{
     overflow-x: auto;
     overflow-y: visible;
 }
-
+.table-scroll-vertical::-webkit-scrollbar {
+    width: 8px;
+}
+.table-scroll-vertical::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+.table-scroll-vertical::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+.table-scroll-vertical::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
     /* Estilo base para Select2 */
     .select2-container .select2-selection--single {
         height: 40px;

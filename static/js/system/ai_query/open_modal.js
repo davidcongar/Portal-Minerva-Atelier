@@ -9,9 +9,35 @@ function closeSqlModal() {
     document.body.style.overflow = '';
 }
 function copySqlToClipboard() {
-    if (!sqlText) return;
-    navigator.clipboard.writeText(sqlText);
+    const modalText = document.getElementById("sql_pre").innerText;
+    navigator.clipboard.writeText(modalText).then(() => {
+        showSuccess("Querie copiado al portapapeles.");
+    }); 
 }
+
+function openAiModal() {
+
+    const modal = document.getElementById("aiModal")
+    const backdrop = document.getElementById("aiModalBackdrop");
+    modal.classList.remove("hidden");
+    backdrop.classList.remove("hidden");
+}
+
+function closeAiModal() {
+    document.getElementById("aiModal").classList.add("hidden");
+    document.getElementById("aiModalBackdrop").classList.add("hidden");
+}
+
+function copyAiSummary() {
+    const modalText = document.getElementById("aiModalContent").innerText;
+    navigator.clipboard.writeText(modalText).then(() => {
+        showSuccess("Texto copiado al portapapeles.");
+    });
+}
+
 document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') closeSqlModal();
+    if (e.key === 'Escape'){
+        closeSqlModal();
+        closeAiModal();
+    }
 });

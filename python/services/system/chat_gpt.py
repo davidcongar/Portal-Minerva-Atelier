@@ -5,8 +5,9 @@ import sqlparse
 from openai import OpenAI
 from sqlalchemy import text
 from python.models.modelos import db
-from config import OMIT_TABLES
+from config import *
 import os
+from flask import session
 
 if os.getenv("OPENAI_API_KEY"):
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -54,8 +55,10 @@ class QueryService:
     # ----------------------------------------------------------------------
     def generate_sql(self, question: str) -> str:
         schema = self.load_schema()
-
-        prompt = f"""
+        if GPT_PROMPT:
+            prompt = GPT_PROMPT.format(schema=schema,question=question,id_usuario=session['id_usuario'])
+        else:
+            prompt = f"""
 You are an expert PostgreSQL assistant.
 Convert the user question into ONE safe read-only SQL query.
 
@@ -90,8 +93,6 @@ SELECT RULES:
 - Include useful direct columns from the main table.
 - Never SELECT *.
 - Never return raw ID columns.
-- Add LIMIT 200 for multi-row queries.
-
 
 FILTERING RULES:
 - Never filter using raw IDs unless the user explicitly provides one.
@@ -160,7 +161,7 @@ Return ONLY SQL OR `INVALID_QUESTION`. Nothing else.
         table = df.head(20).to_markdown()
 
         prompt = f"""
-Summarize this result in a business-friendly explanation.
+Summarize this result in a business-friendly explanation. And make any recommendations you see fit.
 Do NOT include SQL.
 
 {table}
@@ -182,7 +183,9 @@ Do NOT include SQL.
         if sql == "INVALID_QUESTION":
             raise ValueError("La pregunta no es válida o no tiene sentido lógico. Por favor reformúlala.")
         self.validate_sql(sql)
+
         df = self.execute_sql(sql)
+        df = df.fillna(0)
 
         if df.empty:
             answer = "No results found."

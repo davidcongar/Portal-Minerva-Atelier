@@ -9,9 +9,11 @@ function fillAnswer(data) {
     if (data.answer_html) {
         document.getElementById("answer_html").innerHTML = data.answer_html;
         document.getElementById("answer_html").classList.remove("hidden");
+        document.getElementById("aiModalContent").innerHTML = data.answer_html;        
     } else {
         document.getElementById("answer_text").innerText = data.answer;
         document.getElementById("answer_text").classList.remove("hidden");
+        document.getElementById("aiModalContent").innerText = data.answer;
     }
 }
 

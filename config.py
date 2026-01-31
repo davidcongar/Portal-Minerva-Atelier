@@ -1,3 +1,5 @@
+GPT_PROMPT=''
+
 OMIT_TABLES = [
     "alembic_version",
     "logs_auditoria",
