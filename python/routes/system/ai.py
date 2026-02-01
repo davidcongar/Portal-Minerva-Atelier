@@ -4,6 +4,7 @@ from flask import Blueprint, request, render_template, jsonify,current_app,sessi
 from python.services.system.chat_gpt import QueryService
 from python.models.modelos import *
 from config import *
+from python.services.system.authentication import *
 
 ai_query_bp = Blueprint("ai", __name__, url_prefix="/ai")
 
@@ -12,11 +13,15 @@ def get_service():
         return QueryService()
 
 @ai_query_bp.route("/", methods=["GET", "POST"])
+@login_required
+@roles_required()
 def ai_html():
     question = request.form.get("question", "")
     return render_template("system/ai_query.html",question=question,title_formats=TITLE_FORMATS)
 
 @ai_query_bp.route("/agent/<question>", methods=["GET"])
+@login_required
+@roles_required()
 def ai_agent(question):
     service = get_service()
     try:
