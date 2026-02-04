@@ -24,7 +24,7 @@ window.createDataTable = function (config) {
             to: parseInt(config.view) || 50, // Registro final de la página actual
         },
         dateRange:"",
-        categories:[],
+        filters: [],
         // Agregar las columnas pasadas en la configuración
         columns: config.columns || [],
 
@@ -36,8 +36,12 @@ window.createDataTable = function (config) {
             window.addEventListener("refresh-data-table", () => {
                 this.fetchData();
             });
-            this.$watch('categories', value => {
-                // Always run fetchData when categories change
+            this.$watch('filters', value => {
+                this.fetchData();
+            });
+            document.addEventListener("update-filter", (e) => {
+                const { key, value } = e.detail;
+                this.filters[key] = value;     // store values by filter name
                 this.fetchData();
             });
         },
@@ -55,8 +59,9 @@ window.createDataTable = function (config) {
             current.set("sortRule", this.sorted.rule ?? "desc");
             current.set("page", String(this.pagination.currentPage));
             current.set("dateRange", this.dateRange ?? "");
-            current.set("categories", (this.categories || []).join(",")); // keep as CSV
-
+            for (const [key, arr] of Object.entries(this.filters)) {
+                current.set(key, arr.join(","));  // ?id_proveedor=1,2,3
+            }
             try {
                 showLoader();
                 const url = `${this.apiEndpoint}?${current.toString()}`;

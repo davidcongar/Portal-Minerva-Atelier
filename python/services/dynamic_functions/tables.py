@@ -569,3 +569,13 @@ def get_summary_kpis(table_name,id_parent_record):
     }
     data=data.get(table_name,'')
     return data
+
+def get_filter_column(table_name):
+    filter={
+        'table_name': {
+            #'column':[{'value': str(p.id),'text': p.nombre} for p in Proveedores.query.filter_by(estatus='Activo').all()],
+            #'column':[{'value': 'En revisión','text': 'En revisión'},{'value': 'Aprobada','text': 'Aprobada'}],
+        },
+    }
+    filter=filter.get(table_name,'')
+    return filter

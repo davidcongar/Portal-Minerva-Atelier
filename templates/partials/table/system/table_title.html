@@ -68,7 +68,9 @@
         </select>
     </div>
     <div class="flex items-center space-x-2">
-        {% include 'partials/table/filters/' ~ table_name ~ '.html' ignore missing %}
+        {% if filter_column %}
+            {% include "partials/table/system/dynamic_filter.html" %}
+        {% endif %}
         {% if vars.date_range_search | select('in', columns) | list %}
             <input id="dateRange" x-model="dateRange" type="text" class="form-input" placeholder="Rango de fechas...">
         {% endif %}

@@ -53,10 +53,10 @@ def table_view(table_name):
 
     # Datos para resaltar el menú activo en el sidebar
     module,active_menu=get_breadcrumbs(table_name)
-    if module==table_name.replace('_', ' ').capitalize():
-        breadcrumbs=[{"name":table_name.replace('_', ' ').capitalize(),"url":""}]
+    if module==title_format(table_name):
+        breadcrumbs=[{"name":title_format(table_name),"url":""}]
     else:
-        breadcrumbs=[{"name":module,"url":""},{"name":table_name.replace('_', ' ').capitalize(),"url":""}]
+        breadcrumbs=[{"name":title_format(module),"url":""},{"name":title_format(table_name),"url":""}]
     context = {
             "activeMenu": active_menu, 
             "activeItem": table_name,
@@ -68,6 +68,7 @@ def table_view(table_name):
     relationships=get_table_relationships(table_name)
     data_tabs=get_data_tabs(table_name,parent_table,id_parent_record)
     checkbox=get_checkbox(table_name)
+    filter_column=get_filter_column(table_name)
     return render_template(
         "system/dynamic_table.html",
         columns=columns,
@@ -82,6 +83,7 @@ def table_view(table_name):
         title_formats=TITLE_FORMATS,
         javascript=javascript,
         html='table',
+        filter_column=filter_column,
         **context
     )
 
@@ -103,8 +105,12 @@ def data(table_name):
     page = request.args.get("page", 1, type=int)
     status = request.args.get("status", "todos", type=str)
     dateRange=request.args.get("dateRange", "", type=str)
-    categories=request.args.get("categories", "", type=str)
-
+    filters = {}
+    filter_column=get_filter_column(table_name)
+    for key in request.args:
+        if key in filter_column:   # only filters you support
+            filters[key] = request.args.get(key)
+            
     query = model.query
 
     mapper = inspect(model)
@@ -253,10 +259,11 @@ def data(table_name):
             if conditions:
                 query = query.filter(or_(*conditions))
 
-    if categories:
-        if isinstance(categories, str):
-            categories = [c.strip() for c in categories.split(",") if c.strip()]
-        query = query.filter(getattr(model, "id_categoria").in_(categories))
+    for key, raw in filters.items():
+        if raw:
+            values = [v.strip() for v in raw.split(",") if v.strip()]
+            column = getattr(model, key)
+            query = query.filter(column.in_(values))
 
     # Contar registros filtrados
     total = query.count()
@@ -1089,6 +1096,7 @@ def import_data(table_name):
                 mappings.append(clean)
 
             db.session.bulk_insert_mappings(model, mappings)
+
         db.session.commit()
         return jsonify({'alert':'success','message': f"Se importaron {len(df)} registros."})
 
