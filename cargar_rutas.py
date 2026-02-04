@@ -12,7 +12,7 @@ from datetime import datetime
 import numpy as np
 import os
 
-working_directory='/Users/davidcontreras/Documents/Repositorios_SS/Portal-Minerva-Atelier/'
+working_directory='/Users/davidcontrerasgarza/Documents/Repositorios_SS/Portal-Minerva-Atelier/'
 os.chdir(working_directory)
 from app import *
 from python.models import *
@@ -94,7 +94,7 @@ def crear_admin_empresa():
             db.session.add(new_record)
         # usuario admin
         usuario = [
-            {'id_visualizacion':int(1),'nombre': 'Sistema','correo_electronico':'contacto@snappsolutions.com','contrasena':'123','ultimo_cambio_de_contrasena':'2025-10-09','estatus': 'Activo'}
+            {'id_visualizacion':int(1),'nombre': 'Sistema','correo_electronico':'david.contreras@snappsolutions.com','contrasena':'123','ultimo_cambio_de_contrasena':'2025-10-09','estatus': 'Activo'}
         ]
         usuario = pd.DataFrame(usuario)
         for i in range(len(usuario)):
@@ -112,10 +112,14 @@ def agregar_acceso_admin():
         usuario=Usuarios.query.filter_by(nombre="Sistema").first()
         usuario.id_rol=rol.id
         db.session.commit()
+'''
 
 crear_admin_empresa()
 rutas_inciales()
+'''
+
 agregar_acceso_admin()
+'''
 
 crear_rutas_base('usuarios')
 crear_rutas_base('roles')
@@ -179,9 +183,6 @@ crear_rutas_base('sueldos_de_integrantes')
 
 crear_rutas_base('ventas')
 
-
-
-'''
 actions={'contacto_inicial','en_proceso','perdido','activo','finalizar','cancelar'}
 crear_ruta('clientes',actions)
 actions={'pendiente','cancelada','finalizada'}

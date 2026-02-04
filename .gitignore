@@ -5,6 +5,7 @@ flask_session/
 venv/
 .env
 .flaskenv
+migrations/
 migrations_local/
 migrations_prod/
 informacion_inicial/

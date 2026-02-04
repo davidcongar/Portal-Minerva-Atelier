@@ -64,3 +64,4 @@ webauthn==2.7.0
 openpyxl==3.1.5
 tabulate==0.9.0
 openai==2.16.0
+stripe==12.4.0
