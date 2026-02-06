@@ -257,12 +257,34 @@
                                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                                         </form>
                                                     </template>      
-                                                    <template x-if="{{ edit_fields }}.includes(col) && number_colums.includes(col)">
+                                                    <template x-if="{{ edit_fields }}.includes(col) && number_columns.includes(col)">
                                                         <form method="POST">
                                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                                             <input type="number" x-model="record[col]"
                                                                 class="form-input rounded-lg w-32 h-12 " 
                                                                 @blur="update_record(record,col)" />
+                                                        </form>
+                                                    </template>    
+                                                    <template x-if="{{ edit_fields }}.includes(col) && money_format_columns.includes(col)">
+                                                        <form method="POST">
+                                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                            <label class="flex">
+                                                                <div class="flex items-center justify-center rounded-l border-r-0 border-2 border-gray/10 bg-gray/[8%] dark:border-lightgray/20 dark:text-white dark:bg-lightgray/10 px-3.5">
+                                                                    <span>$</span>
+                                                                </div>
+                                                                <input type="number" x-model="record[col]" class="form-input rounded-r border-2 rounded-none w-32 h-12" @blur="update_record(record, col)"/>
+                                                            </label>
+                                                        </form>
+                                                    </template>
+                                                    <template x-if="{{ edit_fields }}.includes(col) && percentage_format_columns.includes(col)">
+                                                        <form method="POST">
+                                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                            <label class="flex">
+                                                                <input type="number" x-model="record[col]" class="form-input rounded-l border-2 rounded-none w-32 h-12" @blur="update_record(record, col)"/>
+                                                                <div class="flex items-center justify-center rounded-r border-l-0 border-2 border-gray/10 bg-gray/[8%] dark:border-lightgray/20 dark:text-white dark:bg-lightgray/10 px-3.5">
+                                                                    <span>%</span>
+                                                                </div>                                                                
+                                                            </label>
                                                         </form>
                                                     </template>                                                    
                                                     <template x-if="{{ edit_fields }}.includes(col) && date_columns.includes(col)">
@@ -337,7 +359,7 @@
     const date_time_columns = {{ vars.date_time_columns | tojson }};
     const time_columns = {{ vars.time_columns | tojson }};
     const textarea_columns = {{ vars.textarea_columns | tojson }};
-    const number_colums = {{ vars.number_colums | tojson }};
+    const number_columns = {{ vars.number_columns | tojson }};
     const text_columns = {{ vars.text_columns | tojson }};
     const money_format_columns = {{ vars.money_format_columns | tojson }};
     const percentage_format_columns = {{ vars.percentage_format_columns | tojson }};

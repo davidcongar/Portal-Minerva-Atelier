@@ -10,7 +10,7 @@ def get_joins():
     joins = {
         'id_usuario': (Usuarios, Usuarios.id, Usuarios.nombre),
         'id_rol': (Roles, Roles.id, Roles.nombre),
-        'id_categoria_de_reporte':(CategoriasDeReportes, CategoriasDeReportes.id, CategoriasDeReportes.nombre),        
+        'id_categoria_de_reporte':(CategoriasDeReportes, CategoriasDeReportes.id, CategoriasDeReportes.nombre),
         'id_producto': (Productos, Productos.id, Productos.nombre),
         'id_almacen': (Almacenes, Almacenes.id, Almacenes.nombre),
         'id_compra': (Compras, Compras.id, Compras.id_visualizacion if hasattr(Compras, 'id_visualizacion') else Compras.id_visualizacion),
@@ -87,10 +87,10 @@ def get_columns(table_name,section):
             'modal': {'informacion_general':['id','tabla_origen','nombre'],'detalles':['nombre_del_archivo','ruta_s3'],'sistema':['fecha_de_creacion']},
             'pdf': []
         },
-        "ai_queries": {
-            "main_page": ["consulta","respuesta"],
-            "modal": {"informacion_general":["consulta"],"respuesta_ai":["sql","respuesta"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion"]},
-            "pdf": []
+        'ai_queries': {
+            'main_page': ['consulta','respuesta'],
+            'modal': {'informacion_general':['consulta'],'respuesta_ai':['sql','respuesta'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion']},
+            'pdf': []
         }, 
         'gastos': {
             'main_page': ['id_visualizacion','id_categoria_de_gasto_nombre','id_proveedor_nombre','id_cuenta_de_banco_nombre','importe','importe_pagado','fecha_de_gasto','estatus'],
@@ -213,13 +213,13 @@ def get_columns(table_name,section):
             'pdf': ['id_visualizacion','id_almacen_nombre','id_producto_nombre','fecha_de_ajuste','tipo_de_ajuste','cantidad','notas','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'transferencias_de_inventario': {
-            'main_page': ['id_visualizacion','id_almacen_salida_nombre','id_almacen_entrada_nombre','fecha_de_transferencia','estatus'],
-            'modal': {'informacion_general':['id','id_visualizacion','id_almacen_salida_nombre','id_almacen_entrada_nombre','fecha_de_transferencia','estatus'],'detalles':['notas'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
+            'main_page': ['id_visualizacion','id_almacen_salida_nombre','id_almacen_entrada_nombre','fecha_de_transferencia','fecha_de_recepicon','estatus'],
+            'modal': {'informacion_general':['id','id_visualizacion','id_almacen_salida_nombre','id_almacen_entrada_nombre','fecha_de_transferencia','fecha_de_recepicon','estatus'],'detalles':['notas'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
             'pdf': ['id_visualizacion','id_almacen_salida_nombre','id_almacen_entrada_nombre','fecha_de_transferencia','notas','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'productos_en_transferencias_de_inventario': {
-            'main_page': ['id_visualizacion','id_transferencia_de_inventario_visualizacion','id_producto_nombre','cantidad'],
-            'modal': {'informacion_general':['id','id_visualizacion','id_transferencia_de_inventario_visualizacion','id_producto_nombre','cantidad'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
+            'main_page': ['id_visualizacion','id_transferencia_de_inventario_visualizacion','id_producto_nombre','cantidad','cantidad_recibida','notas'],
+            'modal': {'informacion_general':['id','id_visualizacion','id_transferencia_de_inventario_visualizacion','id_producto_nombre','cantidad','cantidad_recibida','notas'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
             'pdf': ['id_visualizacion','id_transferencia_de_inventario_visualizacion','id_producto_nombre','cantidad','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'envios': {
@@ -332,10 +332,10 @@ def get_columns(table_name,section):
             'modal': {'informacion_general':['id','id_visualizacion','id_cliente_nombre_completo','espacio','tipo_de_iva','estatus'],'financiero':['importe','iva','importe_total'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
             'pdf': ['id_visualizacion','id_cliente_nombre_completo','espacio','importe','tipo_de_iva','iva','importe_total','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
-        "servicios_en_ventas": {
-            "main_page": ["id_visualizacion","id_venta_id_visualizacion","id_servicio_nombre","id_espacio_nombre","metros_cuadrados","cantidad","precio_unitario","importe"],
-            "modal": {"informacion_general":["id","id_visualizacion","id_venta_id_visualizacion","id_servicio_nombre","id_espacio_nombre"],"detalles":["metros_cuadrados","cantidad","precio_unitario","importe"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
-            "pdf": ["id_visualizacion","id_venta_id_visualizacion","id_servicio_nombre","id_espacio_nombre","metros_cuadrados","cantidad","precio_unitario","importe","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
+        'servicios_en_ventas': {
+            'main_page': ['id_visualizacion','id_venta_id_visualizacion','id_servicio_nombre','id_espacio_nombre','metros_cuadrados','cantidad','precio_unitario','importe'],
+            'modal': {'informacion_general':['id','id_visualizacion','id_venta_id_visualizacion','id_servicio_nombre','id_espacio_nombre'],'detalles':['metros_cuadrados','cantidad','precio_unitario','importe'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
+            'pdf': ['id_visualizacion','id_venta_id_visualizacion','id_servicio_nombre','id_espacio_nombre','metros_cuadrados','cantidad','precio_unitario','importe','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'cuentas_de_banco': {
             'main_page': ['id_visualizacion','id_integrante_nombre','banco','tipo_de_cuenta','nombre','balance','estatus'],
@@ -376,7 +376,7 @@ def get_estatus_options(table_name):
         'recepciones_de_compras': ['En revisión','Aprobada','Finalizada','Cancelada'],
         'actividades': ['Sin iniciar','En proceso','Realizada','Con cambios','Cerrada','Cancelada'],
         'ajustes_de_inventario': ['En revisión','Aprobado','Finalizado','Cancelado'],
-        'transferencias_de_inventario': ['En revisión','Aprobada','Finalizada','Cancelado'],
+        'transferencias_de_inventario': ['En revisión','Aprobada','En tránsito','Finalizada','Cancelado'],
         'briefs_de_clientes': ['En proceso','Contestado','Cancelado'],
         'agenda': ['Pendiente','Confirmada','Finalizada','Cancelada'],
         'ventas': ['Pendiente','Cobrada','Cancelada'],
@@ -397,7 +397,7 @@ def get_open_status(table_name):
         'recepciones_de_compras': ['En revisión','Aprobada'],
         'productos_en_compras': ['Pendiente','Recibido','Recibido parcial'],
         'ajustes_de_inventario': ['En revisión','Aprobado'],
-        'transferencias_de_inventario': ['En revisión','Aprobada'],
+        'transferencias_de_inventario': ['En revisión','Aprobada','En tránsito'],
         'briefs_de_clientes': ['En proceso'],
         'agenda': ['Pendiente','Confirmada'],
         'ventas': ['Pendiente'],
@@ -413,16 +413,17 @@ def get_breadcrumbs(table_name):
         'roles':['Permisos','permisos'],
         'logs_auditoria':['Auditoría','auditoria'],
         'reportes':['Reportes','reportes'],
-        "categorias_de_reportes":['Reportes','reportes'],
+        'categorias_de_reportes':['Reportes','reportes'],
         'archivos':[session['tabla_origen'].replace('_',' ').capitalize(),session['tabla_origen']],
 
-        '':['Almacén','almacen'],
+        'almacenes':['Almacén','almacen'],
         'categorias_de_productos':['Almacén','almacen'],
         'productos':['Almacén','almacen'],
         'inventario':['Almacén','almacen'],
         'recepciones_de_compras':['Almacén','almacen'],
         'ajustes_de_inventario':['Almacén','almacen'],
         'transferencias_de_inventario':['Almacén','almacen'],
+        'productos_en_transferencias_de_inventario':['Almacén','almacen'],
         'envios':['Almacén','almacen'],
 
         'cuentas_de_banco':['Banca','banca'],
@@ -468,17 +469,18 @@ def get_breadcrumbs(table_name):
 def get_table_relationships(table_name):
     relationships={
         'roles':['usuarios'],
-        'almacenes':['inventario','compras','recepciones_de_compras','ajustes_de_inventario','transferencias_de_inventario','envios'],
-        'proveedores':['compras','gastos','pagos_administrativos','precios_de_proveedores','gastos_recurrentes'],
+        'almacenes':['resumen','inventario','compras','recepciones_de_compras','ajustes_de_inventario','transferencias_de_inventario','envios'],
+        'proveedores':['resumen','compras','gastos','pagos_administrativos','precios_de_proveedores','gastos_recurrentes'],
         'productos':['inventario','precios_de_proveedores'],
         'gastos':['gastos_y_compras_en_pagos'],
-        'cuentas_de_banco':['gastos','pagos_administrativos','transferencias_de_dinero','ajustes_de_dinero','pagos_de_nomina'],
+        'cuentas_de_banco':['resumen','gastos','pagos_administrativos','transferencias_de_dinero','ajustes_de_dinero','pagos_de_nomina'],
         'clientes':['resumen','briefs_de_clientes','agenda','ventas','facturas','proyectos','envios','calidad_de_servicio_de_proyectos'],
         'briefs':['preguntas_de_briefs'],
         'preguntas_de_briefs':['respuestas_de_preguntas_de_briefs'],
         'servicios':['precios_de_servicios','actividades_base'],
         'ventas':['servicios_en_ventas'],
         'proyectos':['resumen','actividades'],
+        'integrantes':['resumen','agenda','proyectos','actividades','sueldos_pagados_en_nomina'],
 
         'pagos_administrativos':['gastos_y_compras_en_pagos'],
         'compras':['productos_en_compras'],
@@ -530,7 +532,7 @@ def get_data_tabs(table_name,parent_table,id_parent_record):
     return results
 
 def get_date_fields():
-    date_fields=['fecha_venta', 'fecha_orden', 'fecha_de_gasto', 'fecha_de_transferencia','fecha','fecha_hora']
+    date_fields=['fecha_venta', 'fecha_orden','fecha_pago', 'fecha_de_gasto', 'fecha_de_transferencia','fecha_de_ajuste','fecha','fecha_hora']
     return date_fields
 
 def get_checkbox(table_name):
@@ -542,6 +544,24 @@ def get_checkbox(table_name):
 
 def get_summary_data(table_name):
     data={
+        'almacenes': {
+                        'primary':['nombre','estatus'],
+                        'data':{'información general':['nombre']}
+                        },
+        'cuentas_de_banco': {
+                        'primary':['nombre','banco','estatus'],
+                        'data':{'información general':['nombre','banco','integrante.nombre','balance']}
+                        },
+        'proveedores': {
+                        'primary':['nombre','telefono','correo_electronico'],
+                        'data':{'informacion_general':['nombre','razon_social','rfc','direccion','codigo_postal','estatus','condiciones_pago'],'contacto':['telefono','correo_electronico','persona_contacto','telefono_contacto','correo_electronico_contacto','sitio_web']},
+                        },                        
+        'integrantes': {
+                        'primary':['nombre_completo','telefono','correo_electronico'],
+                        'data':{'informacion_general':['id_puesto_nombre','nombre_completo','fecha_nacimiento','genero','estado_civil','fecha_contratacion','fecha_terminacion','estatus'],'contacto':['direccion','codigo_postal','telefono','correo_electronico'],'documentos':['numero_seguridad_social','rfc','curp'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
+
+        },    
+
         'clientes': {
                         'primary':['nombre_completo','estatus','correo_electronico'],
                         'data':{'información general':['telefono']}
@@ -549,33 +569,76 @@ def get_summary_data(table_name):
         'proyectos': {
                         'primary':['cliente.nombre_completo','servicio.nombre','espacio.nombre','fecha_inicio'],
                         'data':{'información general':['id_integrante.nombre_completo']}
-                        },                        
+                        },
     }
     data=data.get(table_name,'')
     return data
 # get_kpi(table_name,'sql_name',{'variable': id_parent_record})
 def get_summary_kpis(table_name,id_parent_record):
     data = {
-        'clientes': {
+        'almacenes': {
+            'actividades': {
+                'compras_por_recibir': Compras.query.filter(Compras.estatus.in_(['En revisión', 'Aprobada','Recibida parcial']),Compras.id_almacen==id_parent_record).count(),
+                'recepciones_abiertas': RecepcionesDeCompras.query.filter(RecepcionesDeCompras.estatus.in_(['En revisión', 'Aprobada'])).count(),
+                'ajustes_abiertos': AjustesDeInventario.query.filter(AjustesDeInventario.estatus.in_(['En revisión', 'Aprobado'])).count(),
+                'transferencias_abiertas': TransferenciasDeInventario.query.filter(TransferenciasDeInventario.estatus.in_(['En revisión', 'Aprobada'])).count(),
+                'envios_abiertos': Envios.query.filter(Envios.estatus.in_(['En revisión', 'Aprobada'])).count(),
+            },     
             'generales': {
-                'proyectos': 5
+                'cantidad_en_almacen': Inventario.query.with_entities(func.sum(Inventario.cantidad)).filter(Inventario.id_almacen == id_parent_record).scalar() or 0,
+                'cantidad_en_transito': Inventario.query.with_entities(func.sum(Inventario.cantidad_en_transito)).filter(Inventario.id_almacen == id_parent_record).scalar() or 0,
+                'productos_en_almacen': Inventario.query.filter(Inventario.id_almacen==id_parent_record).count(),
+            },                   
+        },
+        'cuentas_de_banco': {
+            'actividades': {
+                'gastos_abiertos': Gastos.query.filter(Gastos.estatus.in_(['En revisión', 'Aprobada','Recibida parcial'])).count(),
+                'transferencias_abiertas': TransferenciasDeDinero.query.filter(TransferenciasDeDinero.estatus.in_(['En revisión', 'Aprobada'])).count(),
+                'ajustes_abiertos': AjustesDeDinero.query.filter(AjustesDeDinero.estatus.in_(['En revisión', 'Aprobado'])).count(),
+                'pagos_administrativos_abiertos': PagosAdministrativos.query.filter(PagosAdministrativos.estatus.in_(['En revisión', 'Aprobada'])).count(),
+                'pagos_nomina_abiertos': PagosDeNomina.query.filter(PagosDeNomina.estatus.in_(['En revisión', 'Aprobada'])).count(),
+            },     
+            'generales': {
+                'entradas_del_mes': 100,
+                'salidas_del_mes': 100,
             },
         },
-        'proyectos': {
-            'generales': {
-                'actividades': '3/5',
+        'proveedores': {
+            'actividades': {
+                'compras_abiertas': Compras.query.filter(Compras.estatus.in_(['En revisión', 'Aprobada','Recibida parcial']),Compras.id_proveedor==id_parent_record).count(),
+                'gastos_abiertos': Gastos.query.filter(Gastos.estatus.in_(['En revisión', 'Aprobada']),Gastos.id_proveedor==id_parent_record).count(),
+                'pagos_administrativos_abiertos': PagosAdministrativos.query.filter(PagosAdministrativos.estatus.in_(['En revisión', 'Aprobada']),PagosAdministrativos.id_proveedor==id_parent_record).count(),
             },
-        }        
+            'generales': {
+                'gasto_del_mes': '$100',
+                'compra_del_mes': '$100',
+            },
+        },
+        'integrantes': {
+            'actividades': {
+                'actividades_abiertas': Actividades.query.filter(Actividades.estatus.in_(['Sin iniciar', 'En proceso','Con cambios']),Proyectos.id_integrante==id_parent_record).count(),
+                'actividades_por_revisar': Actividades.query.filter(Actividades.estatus.in_(['Realizada']),Proyectos.id_integrante==id_parent_record).count(),                
+                'proyectos_abiertos': Proyectos.query.filter(Proyectos.estatus.in_(['En proceso']),Proyectos.id_integrante==id_parent_record).count(),
+            },
+            'generales': {
+                'actividades_al_mes': '$100',
+                'timpo_promedio_por_actividad': '$100',
+            },
+        },                   
     }
     data=data.get(table_name,'')
     return data
 
 def get_filter_column(table_name):
     filter={
-        'table_name': {
-            #'column':[{'value': str(p.id),'text': p.nombre} for p in Proveedores.query.filter_by(estatus='Activo').all()],
+        'inventario': {
+            'id_almacen':[{'value': str(p.id),'text': p.nombre} for p in Almacenes.query.filter_by(estatus='Activo').all()],
             #'column':[{'value': 'En revisión','text': 'En revisión'},{'value': 'Aprobada','text': 'Aprobada'}],
         },
+        'pagos_administrativos': {
+            'id_proveedor':[{'value': str(p.id),'text': p.nombre} for p in Proveedores.query.filter_by(estatus='Activo').all()],
+            #'column':[{'value': 'En revisión','text': 'En revisión'},{'value': 'Aprobada','text': 'Aprobada'}],
+        },        
     }
     filter=filter.get(table_name,'')
     return filter

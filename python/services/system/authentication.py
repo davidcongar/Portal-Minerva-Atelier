@@ -175,7 +175,7 @@ def forgotpassword_submit():
         forgot_password_email(correo_electronico,usuario.codigo_unico)
         usuario.intentos_de_inicio_de_sesion=0
         db.session.commit()
-    flash("Si el correo electrónico ingresado esta registrado, recibirás las intrucciones para cambiar la contraseña.", "danger")
+    flash("Si el correo electrónico ingresado esta registrado, recibirás las intrucciones para cambiar la contraseña.", "info")
     return redirect(url_for('auth.login'))
 
 @auth_bp.route("/logout")

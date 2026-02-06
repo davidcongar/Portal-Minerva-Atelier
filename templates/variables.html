@@ -1,25 +1,25 @@
 <!--Dynamic tables variables-->
-{% set no_tabs= ['logs_auditoria','ai_queries',,'archivos','inventario','productos_en_recepciones_de_compras','servicios_en_facturas','facturas_en_ingresos','gastos_y_compras_en_pagos'] %}
+{% set no_tabs= ['logs_auditoria','ai_queries','archivos','inventario','productos_en_recepciones_de_compras','servicios_en_facturas','facturas_en_ingresos','gastos_y_compras_en_pagos'] %}
 {% set no_tab_count = ['No transferible','Cobrada','Cerrado','Cerrada','Finalizada','Finalizado','Cancelado','Cancelada','Pagado','Pagada','Realizada','Realizado','Perdido','Inactivo'] %}
 {% set no_add_button = ['logs_auditoria','ai_queries','servicios_en_facturas','briefs_de_clientes','facturas_en_ingresos','logs_auditoria','inventario'] %}
 {% set no_edit_button = ['logs_auditoria','ai_queries','inventario','actividades','briefs_de_clientes','servicios_en_facturas','gastos_en_pagos','facturas_en_ingresos','ventas','servicios_en_ventas'] %}
-{% set date_range_search = ['fecha_venta','fecha_orden','fecha_de_gasto','fecha_de_transferencia','fecha','fecha_hora']  %}
-{% set percentage_format_columns = [] %}
-{% set money_format_columns=['balance','importe_pagado','importe_total','importe','precio_unitario','iva'] %}
+{% set date_range_search = ['fecha_venta','fecha_orden','fecha_de_gasto','fecha_de_ajuste','fecha_de_transferencia','fecha','fecha_hora','fecha_pago']  %}
+{% set percentage_format_columns = ['descuento_porcentaje'] %}
+{% set money_format_columns=['balance','importe_pagado','subtotal','importe_total','importe','importe_restante','precio_unitario','iva','costos_adicionales'] %}
 
 {% set purple_badge_values = ['En revisión','Pendiente','Swipe','Sin iniciar'] %}
-{% set primary_badge_values = ['Recibida parcial','En proceso'] %}
+{% set primary_badge_values = ['Recibida parcial','En proceso','Pagado parcial','En tránsito'] %}
 {% set success_badge_values = ['Aprobada','Aprobado','Activo','Confirmada','Perfect match'] %}
 {% set warning_badge_values = [] %}
 {% set danger_badge_values = [] %}
-{% set gray_badge_values = ['Cancelada','Recibida','Inactivo','Contestado','Finalizada','Cobrada'] %}
+{% set gray_badge_values = ['Cancelada','Recibida','Inactivo','Contestado','Finalizada','Cobrada','Realizada','Realizado','Pagado','Pagada'] %}
 
 {% set calendar_titles = {'agenda':['hora_inicio']} %}
 
 <!--Dynamic form variables-->
 {% set columns_foreign_options= ['espacio','regimen_fiscal','tipo_de_iva','unidad_de_medida','inventariable','prioridad','estatus', 'genero','estado_civil','tipo_de_cuenta','tipo_de_ajuste','forma_de_pago','uso_de_cfdi','metodo_de_pago'] %}
 {% set date_time_columns=[] %}
-{% set date_columns=['fecha_entrega_estimada'] %}
+{% set date_columns=['fecha_entrega_estimada','fecha_pago'] %}
 {% set time_columns=['hora_inicio','hora_fin'] %}
 {% set file_columns=[] %}
 
@@ -39,7 +39,7 @@
     {{ option.id_visualizacion ~ ' - ' ~ option.cliente.nombre_completo }}
 {% endmacro %}
 <!--Dynamic two table variables-->
-{% set textarea_columns= [] %}
-{% set number_colums = [] %}
+{% set textarea_columns= ['notas'] %}
+{% set number_columns = ['cantidad_ordenada','cantidad','cantidad_recibida'] %}
 {% set text_columns = ['respuesta'] %}
 {% set allow_new_value_dropdowns = [] %}

@@ -7,61 +7,61 @@ from python.services.dynamic_functions.general_functions import *
 
 def get_variables_double_table_view(table_name):
     columns = {
-        "compras": {
-            "columns_first_table":["nombre","unidad_de_medida","precio_unitario"],
-            "columns_second_table":["nombre","unidad_de_medida","cantidad_ordenada","precio_unitario","subtotal","descuento_porcentaje","importe_total","fecha_entrega_estimada"],
-            "title_first_table":"Productos de proveedor",
-            "title_second_table":"Productos en orden de compra",
-            "query_first_table":"productos",
-            "query_second_table":"productos_en_compras",
-            "model_first_table":"productos",
-            "model_second_table":"productos_en_compras",
-            "details":["id_visualizacion","proveedor.nombre",'importe_total'],
-            "edit_fields":['cantidad_ordenada','descuento_porcentaje','subtotal','fecha_entrega_estimada'],
-            "required_fields":[''],
-            "url_confirm":"compras.confirm"                   
+        'compras': {
+            'columns_first_table':['nombre','unidad_de_medida','precio_unitario'],
+            'columns_second_table':['nombre','unidad_de_medida','cantidad_ordenada','precio_unitario','subtotal','descuento_porcentaje','importe_total','fecha_entrega_estimada'],
+            'title_first_table':'Productos de proveedor',
+            'title_second_table':'Productos en orden de compra',
+            'query_first_table':'productos',
+            'query_second_table':'productos_en_compras',
+            'model_first_table':'productos',
+            'model_second_table':'productos_en_compras',
+            'details':['id_visualizacion','proveedor.nombre','importe_total'],
+            'edit_fields':['cantidad_ordenada','descuento_porcentaje','subtotal','fecha_entrega_estimada'],
+            'required_fields':[''],
+            'url_confirm':'compras.confirm'                   
         },    
-        "recepciones_de_compras": {
-            "columns_first_table":["producto","unidad_de_medida","cantidad_ordenada","cantidad_por_recibir"],
-            "columns_second_table":["producto","unidad_de_medida","cantidad"],
-            "title_first_table":"Productos en compra",
-            "title_second_table":"Productos en recepción",
-            "query_first_table":"prod_compras",
-            "query_second_table":"prod_recepcion",
-            "model_first_table":"productos_en_compras",
-            "model_second_table":"productos_en_recepciones_de_compras",
-            "edit_fields":['cantidad','lote','fecha_de_caducidad'],
-            "details":["id_visualizacion","compras.proveedor.nombre"],
-            "required_fields":[''],
-            "url_confirm":"recepciones_de_compras.confirm"  
+        'recepciones_de_compras': {
+            'columns_first_table':['producto','unidad_de_medida','cantidad_ordenada','cantidad_por_recibir'],
+            'columns_second_table':['producto','unidad_de_medida','cantidad'],
+            'title_first_table':'Productos en compra',
+            'title_second_table':'Productos en recepción',
+            'query_first_table':'prod_compras',
+            'query_second_table':'prod_recepcion',
+            'model_first_table':'productos_en_compras',
+            'model_second_table':'productos_en_recepciones_de_compras',
+            'edit_fields':['cantidad','lote','fecha_de_caducidad'],
+            'details':['id_visualizacion','compras.proveedor.nombre'],
+            'required_fields':[''],
+            'url_confirm':'recepciones_de_compras.confirm'  
         },  
-        "transferencias_de_inventario": {
-            "columns_first_table":["almacen","producto","cantidad_disponible"],
-            "columns_second_table":["producto","cantidad","cantidad_disponible"],
-            "title_first_table":"Inventario disponible",
-            "title_second_table":"Productos a transferir",
-            "query_first_table":"inventario_disponible",
-            "query_second_table":"productos_en_transferencia_de_inventario",
-            "model_first_table":"inventario",
-            "model_second_table":"productos_en_transferencias_de_inventario",
-            "details":["id_visualizacion","almacen_entrada","almacen_salida"],
-            "edit_fields":['cantidad',"id_posicion_de_sub_almacen_entrada"],
-            "required_fields":[''],
-            "url_confirm":"transferencias_de_inventario.confirm"  
+        'transferencias_de_inventario': {
+            'columns_first_table':['almacen','producto','cantidad_disponible'],
+            'columns_second_table':['producto','cantidad','cantidad_disponible'],
+            'title_first_table':'Inventario disponible',
+            'title_second_table':'Productos a transferir',
+            'query_first_table':'inventario_disponible',
+            'query_second_table':'productos_en_transferencia_de_inventario',
+            'model_first_table':'inventario',
+            'model_second_table':'productos_en_transferencias_de_inventario',
+            'details':['id_visualizacion','almacen_salida.nombre','almacen_entrada.nombre'],
+            'edit_fields':['cantidad','id_posicion_de_sub_almacen_entrada'],
+            'required_fields':[''],
+            'url_confirm':'transferencias_de_inventario.confirm'  
         },    
-        "pagos_administrativos": {
-            "columns_first_table":["id_","tipo","proveedor","notas", "importe_total","importe_pagado","importe_restante"],
-            "columns_second_table":["tipo","proveedor","importe","importe_restante","notas"],
-            "title_first_table":"Compras y Gastos de Proveedor",
-            "title_second_table":"Compras y Gastos en Pago",
-            "query_first_table":"compras_gastos_proveedor",
-            "query_second_table":"compras_gastos_pago",
-            "model_first_table":"gastos",
-            "model_second_table":"gastos_y_compras_en_pagos",
-            "details":["id_visualizacion","proveedor.nombre","importe"],
-            "edit_fields":['notas','importe'],
-            "required_fields":[''],
-            "url_confirm":"pagos_administrativos.confirm"  
+        'pagos_administrativos': {
+            'columns_first_table':['id_','tipo','proveedor','notas', 'importe_total','importe_pagado','importe_restante'],
+            'columns_second_table':['tipo','proveedor','importe','importe_restante','notas'],
+            'title_first_table':'Compras y Gastos de Proveedor',
+            'title_second_table':'Compras y Gastos en Pago',
+            'query_first_table':'compras_gastos_proveedor',
+            'query_second_table':'compras_gastos_pago',
+            'model_first_table':'gastos',
+            'model_second_table':'gastos_y_compras_en_pagos',
+            'details':['id_visualizacion','proveedor.nombre','importe'],
+            'edit_fields':['notas','importe'],
+            'required_fields':[''],
+            'url_confirm':'pagos_administrativos.confirm'  
         },                   
     }
     columns=columns.get(table_name,'')

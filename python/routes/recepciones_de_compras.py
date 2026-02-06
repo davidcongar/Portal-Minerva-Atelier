@@ -20,7 +20,7 @@ recepciones_de_compras_bp = Blueprint("recepciones_de_compras", __name__,url_pre
 def aprobar(id):
     try:
         record=RecepcionesDeCompras.query.get(id)
-        if record.estatuss=='En revisión':
+        if record.estatus=='En revisión':
             record.estatus="Aprobada"
             db.session.commit()
             flash('La recepción de recepcion de compra ha sido Aprobada.','success')

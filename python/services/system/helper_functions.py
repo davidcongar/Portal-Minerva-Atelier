@@ -73,7 +73,8 @@ def sanitize_data(model, data):
 
                 value = t
         elif "date" in col_type_str:
-            value=value
+            if value=='':
+                value=None
         # 🧩 3. Convierte cadenas vacías según tipo
         elif value == "" or value is None:
             if any(t in col_type_str for t in ["date", "time", "timestamp", "uuid", "json"]):

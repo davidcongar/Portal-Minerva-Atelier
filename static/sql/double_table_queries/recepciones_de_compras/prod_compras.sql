@@ -1,20 +1,32 @@
-with orden as (
-    select
+WITH orden AS (
+    SELECT
         id_compra
-    from recepciones_de_compras
-    where id=:id_main_record
+    FROM recepciones_de_compras
+    WHERE id = :id_main_record
+),
+productos_seleccionados AS (
+    SELECT
+        id_producto
+    FROM productos_en_recepciones_de_compras
+    WHERE id_recepcion_de_compra = :id_main_record
 )
-select
+SELECT
     prod.id,
-    productos.nombre as producto,
-    unidad_de_medida,
-    cantidad_ordenada,
-    cantidad_ordenada-cantidad_recibida as cantidad_por_recibir,
+    productos.nombre AS producto,
+    productos.unidad_de_medida,
+    prod.cantidad_ordenada,
+    prod.cantidad_ordenada - prod.cantidad_recibida AS cantidad_por_recibir,
     prod.fecha_de_creacion
-from productos_en_compras as prod
-left join productos
-    on prod.id_producto=productos.id
-join orden on prod.id_compra=orden.id_compra
-where
-    prod.cantidad_ordenada>prod.cantidad_recibida
-order by nombre
+FROM productos_en_compras AS prod
+LEFT JOIN productos
+    ON prod.id_producto = productos.id
+LEFT JOIN orden
+    ON prod.id_compra = orden.id_compra
+WHERE
+    prod.cantidad_ordenada > prod.cantidad_recibida
+    AND NOT EXISTS (
+        SELECT 1
+        FROM productos_seleccionados ps
+        WHERE ps.id_producto = productos.id
+    )
+ORDER BY productos.nombre

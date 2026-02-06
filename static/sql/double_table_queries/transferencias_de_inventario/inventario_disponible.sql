@@ -4,6 +4,12 @@ with almacen_salida as (
     from transferencias_de_inventario
     where 
         id=:id_main_record
+),
+productos_seleccionados AS (
+    SELECT
+        id_producto
+    FROM productos_en_transferencias_de_inventario
+    WHERE id_transferencia_de_inventario = :id_main_record
 )
 select
     inv.id as id,
@@ -20,3 +26,8 @@ left join productos
     on inv.id_producto=productos.id
 where
     cantidad>0
+    AND NOT EXISTS (
+        SELECT 1
+        FROM productos_seleccionados ps
+        WHERE ps.id_producto = productos.id
+    )    

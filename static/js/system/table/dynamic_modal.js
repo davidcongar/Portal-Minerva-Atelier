@@ -178,7 +178,7 @@ async function get_record(form, recordId) {
                             </button>
                         </td>
                     `;
-                } else if (!['id'].includes(key)) {
+                } else if (!['id','id_categoria_de_gasto','id_proveedor','id_cuenta_de_banco'].includes(key)) {
                     // ---- File ----
                     if (key.includes('archivo')) {
                         const [uuid, name] = value.split("__");

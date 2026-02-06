@@ -1,13 +1,10 @@
 <!-- templates/main/dashboard.htmla -->
 {% extends './partials/system/layout1.html' %}
 {% block content %}
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="/static/js/system/apexcharts.js"></script>
 <script src="/static/js/charts/general.js"></script>
 <script src="/static/js/charts/waterfall.js"></script>
-<script src="/static/js/system/data_table.js"></script>
-<script src="/static/js/system/loader.js"></script>
-<script src="/static/js/system/dynamic_table_init.js"></script>
-<script src="/static/js/system/format_functions.js"></script>
+<script src="/static/js/system/table/loader.js"></script>
 <script src="/static/js/system/funciones_generales.js"></script>
 
 <div id="main" class=" pt-5">
@@ -146,9 +143,6 @@
     </div>
     {% include "./partials/system/loader.html" %}
 </div>
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>  

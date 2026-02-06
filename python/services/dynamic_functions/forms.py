@@ -89,6 +89,7 @@ def get_ignored_columns(table_name):
         'agenda':{'id_integrante','hora_fin','motivo_de_cancelacion','notas'},
         'ventas':{'id_stripe','id_cuenta_de_banco','importe_total','iva','tipo_de_iva','precio_unitario','importe'},
         'servicios_en_ventas':{'id_proyecto','precio_unitario','importe','id_precio_stripe','cantidad'},   
+        'transferencias_de_inventario':{'fecha_de_recepcion'},   
 
     }
     columns=columns.get(table_name,columnas_generales) | columnas_generales
@@ -105,7 +106,7 @@ def get_ignored_columns_edit(table_name,estatus):
         'integrantes': {'default':{'fecha_terminacion','estatus'}},
         'compras': {'default':{'importe_total','subtotal','descuentos','estatus_de_pago','estatus'}},
         'ajustes_de_inventario': {'default':{'cantidad','tipo_de_ajuste','id_almacen','id_producto','estatus'}},
-        'transferencias_de_inventario': {'default':{'id_almacen_salida','id_almacen_entrada','estatus'}},
+        'transferencias_de_inventario': {'default':{'id_almacen_salida','fecha_de_recepcion','id_almacen_entrada','estatus'}},
         'pagos_administrativos':{'default':{'importe','estatus'}},
         'preguntas_de_briefs':{'default':{'id_brief'}},
         'actividades_base':{'default':{'id_servicio'}},
@@ -139,6 +140,7 @@ def get_non_mandatory_columns(table_name):
         'integrantes':{'rfc','curp','numero_seguridad_social','direccion','codigo_postal','telefono','correo_electronico','genero','estado_civil','fecha_nacimiento'},
         'briefs': {'id_servicio'},
         'briefs_de_clientes': {'id_proyecto'},
+        'gastos_recurrentes': {'id_cuenta_de_banco'} ,
     }
     columns=columns.get(table_name,{''}) | columnas_generales
     return columns

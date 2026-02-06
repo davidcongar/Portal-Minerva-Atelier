@@ -1,7 +1,18 @@
-<div class="flex justify-end items-center gap-2" x-data x-show="true">
-    <template x-if="$store.modalData.record">
-        <button type="submit"
-            @click.stop="window.location.href='/dynamic/gastos/form?id_categoria_de_gasto='+$store.modalData.getField('id')_categoria_de_gasto+'&id_cuenta_de_banco='+$store.modalData.getField('id')_cuenta_de_banco+'&id_proveedor='+$store.modalData.getField('id')_proveedor+'&importe='+$store.modalData.record.importe+'&notas='+$store.modalData.record.notas"
+<div class="flex justify-end items-center gap-2" x-data="{}" x-show="true">
+    <template x-if="$store.modalData">
+        <button
+            type="button"
+            @click.stop="
+                window.location.href =
+                    '/dynamic/gastos/form?' +
+                    new URLSearchParams({
+                        id_cuenta_de_banco: $store.modalData.getField('id_cuenta_de_banco'),
+                        id_categoria_de_gasto: $store.modalData.getField('id_categoria_de_gasto'),
+                        id_proveedor: $store.modalData.getField('id_proveedor'),
+                        importe: $store.modalData.getField('importe'),
+                        notas: $store.modalData.getField('notas'),
+                    }).toString()
+            "
             class="btn border text-primary border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-primary bg-primary/10">
             Generar Gasto
         </button>

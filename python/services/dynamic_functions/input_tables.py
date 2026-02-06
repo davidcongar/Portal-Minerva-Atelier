@@ -6,16 +6,26 @@ from python.services.dynamic_functions.general_functions import *
 
 def get_variables_table_view_input(table_name):
     columns = {
-        "briefs_de_clientes": {
-            "columns":["pregunta","respuesta"],
-            "table_title":"Preguntas de Brief",
-            "query_table":"respuestas_briefs_de_clientes",
-            "table_name":"respuestas_briefs_de_clientes",
-            "edit_fields":['respuesta'],
-            "required_fields":['respuesta'],
-            "details":['cliente.nombre_completo','brief.nombre'],
-            "url_confirm":"briefs_de_clientes.confirmar",
+        'briefs_de_clientes': {
+            'columns':['pregunta','respuesta'],
+            'table_title':'Preguntas de Brief',
+            'query_table':'respuestas_briefs_de_clientes',
+            'table_name':'respuestas_briefs_de_clientes',
+            'edit_fields':['respuesta'],
+            'required_fields':['respuesta'],
+            'details':['cliente.nombre_completo','brief.nombre'],
+            'url_confirm':'briefs_de_clientes.confirmar',
         },
+        'transferencias_de_inventario': {
+            'columns':['producto','cantidad_enviada','cantidad_recibida','notas'],
+            'table_title':'Productos en Transferencia',
+            'query_table':'productos_en_transferencias_de_inventario',
+            'table_name':'productos_en_transferencias_de_inventario',
+            'edit_fields':['cantidad_recibida','notas'],
+            'required_fields':['cantidad_recibida'],
+            'details':['almacen_salida.nombre','almacen_entrada.nombre'],
+            'url_confirm':'transferencias_de_inventario.finalizar',
+        },        
     }
     columns=columns.get(table_name,'')
     return columns
@@ -23,16 +33,21 @@ def get_variables_table_view_input(table_name):
 
 def get_update_validation(table_name,record,column,value):
     validation={}
+    validation['status']=1    
     if table_name=='productos_en_compras' and column in ('cantidad_ordenada','descuento_porcentaje','precio_unitario'):
         if column=='cantidad_ordenada':
             record.subtotal=float(value)*record.precio_unitario
             record.importe_total=record.subtotal*(100-record.descuento_porcentaje)/100   
         elif column=='descuento_porcentaje':
-            record.importe_total=record.subtotal*(100-float(value))/100      
+            if float(value)>=100:
+                validation['message']='El porcentaje de descuento no puede ser mayor a 100.'
+                validation['status']=0
+                validation['value_warning']=record.descuento_porcentaje
+            else:
+                record.importe_total=record.subtotal*(100-float(value))/100  
         elif column=='precio_unitario':
             record.subtotal=float(value)*record.cantidad_ordenada
             record.importe_total=record.subtotal*(100-record.descuento_porcentaje)/100   
-        validation['status']=1
     elif table_name=='productos_en_recepciones_de_compras' and column in ('cantidad'):
         recepcion=RecepcionesDeCompras.query.get(record.id_recepcion_de_compra)
         oc=Compras.query.get(recepcion.id_compra)
@@ -40,11 +55,10 @@ def get_update_validation(table_name,record,column,value):
         cantidad_global=prod_oc.cantidad_recibida-record.cantidad+float(value)
         if cantidad_global>prod_oc.cantidad_ordenada:
             validation['status']=0
-            validation['value_warning']=prod_oc.cantidad_recibida          
-            validation['message']="La cantidad a recibir no puede ser mayor a la cantidad ordenada."
+            validation['value_warning']=prod_oc.cantidad_recibida
+            validation['message']=f'La cantidad a recibir no puede ser mayor a la cantidad faltante de recibir, {prod_oc.cantidad_ordenada-prod_oc.cantidad_recibida}'
         else:
             prod_oc.cantidad_recibida=cantidad_global
-            validation['status']=1
             db.session.flush()
     elif table_name=='productos_en_transferencias_de_inventario':
         if column=='cantidad':
@@ -53,12 +67,19 @@ def get_update_validation(table_name,record,column,value):
             if float(value)>cantidad_disponible:
                 validation['status']=0
                 validation['value_warning']=record.cantidad         
-                validation['message']="La cantidad a transferir no puede ser mayor a la cantidad disponible en inventario."
+                validation['message']='La cantidad a transferir no puede ser mayor a la cantidad disponible en inventario.'
             else:
                 # agregar a no disponible
                 inventario.cantidad=inventario.cantidad+record.cantidad-float(value)
                 inventario.cantidad_en_transito=inventario.cantidad_en_transito-record.cantidad+float(value)
-                validation['status']=1
+                record.cantidad_recibida=value
+        elif column=='cantidad_recibida':
+            if float(value)>record.cantidad:
+                validation['status']=0
+                validation['value_warning']=record.cantidad
+                record.cantidad_recibida=record.cantidad
+                db.session.commit()
+                validation['message']='La cantidad a recibir no puede ser mayor a la cantidad enviada.'
     elif table_name=='gastos_y_compras_en_pagos':
         if record.id_gasto:
             main_record=Gastos.query.get(record.id_gasto)
@@ -66,7 +87,7 @@ def get_update_validation(table_name,record,column,value):
                     db.session.query(func.sum(GastosYComprasEnPagos.importe))
                     .join(PagosAdministrativos, GastosYComprasEnPagos.id_pago == PagosAdministrativos.id)
                     .filter(GastosYComprasEnPagos.id_gasto == record.id_gasto,GastosYComprasEnPagos.id!=record.id)
-                    .filter(PagosAdministrativos.estatus != "Cancelado")
+                    .filter(PagosAdministrativos.estatus != 'Cancelado')
                     .scalar()
                 ) or 0
             importe_restante=main_record.importe-importe_pagado
@@ -76,18 +97,15 @@ def get_update_validation(table_name,record,column,value):
                     db.session.query(func.sum(GastosYComprasEnPagos.importe))
                     .join(PagosAdministrativos, GastosYComprasEnPagos.id_pago == PagosAdministrativos.id)
                     .filter(GastosYComprasEnPagos.id_compra == record.id_compra,GastosYComprasEnPagos.id!=record.id)
-                    .filter(PagosAdministrativos.estatus != "Cancelado")
+                    .filter(PagosAdministrativos.estatus != 'Cancelado')
                     .scalar()
                 ) or 0
             importe_restante=main_record.importe_total-importe_pagado    
         if float(value)>importe_restante:
             validation['status']=0
-            validation['message']="El importe no puede ser mayor al importe restante."
+            validation['message']='El importe no puede ser mayor al importe restante.'
             validation['value_warning']=importe_restante
         else:
             main_record.importe_pagado=main_record.importe_pagado-record.importe+float(value)
-            validation['status']=1                                       
-    else:
-        validation['status']=1
     return validation
 

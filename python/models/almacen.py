@@ -92,7 +92,8 @@ class TransferenciasDeInventario(db.Model,BaseMixin,AuditMixin):
     id_almacen_salida = db.Column(db.UUID, db.ForeignKey("almacenes.id"), nullable=False)
     id_almacen_entrada = db.Column(db.UUID, db.ForeignKey("almacenes.id"), nullable=False)
 
-    fecha_de_transferencia= db.Column(db.Date)
+    fecha_de_transferencia = db.Column(db.Date)
+    fecha_de_recepcion = db.Column(db.Date)
     notas = db.Column(db.Text)
     estatus = db.Column(db.String(50),nullable=False, default="En revisión")
 
@@ -105,6 +106,9 @@ class ProductosEnTransferenciasDeInventario(db.Model,BaseMixin,AuditMixin):
     id_producto = db.Column(db.UUID, db.ForeignKey("productos.id"), nullable=False)
 
     cantidad = db.Column(db.Float, nullable=False, default=0)
+    cantidad_recibida = db.Column(db.Float, nullable=False, default=0)
+
+    notas = db.Column(db.Text)
 
     transferencia_de_inventario = db.relationship("TransferenciasDeInventario", backref="productos_en_transferencias_de_inventario", lazy="joined")
     producto = db.relationship("Productos", backref="productos_en_transferencias_de_inventario", lazy="joined")

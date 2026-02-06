@@ -50,7 +50,7 @@
                     </a>
                 </li>
                 {% endif %}  
-                {% if can_access('/dynamic/almacenes/view') or can_access('/dynamic/categorias_de_productos/view') or can_access('/dynamic/productos/view') or can_access('/dynamic/inventario/view') or can_access('/dynamic/recepciones_de_compras/view') or can_access('/dynamic/ajustes_de_inventario/view') or can_access('/dynamic/transferencias_de_inventario/view') or can_access('/dynamic/envios/view') %}
+                {% if can_access('/dynamic/almacenes/view') or can_access('/dynamic/productos/view') or can_access('/dynamic/inventario/view') or can_access('/dynamic/recepciones_de_compras/view') or can_access('/dynamic/ajustes_de_inventario/view') or can_access('/dynamic/transferencias_de_inventario/view') or can_access('/dynamic/envios/view') %}
                     <li class="menu nav-item">
                         <a href="javascript:;" class="nav-link group items-center justify-between"
                             :class="{'active' : activeMenu === 'almacen'}"
@@ -78,9 +78,6 @@
                             <li>
                                 {% if can_access('/dynamic/almacenes/view') %}                                
                                     <a :class="{'active': activeItem === 'almacenes'}" href="/dynamic/almacenes/view">almacenes</a>
-                                {% endif %}
-                                {% if can_access('/dynamic/categorias_de_productos/view') %}                                
-                                    <a :class="{'active': activeItem === 'categorias_de_productos'}" href="/dynamic/categorias_de_productos/view">categorías de productos</a>
                                 {% endif %}
                                 {% if can_access('/dynamic/productos/view') %}                                
                                     <a :class="{'active': activeItem === 'productos'}" href="/dynamic/productos/view">productos</a>
@@ -147,7 +144,7 @@
                         </ul>
                     </li>
                 {% endif %} 
-                {% if can_access('/dynamic/proveedores/view') or can_access('/dynamic/categorias_de_gastos/view') or can_access('/dynamic/gastos/view') or can_access('/dynamic/gastos_recurrentes/view') or can_access('/dynamic/precios_de_proveedores/view')  or can_access('/dynamic/compras/view') %}
+                {% if can_access('/dynamic/proveedores/view') or can_access('/dynamic/gastos/view') or can_access('/dynamic/gastos_recurrentes/view') or can_access('/dynamic/precios_de_proveedores/view')  or can_access('/dynamic/compras/view') %}
                     <li class="menu nav-item">
                         <a href="javascript:;" class="nav-link group items-center justify-between"
                             :class="{'active' : activeMenu === 'com pras'}"
@@ -175,9 +172,6 @@
                             <li>
                                 {% if can_access('/dynamic/proveedores/view') %}                                
                                     <a :class="{'active': activeItem === 'proveedores'}" href="/dynamic/proveedores/view">proveedores</a>
-                                {% endif %}
-                                {% if can_access('/dynamic/categorias_de_gastos/view') %}                                
-                                    <a :class="{'active': activeItem === 'categorias_de_gastos'}" href="/dynamic/categorias_de_gastos/view">categorías de gastos</a>
                                 {% endif %}
                                 {% if can_access('/dynamic/gastos/view') %}                                
                                     <a :class="{'active': activeItem === 'gastos'}" href="/dynamic/gastos/view">gastos</a>

@@ -15,9 +15,16 @@
     </template>
     <template x-if="$store.modalData.getField('estatus') === 'Aprobada'">
         <button type="submit"
-            @click.stop.prevent="window.location.href = `/transferencias_de_inventario/finalizar/${encodeURIComponent($store.modalData.getField('id'))}?return_url=${encodeURIComponent(window.location.href)}`"
+            @click.stop.prevent="window.location.href = `/transferencias_de_inventario/en_transito/${encodeURIComponent($store.modalData.getField('id'))}?return_url=${encodeURIComponent(window.location.href)}`"
             class="btn border text-primary border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-primary bg-primary/10">
-            Finalizar
+            En tránsito
+        </button>
+    </template>    
+    <template x-if="$store.modalData.getField('estatus') === 'En tránsito'">
+        <button type="submit"
+            @click.stop.prevent="window.location.href = `/transferencias_de_inventario/recibir/${encodeURIComponent($store.modalData.getField('id'))}?return_url=${encodeURIComponent(window.location.href)}`"
+            class="btn border text-primary border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-primary bg-primary/10">
+            Recibir
         </button>
     </template>
     <template x-if="['En revisión', 'Aprobada'].includes($store.modalData.getField('estatus'))">
