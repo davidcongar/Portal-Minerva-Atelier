@@ -13,8 +13,12 @@ from python.services.system.helper_functions import *
 from python.services.dynamic_functions.general_functions import *
 from config import *
 import stripe
+from dotenv import load_dotenv
+load_dotenv()
+
 #4242424242424242
-YOUR_DOMAIN = 'http://localhost:8000'
+DOMAIN = os.getenv('DOMAIN')
+stripe.api_key = os.getenv('STRIPE_API_KEY')
 
 ventas_bp = Blueprint("ventas", __name__,url_prefix="/ventas")
 
@@ -33,8 +37,8 @@ def create_checkout_session(id):
             checkout_session = stripe.checkout.Session.create(
                 line_items=line_items,
                 mode='payment',
-                success_url=f"{YOUR_DOMAIN}/ventas/success?session_id={{CHECKOUT_SESSION_ID}}",
-                cancel_url=f"{YOUR_DOMAIN}/ventas/cancelar",
+                success_url=f"{DOMAIN}/ventas/success?session_id={{CHECKOUT_SESSION_ID}}",
+                cancel_url=f"{DOMAIN}/ventas/cancelar",
                 payment_intent_data={'metadata':{'id_venta':id}},
                 metadata={"id_venta": id}
             )

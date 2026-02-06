@@ -10,7 +10,7 @@ from python.services.dynamic_functions.general_functions import *
 from python.services.system.email import *
 from python.services.system.helper_functions import *
 from config import *
-
+from python.services.stripe import *
 #####
 # funciones de formulariosa
 #####
@@ -75,3 +75,8 @@ def servicios_en_ventas(id):
     record.importe=record.precio_unitario*record.cantidad
     venta=Ventas.query.get(record.id_venta)
     actualizar_venta(venta)    
+
+@handler_on_success('precios_de_servicios')
+def precios_de_servicios(id):
+    create_product(id)
+    create_price(id)

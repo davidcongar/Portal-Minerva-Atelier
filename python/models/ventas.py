@@ -10,7 +10,9 @@ class Servicios(db.Model,BaseMixin,AuditMixin):
 
     nombre = db.Column(db.String(100))
     descripcion = db.Column(db.Text)
+
     estatus = db.Column(db.String(255),default="Activo")
+
 
 class Espacios(db.Model,BaseMixin,AuditMixin):
 
@@ -26,7 +28,8 @@ class PreciosDeServicios(db.Model,BaseMixin,AuditMixin):
     precio_unitario = db.Column(db.Float, nullable=False)
 
     estatus = db.Column(db.String(255),default="Activo")
-    id_stripe = db.Column(db.String(255))
+    id_stripe_precio = db.Column(db.String(255))
+    id_stripe_producto = db.Column(db.String(255))
 
     servicio = db.relationship('Servicios', backref='precios_de_servicios', lazy=True)
     espacio = db.relationship('Espacios', backref='precios_de_servicios', lazy=True)

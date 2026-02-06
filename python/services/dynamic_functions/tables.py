@@ -169,7 +169,7 @@ def get_columns(table_name,section):
         },
         'precios_de_servicios': {
             'main_page': ['id_visualizacion','id_servicio_nombre','id_espacio_nombre','precio_unitario','estatus'],
-            'modal': {'informacion_general':['id','id_visualizacion','id_servicio_nombre','id_espacio_nombre','estatus'],'financiero':['precio_unitario'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
+            'modal': {'informacion_general':['id','id_visualizacion','id_servicio_nombre','id_espacio_nombre','estatus'],'financiero':['precio_unitario'],'stripe':['id_stripe_producto','id_stripe_precio'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
             'pdf': ['id_visualizacion','id_servicio_nombre','precio_unitario','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'cotizaciones': {

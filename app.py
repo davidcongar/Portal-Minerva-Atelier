@@ -175,6 +175,8 @@ from python.routes.ventas import ventas_bp
 app.register_blueprint(ventas_bp)
 from python.routes.clientes import clientes_bp
 app.register_blueprint(clientes_bp)
+from python.routes.precios_de_servicios import precios_de_servicios_bp
+app.register_blueprint(precios_de_servicios_bp)
 from python.routes.actividades import actividades_bp
 app.register_blueprint(actividades_bp)
 

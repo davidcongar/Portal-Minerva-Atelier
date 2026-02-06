@@ -9,6 +9,7 @@ from datetime import date, datetime
 from python.services.dynamic_functions.general_functions import *
 from python.services.system.helper_functions import *
 from python.services.system.email import *
+from python.services.stripe import *
 
 #####
 # funciones de formularios
@@ -96,3 +97,9 @@ def actividades(id,changed_fields):
                 f"Actividad: {record.actividad_base.nombre}",
             ]
         )    
+
+@handler_edit_on_success('precios_de_servicios')
+def precios_de_servicios(id,changed_fields):
+    precio_changed = field_changed(changed_fields, "precio_uhnitario")
+    if precio_changed:
+        modify_price(id)

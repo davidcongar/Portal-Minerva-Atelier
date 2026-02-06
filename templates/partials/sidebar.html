@@ -314,7 +314,7 @@
                         <ul x-cloak x-show="activeMenu === 'ventas'" x-collapse class="sub-menu flex flex-col gap-1">
                             <li>
                                 {% if can_access('/dynamic/espacios/view') %}                                
-                                    <a :class="{'active': activeItem === 'espacios'}" href="/dynamic/espacios/view">espacios de proyectos</a>
+                                    <a :class="{'active': activeItem === 'espacios'}" href="/dynamic/espacios/view">espacios</a>
                                 {% endif %}
                                 {% if can_access('/dynamic/servicios/view') %}                                
                                     <a :class="{'active': activeItem === 'servicios'}" href="/dynamic/servicios/view">servicios</a>

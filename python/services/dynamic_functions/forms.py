@@ -71,7 +71,7 @@ def get_multiple_choice_data():
     return multiple_choice_data
 
 def get_ignored_columns(table_name):
-    columnas_generales = {'fecha_de_creacion', 'estatus', 'id_usuario', 'id_visualizacion', 'fecha_de_actualizacion'}
+    columnas_generales = {'fecha_de_creacion', 'estatus', 'id_usuario', 'id_visualizacion', 'fecha_de_actualizacion','id_stripe','id_stripe_producto','id_stripe_precio'}
     columns = {
         'usuarios':{'codigo_unico','id_rol','contrasena','contrasena_api','intentos_de_inicio_de_sesion','ultima_sesion','ultimo_cambio_de_contrasena','codigo_unico_expira'},
         'archivos':{'tabla_origen','id_registro','nombre_del_archivo','ruta_s3'},
@@ -87,7 +87,7 @@ def get_ignored_columns(table_name):
         'pagos_administrativos':{'importe'},
         'briefs_de_clientes':{'fecha_cierre'},
         'agenda':{'id_integrante','hora_fin','motivo_de_cancelacion','notas'},
-        'ventas':{'id_stripe','id_cuenta_de_banco','importe_total','iva','tipo_de_iva','precio_unitario','importe'},
+        'ventas':{'id_cuenta_de_banco','importe_total','iva','tipo_de_iva','precio_unitario','importe'},
         'servicios_en_ventas':{'id_proyecto','precio_unitario','importe','id_precio_stripe','cantidad'},   
         'transferencias_de_inventario':{'fecha_de_recepcion'},   
 
@@ -96,7 +96,7 @@ def get_ignored_columns(table_name):
     return columns
 
 def get_ignored_columns_edit(table_name,estatus):
-    columnas_generales = {'default':{'fecha_de_creacion', 'id_usuario', 'id_visualizacion', 'fecha_de_actualizacion'}}
+    columnas_generales = {'default':{'fecha_de_creacion', 'id_usuario', 'id_visualizacion', 'fecha_de_actualizacion','id_stripe','id_stripe_producto','id_stripe_precio'}}
     tables = {
         'usuarios':{'default':{'codigo_unico','id_rol','contrasena','contrasena_api','intentos_de_inicio_de_sesion','ultima_sesion','ultimo_cambio_de_contrasena','codigo_unico_expira','estatus'}},
         'archivos':{'default':{'tabla_origen','id_registro','nombre_del_archivo','ruta_s3'}},
