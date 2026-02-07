@@ -31,11 +31,16 @@ def create_checkout_session(id):
             line_items=[]
             for item in items:
                 line_items.append({
-                    "price": item.id_precio_stripe,
+                    "price": item.id_stripe_precio,
                     "quantity": int(item.cantidad)
                 })
+            descuento=Descuentos.query.filter_by(estatus='Activo',codigo_de_descuento=venta.codigo_de_descuento).first()
+            descuentos=[]
+            if descuento:
+                descuentos=[{'coupon':descuento.id_stripe}]
             checkout_session = stripe.checkout.Session.create(
                 line_items=line_items,
+                discounts=descuentos,
                 mode='payment',
                 success_url=f"{DOMAIN}/ventas/success?session_id={{CHECKOUT_SESSION_ID}}",
                 cancel_url=f"{DOMAIN}/ventas/cancelar",

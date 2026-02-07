@@ -38,3 +38,24 @@ def modify_price(id):
             active=False,
         )
     create_price(id)
+
+
+def create_coupon(id):
+    descuento = Descuentos.query.get(id)
+    if descuento.tipo_de_descuento=='Importe':
+        if descuento.id_servicio and descuento.id_espacio:
+            product=PreciosDeServicios.query.filter_by(id_servicio=descuento.id_servicio,id_espacio=descuento.id_espacio).first()
+            if product:
+                coupon = stripe.Coupon.create(amount_off=int(descuento.valor*100),currency="mxn",duration="forever",applies_to={"products": [product.id_stripe_producto]})
+        else:
+            coupon = stripe.Coupon.create(amount_off=int(descuento.valor*100),currency="mxn",duration="forever")
+    elif descuento.tipo_de_descuento=='Porcentaje':
+        if descuento.id_servicio and descuento.id_espacio:
+            product=PreciosDeServicios.query.filter_by(id_servicio=descuento.id_servicio,id_espacio=descuento.id_espacio).first()
+            if product:
+                coupon = stripe.Coupon.create(percent_off=descuento.valor,duration="forever",applies_to={"products": [product.id_stripe_producto]})
+        else:
+            coupon = stripe.Coupon.create(percent_off=descuento.valor,duration="forever")
+
+    descuento.id_stripe = coupon.id
+    db.session.commit()

@@ -40,15 +40,45 @@ class PreciosDeServicios(db.Model,BaseMixin,AuditMixin):
             raise ValueError(f"{key.replace('_',' ').capitalize()} no puede ser negativo")
         return value
 
+class Descuentos(db.Model,BaseMixin,AuditMixin):
+
+    id_servicio=db.Column(db.UUID, db.ForeignKey("servicios.id"))
+    id_espacio=db.Column(db.UUID, db.ForeignKey("espacios.id"))
+    
+    id_stripe=db.Column(db.String(255))
+    codigo_de_descuento = db.Column(db.String(255), nullable=False)
+    tipo_de_descuento=db.Column(db.String(255), nullable=False)
+    valor = db.Column(db.Float, nullable=False, default=0.00)
+
+    estatus = db.Column(db.String(100),nullable=False, default="Activo")
+
+    servicio = db.relationship('Servicios', backref='descuentos',lazy=True)
+    espacio = db.relationship('Espacios', backref='descuentos',lazy=True)
+
+    @validates('valor')
+    def validate_non_negative(self, key, value):
+        if float(value) < 0:
+            raise ValueError(f"{key.replace('_',' ').capitalize()} no puede ser negativo")
+        return value
+
+class ClientesDescuentos(db.Model,BaseMixin,AuditMixin):
+
+    id_descuento = db.Column(db.UUID, db.ForeignKey("descuentos.id"))
+    id_cliente = db.Column(db.UUID, db.ForeignKey("clientes.id"),nullable=False)
+
+    estatus = db.Column(db.String(100),nullable=False, default="Activo")
+
 class Ventas(db.Model,BaseMixin,AuditMixin):
 
     id_cliente = db.Column(db.UUID, db.ForeignKey("clientes.id"),nullable=False)
     id_cuenta_de_banco = db.Column(db.UUID, db.ForeignKey("cuentas_de_banco.id"))
+    id_descuento = db.Column(db.UUID, db.ForeignKey("descuentos.id"))
 
     fecha_de_venta = db.Column(db.Date, nullable=False)
-    codigo_de_descuento = db.Column(db.String(255))
+    subtotal = db.Column(db.Float, nullable=False, default=0.00)
+    codigo_de_descuento = db.Column(db.String(255), nullable=False)
+    importe_descuento = db.Column(db.Float, nullable=False, default=0.00)
     importe = db.Column(db.Float, nullable=False, default=0.00)
-    descuento = db.Column(db.Float, nullable=False, default=0.00)
     tipo_de_iva = db.Column(db.String(255))
     iva = db.Column(db.Float, default=0.00)
     importe_total = db.Column(db.Float, default=0.00)
@@ -58,6 +88,7 @@ class Ventas(db.Model,BaseMixin,AuditMixin):
 
     cliente = db.relationship('Clientes', backref='ventas',lazy=True)
     cuenta_de_banco = db.relationship('CuentasDeBanco', backref='ventas',lazy=True)
+    descuento = db.relationship('Descuentos', backref='ventas',lazy=True)
 
     @validates('importe','importe_total')
     def validate_non_negative(self, key, value):
@@ -74,14 +105,16 @@ class ServiciosEnVentas(db.Model,BaseMixin,AuditMixin):
     metros_cuadrados= db.Column(db.Float, nullable=False, default=0.00)
     cantidad = db.Column(db.Float, nullable=False, default=1)
     precio_unitario = db.Column(db.Float, nullable=False, default=0.00)
+    subtotal = db.Column(db.Float, nullable=False, default=0.00)
+    descuento = db.Column(db.Float, nullable=False, default=0.00)
     importe = db.Column(db.Float, nullable=False, default=0.00)
-    id_precio_stripe = db.Column(db.String(255))
+    id_stripe_precio = db.Column(db.String(255))
 
     venta = db.relationship('Ventas', backref='servicios_en_ventas',lazy=True)
     espacio = db.relationship('Espacios', backref='servicios_en_ventas', lazy=True)
     servicio = db.relationship('Servicios', backref='servicios_en_ventas',lazy=True)
 
-    @validates('importe','precio_unitario')
+    @validates('importe','precio_unitario','subtotal','descuento')
     def validate_non_negative(self, key, value):
         if float(value) < 0:
             raise ValueError(f"{key.replace('_',' ').capitalize()} no puede ser negativo")

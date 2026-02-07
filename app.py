@@ -179,6 +179,8 @@ from python.routes.precios_de_servicios import precios_de_servicios_bp
 app.register_blueprint(precios_de_servicios_bp)
 from python.routes.actividades import actividades_bp
 app.register_blueprint(actividades_bp)
+from python.routes.descuentos import descuentos_bp
+app.register_blueprint(descuentos_bp)
 
 from python.services.system.template_formats import *
 

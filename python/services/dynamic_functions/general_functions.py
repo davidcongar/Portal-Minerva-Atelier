@@ -80,6 +80,27 @@ def calcular_importe_pago(record):
             ) or 0
         
 def actualizar_venta(record):
-    record.importe=(db.session.query(func.sum(ServiciosEnVentas.importe)).filter(ServiciosEnVentas.id_venta == record.id).scalar()) or 0    
-    record.iva=record.importe*.16
-    record.importe_total=record.importe*1.16
+    record.subtotal=(db.session.query(func.sum(ServiciosEnVentas.subtotal)).filter(ServiciosEnVentas.id_venta == record.id).scalar()) or 0
+    if record.codigo_de_descuento:
+        descuento_total=0
+        descuento=Descuentos.query.filter_by(estatus='Activo',codigo_de_descuento=record.codigo_de_descuento).first()
+        if descuento.tipo_de_descuento=='Importe':
+            if descuento.id_servicio and descuento.id_espacio:
+                servicio=ServiciosEnVentas.query.filter_by(id_venta=record.id,id_servicio=descuento.id_servicio,id_espacio=descuento.id_espacio).first()
+                if servicio:
+                    servicio.descuento=descuento.valor
+                    servicio.subtotal=servicio.subtotal-servicio.descuento
+            descuento_total=descuento.valor
+        elif descuento.tipo_de_descuento=='Porcentaje':
+            if descuento.id_servicio and descuento.id_espacio:
+                servicio=ServiciosEnVentas.query.filter_by(id_venta=record.id,id_servicio=descuento.id_servicio,id_espacio=descuento.id_espacio).first()
+                if servicio:
+                    servicio.descuento=servicio.subtotal*descuento.valor/100
+                    servicio.importe_total=servicio.subtotal-servicio.descuento
+                    descuento_total=servicio.descuento
+            else:
+                descuento_total=record.subtotal*descuento.valor/100
+    record.importe_descuento=descuento_total
+    record.importe=record.subtotal-record.importe_descuento
+    record.iva=(record.importe)*.16
+    record.importe_total=(record.importe)*1.16

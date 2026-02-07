@@ -31,6 +31,7 @@ def get_foreign_options():
         'id_proyecto':Proyectos.query.filter_by(estatus='Activo'),
         'id_espacio':Espacios.query.filter_by(estatus='Activo'),
         'id_venta':Ventas.query.filter_by(estatus='Pendiente'),
+        'id_descuento':Descuentos.query.filter_by(estatus='Activo'),
 
         # --- Campos con opciones fijas ---
         'regimen_fiscal':['601 - General de Ley Personas Morales','603 - Personas Morales con Fines no Lucrativos','605 - Sueldos y Salarios e Ingresos Asimilados a Salarios','606 - Arrendamiento','607 - Régimen de Enajenación o Adquisición de Bienes','608 - Demás ingresos','610 - Residentes en el Extranjero sin Establecimiento Permanente en México','611 - Ingresos por Dividendos (socios y accionistas)','612 - Personas Físicas con Actividades Empresariales y Profesionales','614 - Ingresos por intereses','615 - Régimen de los ingresos por obtención de premios','616 - Sin obligaciones fiscales','620 - Sociedades Cooperativas de Producción que optan por diferir sus ingresos','621 - Incorporación Fiscal (ya derogado, solo histórico)','622 - Actividades Agrícolas, Ganaderas, Silvícolas y Pesqueras (Personas Morales)','623 - Opcional para Grupos de Sociedades','624 - Coordinados','625 - Régimen de las Actividades Empresariales con ingresos a través de Plataformas Tecnológicas','626 - Régimen Simplificado de Confianza (RESICO)',],
@@ -45,7 +46,8 @@ def get_foreign_options():
         'inventariable':['Si','No'],
         'unidad_de_medida':['Pieza','Caja'],
         'tipo_de_iva':['16%','0%','8%'],
-
+        'opcion_de_respuesta':['A','B'],
+        'tipo_de_descuento':['Importe','Porcentaje'],
     }
     return foreign_options
 
@@ -87,9 +89,10 @@ def get_ignored_columns(table_name):
         'pagos_administrativos':{'importe'},
         'briefs_de_clientes':{'fecha_cierre'},
         'agenda':{'id_integrante','hora_fin','motivo_de_cancelacion','notas'},
-        'ventas':{'id_cuenta_de_banco','importe_total','iva','tipo_de_iva','precio_unitario','importe'},
-        'servicios_en_ventas':{'id_proyecto','precio_unitario','importe','id_precio_stripe','cantidad'},   
+        'ventas':{'id_cuenta_de_banco','id_descuento','importe_total','iva','tipo_de_iva','precio_unitario','importe','importe_descuento','subtotal'},
+        'servicios_en_ventas':{'id_proyecto','precio_unitario','importe','subtotal','descuento','id_precio_stripe','cantidad'},   
         'transferencias_de_inventario':{'fecha_de_recepcion'},   
+        'descuentos':{'id_stripe'},   
 
     }
     columns=columns.get(table_name,columnas_generales) | columnas_generales
@@ -117,7 +120,9 @@ def get_ignored_columns_edit(table_name,estatus):
         'facturas': {'default':{'importe_total','impuestos','subtotal','importe_cobrado'},'Aprobada':{'id_cliente','id_proyecto','importe_total','impuestos','subtotal','importe_cobrado'}},
         'actividades': {'default':{''},
                         'Asignar':{'id_cliente','id_actividad_base','fecha_inicio','fecha_fin','horas','notas_cierre','comentarios_supervisor','estatus','notas_cambios','id_proyecto',},                                                
-                        },
+                        },       
+        'descuentos':{'default':{'id_stripe'}},   
+
     }
     table_dict = tables.get(table_name, columnas_generales)
     if not estatus or estatus not in table_dict:
@@ -141,6 +146,8 @@ def get_non_mandatory_columns(table_name):
         'briefs': {'id_servicio'},
         'briefs_de_clientes': {'id_proyecto'},
         'gastos_recurrentes': {'id_cuenta_de_banco'} ,
+        'ventas': {'codigo_de_descuento'},       
+        'descuentos': {'id_servicio','id_espacio'},        
     }
     columns=columns.get(table_name,{''}) | columnas_generales
     return columns
@@ -223,6 +230,7 @@ def get_parent_record(table_name,parent_table):
         'precios_de_servicios':{'servicios':'id_servicio'},
         'actividades_base':{'servicios':'id_servicio'},
         'servicios_en_ventas':{'ventas':'id_venta'},
+        'clientes_descuentos':{'descuentos':'id_descuento'},
 
     }
     parent_record=parent_record.get(table_name,{'':''}).get(parent_table,'')

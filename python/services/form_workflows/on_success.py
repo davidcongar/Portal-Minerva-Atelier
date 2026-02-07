@@ -71,7 +71,8 @@ def servicios_en_ventas(id):
     ).first()
     if precio:
         record.precio_unitario = precio.precio_unitario
-        record.id_precio_stripe=precio.id_stripe
+        record.id_stripe_precio=precio.id_stripe_precio
+    record.subtotal=record.precio_unitario*record.cantidad
     record.importe=record.precio_unitario*record.cantidad
     venta=Ventas.query.get(record.id_venta)
     actualizar_venta(venta)    
@@ -80,3 +81,7 @@ def servicios_en_ventas(id):
 def precios_de_servicios(id):
     create_product(id)
     create_price(id)
+
+@handler_on_success('descuentos')
+def descuentos(id):
+    create_coupon(id)

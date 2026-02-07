@@ -1148,7 +1148,7 @@ def related(id,parent_table,table_name):
     id_parent_record=id
     record=model.query.get(id)
     modulo,active_menu=get_breadcrumbs(parent_table)
-    parent_record_name = getattr(record, "nombre", None) or getattr(record, "nombre_completo", None) or getattr(record, "id_visualizacion", None)   
+    parent_record_name = getattr(record, "nombre", None) or getattr(record, "nombre_completo", None) or getattr(record, "pregunta", None) or getattr(record, "id_visualizacion", None)   
     breadcrumbs=[{"name":modulo,"url":""},{"name":title_format(parent_table),"url":url_for("dynamic.table_view", table_name=parent_table)},{"name":parent_record_name,"url":""}]
     context = {
         "activeMenu": active_menu,

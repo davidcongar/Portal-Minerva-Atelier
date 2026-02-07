@@ -46,6 +46,7 @@ def get_joins():
         'id_espacio': (Espacios, Espacios.id, Espacios.nombre),   
         'id_venta': (Ventas, Ventas.id, Ventas.id_visualizacion),
         'id_proyecto': (Proyectos, Proyectos.id, Proyectos.id_visualizacion),   
+        'id_descuento': (Descuentos, Descuentos.id, Descuentos.codigo_de_descuento),   
 
     }
     return joins
@@ -248,8 +249,8 @@ def get_columns(table_name,section):
             'pdf': ['id_visualizacion','id_brief_nombre','orden','pregunta','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'respuestas_de_preguntas_de_briefs': {
-            'main_page': ['id_visualizacion','id_pregunta_de_brief_pregunta','respuesta','estatus'],
-            'modal': {'informacion_general':['id','id_visualizacion','id_pregunta_de_brief','respuesta','estatus'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
+            'main_page': ['id_visualizacion','opcion_de_respuesta','respuesta','estatus'],
+            'modal': {'informacion_general':['id','id_visualizacion','id_pregunta_de_brief','opcion_de_respuesta','respuesta','estatus'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
             'pdf': ['id_visualizacion','id_pregunta_de_brief','respuesta','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },        
         'agenda': {
@@ -327,14 +328,24 @@ def get_columns(table_name,section):
             'modal': {'informacion_general':['id','id_visualizacion','id_integrante_nombre','estatus'],'financiero':['sueldo'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
             'pdf': ['id_visualizacion','id_integrante_nombre','sueldo','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
+        "descuentos":{
+            "main_page":["id_visualizacion",'id_servicio_nombre','id_espacio_nombre',"codigo_de_descuento","tipo_de_descuento","valor","estatus"],
+            "modal":{"informacion_general":["id","id_visualizacion",'id_servicio_nombre','id_espacio_nombre',"codigo_de_descuento","tipo_de_descuento","valor","estatus",'id_stripe'],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
+            "pdf":["id_visualizacion","codigo_de_descuento","tipo_de_descuento","valor","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
+        },
+        "clientes_descuentos":{
+            "main_page":["id_visualizacion","id_cliente_nombre_completo","id_descuento_codigo_de_descuento","estatus"],
+            "modal":{"informacion_general":["id","id_visualizacion","id_cliente_nombre_completo","id_descuento_codigo_de_descuento","estatus"],"sistema":["id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]},
+            "pdf":["id_visualizacion","id_cliente","id_descuento","estatus","id_usuario_correo_electronico","fecha_de_creacion","fecha_de_actualizacion"]
+        },
         'ventas': {
-            'main_page': ['id_visualizacion','id_cliente_nombre_completo','importe','iva','importe_total','estatus'],
-            'modal': {'informacion_general':['id','id_visualizacion','id_cliente_nombre_completo','espacio','tipo_de_iva','estatus'],'financiero':['importe','iva','importe_total'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
+            'main_page': ['id_visualizacion','id_cliente_nombre_completo','importe','iva','codigo_de_descuento','importe_descuento','importe_total','estatus'],
+            'modal': {'informacion_general':['id','id_visualizacion','id_cliente_nombre_completo','espacio','tipo_de_iva','codigo_de_descuento','estatus'],'financiero':['subtotal','importe_descuento','importe','iva','importe_total'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
             'pdf': ['id_visualizacion','id_cliente_nombre_completo','espacio','importe','tipo_de_iva','iva','importe_total','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'servicios_en_ventas': {
-            'main_page': ['id_visualizacion','id_venta_id_visualizacion','id_servicio_nombre','id_espacio_nombre','metros_cuadrados','cantidad','precio_unitario','importe'],
-            'modal': {'informacion_general':['id','id_visualizacion','id_venta_id_visualizacion','id_servicio_nombre','id_espacio_nombre'],'detalles':['metros_cuadrados','cantidad','precio_unitario','importe'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
+            'main_page': ['id_visualizacion','id_venta_id_visualizacion','id_servicio_nombre','id_espacio_nombre','metros_cuadrados','cantidad','precio_unitario','subtotal','descuento','importe'],
+            'modal': {'informacion_general':['id','id_visualizacion','id_venta_id_visualizacion','id_servicio_nombre','id_espacio_nombre'],'detalles':['metros_cuadrados','cantidad','precio_unitario','subtotal','descuento','importe'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
             'pdf': ['id_visualizacion','id_venta_id_visualizacion','id_servicio_nombre','id_espacio_nombre','metros_cuadrados','cantidad','precio_unitario','importe','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'cuentas_de_banco': {
@@ -459,6 +470,8 @@ def get_breadcrumbs(table_name):
         'espacios':['Ventas','ventas'],
         'servicios':['Ventas','ventas'],
         'ventas':['Ventas','ventas'],
+        'descuentos':['Ventas','ventas'],
+        'clientes_descuentos':['Ventas','ventas'],
         'facturas':['Ventas','ventas'],
         'cotizaciones':['Ventas','ventas'],
 
@@ -485,6 +498,7 @@ def get_table_relationships(table_name):
         'pagos_administrativos':['gastos_y_compras_en_pagos'],
         'compras':['productos_en_compras'],
         'recepciones_de_compras':['productos_en_recepciones_de_compras'],
+        'descuentos':['clientes_descuentos'],
 
     }
     relationships = relationships.get(table_name, [])
