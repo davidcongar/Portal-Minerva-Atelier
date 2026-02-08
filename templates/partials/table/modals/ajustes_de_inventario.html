@@ -1,4 +1,5 @@
 <div class="flex justify-end items-center gap-2" x-data x-show="true">
+    {% if can_access('/ajustes_de_inventario/aprobar') %}    
     <template x-if="$store.modalData.getField('estatus') === 'En revisión'">
         <button type="submit"
             @click.stop.prevent="window.location.href = `/ajustes_de_inventario/aprobar/${encodeURIComponent($store.modalData.getField('id'))}?return_url=${encodeURIComponent(window.location.href)}`"
@@ -6,6 +7,8 @@
             Aprobar
         </button>
     </template>
+    {% endif %}
+    {% if can_access('/ajustes_de_inventario/finalizar') %}    
     <template x-if="$store.modalData.getField('estatus') === 'Aprobado'">
         <button type="submit"
             @click.stop.prevent="window.location.href = `/ajustes_de_inventario/finalizar/${encodeURIComponent($store.modalData.getField('id'))}?return_url=${encodeURIComponent(window.location.href)}`"
@@ -13,6 +16,8 @@
             Finalizar
         </button>
     </template>
+    {% endif %}
+    {% if can_access('/ajustes_de_inventario/cancelar') %}    
     <template x-if="['En revisión','Aprobado'].includes($store.modalData.getField('estatus'))">
         <button type="submit"
             @click.stop.prevent="window.location.href = `/ajustes_de_inventario/cancelar/${encodeURIComponent($store.modalData.getField('id'))}?return_url=${encodeURIComponent(window.location.href)}`"
@@ -20,4 +25,5 @@
             Cancelar
         </button>
     </template>
+    {% endif %}
 </div>

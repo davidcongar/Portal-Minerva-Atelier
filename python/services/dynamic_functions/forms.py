@@ -119,7 +119,7 @@ def get_ignored_columns_edit(table_name,estatus):
         'cuentas_de_banco': {'default':{'balance'}},
         'facturas': {'default':{'importe_total','impuestos','subtotal','importe_cobrado'},'Aprobada':{'id_cliente','id_proyecto','importe_total','impuestos','subtotal','importe_cobrado'}},
         'actividades': {'default':{''},
-                        'Asignar':{'id_cliente','id_actividad_base','fecha_inicio','fecha_fin','horas','notas_cierre','comentarios_supervisor','estatus','notas_cambios','id_proyecto',},                                                
+                        'Asignar':{'id_cliente','calificacion_cliente','notas_cliente','aceptacion_de_cliente','id_actividad_base','fecha_inicio','fecha_fin','horas','notas_cierre','comentarios_supervisor','estatus','notas_cambios','id_proyecto',},                                                
                         },       
         'descuentos':{'default':{'id_stripe'}},   
 

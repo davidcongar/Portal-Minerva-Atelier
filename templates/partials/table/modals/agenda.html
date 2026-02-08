@@ -1,11 +1,14 @@
 <div class="flex justify-end items-center gap-2" x-data x-show="true">
+    {% if can_access('/agenda/confirmar') %}    
     <template x-if="$store.modalData.getField('estatus') === 'Pendiente'">
         <button type="submit"
             @click.stop.prevent="window.location.href = `/agenda/confirmar/${encodeURIComponent($store.modalData.getField('id'))}?return_url=${encodeURIComponent(window.location.href)}`"
             class="btn border text-success border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-success bg-success/10">
             Confirmar
         </button>
-    </template>    
+    </template> 
+    {% endif %}
+    {% if can_access('/agenda/finalizar') %}       
     <template x-if="$store.modalData.getField('estatus') === 'Confirmada'">
         <button type="submit"
             @click.stop.prevent="window.location.href = `/agenda/finalizar/${encodeURIComponent($store.modalData.getField('id'))}?return_url=${encodeURIComponent(window.location.href)}`"
@@ -13,6 +16,8 @@
             Finalizar
         </button>
     </template>
+    {% endif %}
+    {% if can_access('/agenda/cancelar') %}    
     <template x-if="['Pendiente','Confirmada'].includes($store.modalData.getField('estatus'))">
         <button type="submit"
             @click.stop.prevent="window.location.href = `/agenda/cancelar/${encodeURIComponent($store.modalData.getField('id'))}?return_url=${encodeURIComponent(window.location.href)}`"
@@ -20,4 +25,5 @@
             Cancelar
         </button>
     </template>
+    {% endif %}
 </div>

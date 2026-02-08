@@ -1,4 +1,5 @@
 <div class="flex justify-end items-center gap-2" x-data x-show="true">
+    {% if can_access('/pagos_administrativos') %}    
     <template x-if="$store.modalData.getField('estatus') === 'En revisión'">
         <button type="submit"
             @click.stop.prevent="window.location.href = `/dynamic/pagos_administrativos/double_table/view/${encodeURIComponent($store.modalData.getField('id'))}?return_url=${encodeURIComponent(window.location.href)}`"
@@ -6,6 +7,8 @@
             Compras/Gastos
         </button>
     </template>
+    {% endif %}
+    {% if can_access('/pagos_administrativos/aprobar') %}    
     <template x-if="$store.modalData.getField('estatus') === 'En revisión'">
         <button type="submit"
             @click.stop.prevent="window.location.href = `/pagos_administrativos/aprobar/${encodeURIComponent($store.modalData.getField('id'))}?return_url=${encodeURIComponent(window.location.href)}`"
@@ -13,6 +16,8 @@
             Aprobar
         </button>
     </template>
+    {% endif %}
+    {% if can_access('/pagos_administrativos/pagar') %}    
     <template x-if="$store.modalData.getField('estatus') === 'Aprobado'">
         <button type="submit"
             @click.stop.prevent="window.location.href = `/pagos_administrativos/pagar/${encodeURIComponent($store.modalData.getField('id'))}?return_url=${encodeURIComponent(window.location.href)}`"
@@ -20,6 +25,8 @@
             Pagar
         </button>
     </template>
+    {% endif %}
+    {% if can_access('/pagos_administrativos/cancelar') %}    
     <template x-if="['En revisión', 'Aprobado'].includes($store.modalData.getField('estatus'))">
         <button type="submit"
             @click.stop.prevent="window.location.href = `/pagos_administrativos/cancelar/${encodeURIComponent($store.modalData.getField('id'))}?return_url=${encodeURIComponent(window.location.href)}`"
@@ -27,4 +34,5 @@
             Cancelar
         </button>
     </template>
+    {% endif %}
 </div>

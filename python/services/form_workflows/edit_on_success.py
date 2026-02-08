@@ -79,7 +79,9 @@ def agenda(id,changed_fields):
 @handler_edit_on_success('actividades')
 def actividades(id,changed_fields):
     record=Actividades.query.get(id)
-    if record.estatus=='Sin iniciar' and record.id_integrante:
+    integrante_changed= field_changed(changed_fields, "id_integrante")
+    print(integrante_changed)
+    if record.estatus in ('Sin iniciar','En proceso') and integrante_changed:
         record.estatus='En proceso'
         record.fecha_inicio=datetime.today()
         send_html_email(
@@ -91,10 +93,12 @@ def actividades(id,changed_fields):
                 "Se acaba de asignar una actividad nueva en el portal de <strong>Minerva Atelier</strong>.<br>"
             ),
             details_list=[
-                f"Fecha: {record.fecha_inicio}",
-                f"Proyecto: {record.proyecto.id_visualizacion}",
-                f"Cliente: {record.proyecto.cliente.nombre_completo}",
-                f"Actividad: {record.actividad_base.nombre}",
+                f"Cliente: {record.proyecto.cliente.nombre_completo} | "
+                f"ID Proyecto: {record.proyecto.id_visualizacion} | "
+                f"Actividad: {record.actividad_base.nombre} | "
+                f"Inicio: {record.fecha_inicio} | "
+                f"Entrega estimada: {record.fecha_estimada} | "
+                f"Horas estimadas: {record.horas}"                
             ]
         )    
 

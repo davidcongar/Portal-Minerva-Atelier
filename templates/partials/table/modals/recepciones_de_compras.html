@@ -1,4 +1,5 @@
 <div class="flex justify-end items-center gap-2" x-data x-show="true">
+    {% if can_access('/recepciones_de_compras') %}    
     <template x-if="$store.modalData.getField('estatus') === 'En revisión'">
         <button type="submit"
             @click.stop.prevent="window.location.href = `/dynamic/recepciones_de_compras/double_table/view/${encodeURIComponent($store.modalData.getField('id'))}?return_url=${encodeURIComponent(window.location.href)}`"
@@ -6,6 +7,8 @@
             Productos
         </button>
     </template>
+    {% endif %}
+    {% if can_access('/recepciones_de_compras/aprobar') %}    
     <template x-if="$store.modalData.getField('estatus') === 'En revisión'">
         <button type="submit"
             @click.stop.prevent="window.location.href = `/recepciones_de_compras/aprobar/${encodeURIComponent($store.modalData.getField('id'))}?return_url=${encodeURIComponent(window.location.href)}`"
@@ -13,6 +16,8 @@
             Aprobar
         </button>
     </template>
+    {% endif %}
+    {% if can_access('/recepciones_de_compras/finalizar') %}    
     <template x-if="['Aprobada'].includes($store.modalData.getField('estatus'))">
         <button type="submit"
             @click.stop.prevent="window.location.href = `/recepciones_de_compras/finalizar/${encodeURIComponent($store.modalData.getField('id'))}?return_url=${encodeURIComponent(window.location.href)}`"
@@ -20,6 +25,8 @@
             Finalizar
         </button>
     </template>
+    {% endif %}
+    {% if can_access('/recepciones_de_compras/cancelar') %}    
     <template x-if="['En revisión', 'Aprobada'].includes($store.modalData.getField('estatus'))">
         <button type="submit"
             @click.stop.prevent="window.location.href = `/recepciones_de_compras/cancelar/${encodeURIComponent($store.modalData.getField('id'))}?return_url=${encodeURIComponent(window.location.href)}`"
@@ -27,4 +34,5 @@
             Cancelar
         </button>
     </template>
+    {% endif %}
 </div>

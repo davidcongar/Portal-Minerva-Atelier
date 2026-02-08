@@ -607,10 +607,11 @@ def edit(table_name):
             state = inspect(record)
             changed_fields = {
                 attr.key: {
-                    "old": attr.history.deleted[0] if attr.history.deleted else None,
-                    "new": attr.history.added[0] if attr.history.added else None
+                    "old": str(attr.history.deleted[0]) if attr.history.deleted else None,
+                    "new": str(attr.history.added[0]) if attr.history.added else None
                 }
-                for attr in state.attrs if attr.history.has_changes()
+                for attr in state.attrs
+                if attr.history.has_changes()
             }
             db.session.flush()
             edit_on_success(table_name, record.id, changed_fields)            

@@ -11,6 +11,19 @@ import math
 
 actividades_bp = Blueprint("actividades", __name__,url_prefix="/actividades")
 
+@actividades_bp.route("/asignar_manual/<id>", methods=["GET","POST"])
+@login_required
+@roles_required()
+def asignar_manual(id):
+    try:
+        record=Actividades.query.get(id)
+        if record.estatus in ('Sin iniciar','En proceso'):
+            session['return_url']=request.args.get("return_url", "")
+            return redirect(url_for('dynamic.form', table_name='actividades',id=id,accion='Asignar'))
+    except Exception as e:
+        flash(f"Error al asignar la actividad: {str(e)}", "danger")
+    return redirect(url_for('dynamic.table_view', table_name='actividades'))
+
 @actividades_bp.route("/asignar", methods=["POST"])
 @login_required
 @csrf.exempt
@@ -164,7 +177,7 @@ def send_assignment_summary_emails(asignaciones_por_integrante):
                 "Aquí tienes un resumen de tus tareas:"
             )
             send_html_email(
-                subject="Nuevas actividades asignadas",
+                subject="Minerva Atelier - Asignación de actividad",
                 recipient_email=integrante.correo_electronico,
                 template="partials/system/email_template.html",
                 body_content=body_content,

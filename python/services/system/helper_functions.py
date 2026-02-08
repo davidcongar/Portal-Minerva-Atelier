@@ -599,8 +599,14 @@ def return_url_redirect(f):
     return wrapper
 
 def field_changed(changed_fields, field_name):
-    if field_name in changed_fields:
-        old = changed_fields[field_name]["old"]
-        new = changed_fields[field_name]["new"]
-        return True, old, new
-    return False, None, None
+    if field_name not in changed_fields:
+        return False, None, None
+
+    old = changed_fields[field_name]["old"]
+    new = changed_fields[field_name]["new"]
+
+    # If both exist and are equal → NOT changed
+    if old == new:
+        return False, old, new
+
+    return True, old, new

@@ -1,4 +1,5 @@
 <div class="flex justify-end items-center gap-2" x-data x-show="true">
+    {% if can_access('/clientes/activar') %}    
     <template x-if="['Perfect match','Swipe'].includes($store.modalData.getField('estatus'))">
         <button type="submit"
             @click.stop.prevent="window.location.href = `/clientes/activar/${encodeURIComponent($store.modalData.getField('id'))}?return_url=${encodeURIComponent(window.location.href)}`"
@@ -6,6 +7,8 @@
             Activar
         </button>
     </template>
+    {% endif %}
+    {% if can_access('/clientes/perdido') %}    
     <template x-if="['Perfect match','Swipe'].includes($store.modalData.getField('estatus'))">
         <button type="submit"
             @click.stop.prevent="window.location.href = `/clientes/perdido/${encodeURIComponent($store.modalData.getField('id'))}?return_url=${encodeURIComponent(window.location.href)}`"
@@ -13,4 +16,5 @@
             Perdido
         </button>
     </template>
+    {% endif %}
 </div>
