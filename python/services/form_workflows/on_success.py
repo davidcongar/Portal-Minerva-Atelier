@@ -85,3 +85,9 @@ def precios_de_servicios(id):
 @handler_on_success('descuentos')
 def descuentos(id):
     create_coupon(id)
+
+@handler_on_success('comentarios_de_clientes_de_actividades')
+def comentarios_de_clientes_de_actividades(id):
+    record=ComentariosDeClientesDeActividades.query.get(id)
+    actividad=Actividades.query.get(record.id_actividad)
+    actividad.estatus='Con cambios'

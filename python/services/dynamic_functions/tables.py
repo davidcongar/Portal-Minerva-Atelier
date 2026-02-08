@@ -47,6 +47,7 @@ def get_joins():
         'id_venta': (Ventas, Ventas.id, Ventas.id_visualizacion),
         'id_proyecto': (Proyectos, Proyectos.id, Proyectos.id_visualizacion),   
         'id_descuento': (Descuentos, Descuentos.id, Descuentos.codigo_de_descuento),   
+        'id_actividad': (Actividades, Actividades.id, Actividades.id_visualizacion),   
 
     }
     return joins
@@ -269,10 +270,15 @@ def get_columns(table_name,section):
             'pdf': ['id_visualizacion','id_servicio_nombre','nombre','descripcion','entregable','horas_estimadas','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'actividades': {
-            'main_page': ['id_visualizacion','id_proyecto_id_visualizacion','id_integrante_nombre_completo','id_actividad_base_nombre','fecha_inicio','fecha_estimada','fecha_fin','calificacion_cliente','notas_cliente','aceptacion_de_cliente','estatus'],
-            'modal': {'informacion_general':['id','id_visualizacion','id_proyecto_id_visualizacion','id_integrante_nombre_completo','id_actividad_base_nombre','prioridad','horas','estatus'],'cliente':['calificacion_cliente','notas_cliente','aceptacion_de_cliente'],'fechas':['fecha_inicio','fecha_estimada','fecha_fin'],'detalles':['notas','notas_cierre','comentarios_supervisor'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
-            'pdf': ['id_visualizacion','id_proyecto_id_visualizacion','id_integrante_nombre_completo','id_actividad_base_nombre','fecha_inicio','fecha_estimada','fecha_fin','prioridad','horas','notas','comentarios_supervisor','calificacion_cliente','notas_cliente','aceptacion_de_cliente','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
+            'main_page': ['id_visualizacion','id_proyecto_id_visualizacion','id_integrante_nombre_completo','id_actividad_base_nombre','fecha_inicio','fecha_estimada','fecha_fin','calificacion_cliente','aceptacion_de_cliente','estatus'],
+            'modal': {'informacion_general':['id','id_visualizacion','id_proyecto_id_visualizacion','id_integrante_nombre_completo','id_actividad_base_nombre','prioridad','horas','estatus'],'cliente':['calificacion_cliente','aceptacion_de_cliente'],'fechas':['fecha_inicio','fecha_estimada','fecha_fin'],'detalles':['notas','notas_cierre','comentarios_supervisor'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
+            'pdf': ['id_visualizacion','id_proyecto_id_visualizacion','id_integrante_nombre_completo','id_actividad_base_nombre','fecha_inicio','fecha_estimada','fecha_fin','prioridad','horas','notas','comentarios_supervisor','calificacion_cliente','aceptacion_de_cliente','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
+        'comentarios_de_clientes_de_actividades': {
+            'main_page': ['id_visualizacion','comentario_cliente','notas_cierre','estatus'],
+            'modal': {'informacion_general':['id','id_visualizacion','comentario_cliente','notas_cierre','estatus'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
+            'pdf': ['id_visualizacion','comentario_cliente','notas_cierre','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
+        },        
         'preguntas_de_calidad_de_servicio': {
             'main_page': ['id_visualizacion','id_servicio_nombre','orden','pregunta','tipo_de_respuesta'],
             'modal': {'informacion_general':['id','id_visualizacion','id_servicio_nombre','orden','pregunta','tipo_de_respuesta','estatus'],'detalles':['opciones'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
@@ -385,12 +391,13 @@ def get_estatus_options(table_name):
         'compras': ['En revisión','Aprobada','Recibida parcial','Recibida','Cancelada'],
         'productos_en_compras': ['Pendiente','Recibido','Recibido parcial','Cancelado'],
         'recepciones_de_compras': ['En revisión','Aprobada','Finalizada','Cancelada'],
-        'actividades': ['Sin iniciar','En proceso','Realizada','Con cambios','Finalizada','Cancelada'],
+        'actividades': ['Sin iniciar','En proceso','Con cambios','Realizada','Finalizada','Cancelada'],
         'ajustes_de_inventario': ['En revisión','Aprobado','Finalizado','Cancelado'],
         'transferencias_de_inventario': ['En revisión','Aprobada','En tránsito','Finalizada','Cancelado'],
         'briefs_de_clientes': ['En proceso','Contestado','Cancelado'],
         'agenda': ['Pendiente','Confirmada','Finalizada','Cancelada'],
         'ventas': ['Pendiente','Cobrada','Cancelada'],
+        'comentarios_de_clientes_de_actividades': ['En revisión','Cerrado'],
 
     }
     options=options.get(table_name, ['Activo', 'Inactivo'])
@@ -460,6 +467,8 @@ def get_breadcrumbs(table_name):
         'agenda':['Proyectos','proyectos'],
         'actividades_base':['Proyectos','proyectos'],
         'actividades':['Proyectos','proyectos'],
+        'comentarios_de_clientes_de_actividades':['Proyectos','proyectos'],
+
         'preguntas_de_calidad_de_servicio':['Proyectos','proyectos'],
         'preguntas_de_encuesta_de_satisfaccion':['Proyectos','proyectos'],
 
@@ -499,6 +508,7 @@ def get_table_relationships(table_name):
         'compras':['productos_en_compras'],
         'recepciones_de_compras':['productos_en_recepciones_de_compras'],
         'descuentos':['clientes_descuentos'],
+        'actividades':['comentarios_de_clientes_de_actividades'],
 
     }
     relationships = relationships.get(table_name, [])

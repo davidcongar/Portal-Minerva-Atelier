@@ -80,7 +80,6 @@ def agenda(id,changed_fields):
 def actividades(id,changed_fields):
     record=Actividades.query.get(id)
     integrante_changed= field_changed(changed_fields, "id_integrante")
-    print(integrante_changed)
     if record.estatus in ('Sin iniciar','En proceso') and integrante_changed:
         record.estatus='En proceso'
         record.fecha_inicio=datetime.today()
@@ -104,6 +103,12 @@ def actividades(id,changed_fields):
 
 @handler_edit_on_success('precios_de_servicios')
 def precios_de_servicios(id,changed_fields):
-    precio_changed = field_changed(changed_fields, "precio_uhnitario")
+    precio_changed = field_changed(changed_fields, "precio_unitario")
     if precio_changed:
         modify_price(id)
+
+@handler_edit_on_success('comentarios_de_clientes_de_actividades')
+def comentarios_de_clientes_de_actividades(id,changed_fields):
+    record=ComentariosDeClientesDeActividades.query.get(id)
+    if record.notas_cierre:
+        record.estatus='Cerrado'

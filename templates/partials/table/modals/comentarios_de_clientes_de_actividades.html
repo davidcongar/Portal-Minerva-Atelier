@@ -1,0 +1,11 @@
+<div class="flex justify-end items-center gap-2" x-data x-show="true">
+    {% if can_access('/comentarios_de_clientes_de_actividades/cerrar') %}    
+    <template x-if="['En proceso'].includes($store.modalData.getField('estatus'))">
+        <button type="submit"
+            @click.stop.prevent="window.location.href = `/comentarios_de_clientes_de_actividades/cerrar/${encodeURIComponent($store.modalData.getField('id'))}?return_url=${encodeURIComponent(window.location.href)}`"
+            class="btn border text-primary border-transparent rounded-md transition-all duration-300 hover:text-white hover:bg-primary bg-primary/10">
+            Cerrar
+        </button>
+    </template>
+    {% endif %}      
+</div>

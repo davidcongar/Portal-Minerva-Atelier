@@ -181,6 +181,8 @@ from python.routes.actividades import actividades_bp
 app.register_blueprint(actividades_bp)
 from python.routes.descuentos import descuentos_bp
 app.register_blueprint(descuentos_bp)
+from python.routes.comentarios_de_clientes_de_actividades import comentarios_de_clientes_de_actividades_bp
+app.register_blueprint(comentarios_de_clientes_de_actividades_bp)
 
 from python.services.system.template_formats import *
 

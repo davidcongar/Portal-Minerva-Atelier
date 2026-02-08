@@ -24,6 +24,77 @@ def asignar_manual(id):
         flash(f"Error al asignar la actividad: {str(e)}", "danger")
     return redirect(url_for('dynamic.table_view', table_name='actividades'))
 
+@actividades_bp.route("/realizada/<id>", methods=["GET","POST"])
+@login_required
+@roles_required()
+def realizada(id):
+    try:
+        record=Actividades.query.get(id)
+        comentarios=ComentariosDeClientesDeActividades.query.filter_by(id_actividad=id,estatus='En proceso').first()
+        if record.estatus in ('En proceso','Con cambios') and comentarios==None:
+            record.estatus="Realizada"
+            # Enviar correo al cliente para aceptacion
+            proyecto=Proyectos.query.get(record.id_proyecto)
+            correo_cliente=proyecto.cliente.correo_electronico
+            send_html_email(
+                subject="Portal Minerva Atelier - Entregable listo para revisión",
+                recipient_email=correo_cliente,
+                template="partials/system/email_template.html",
+                body_content=f"Se acaba de dar de alta los entregables de la actividad {record.actividad_base.nombre}. Favor de revisarlo.",
+                details_list=[
+                    f"ID Proyecto: {proyecto.id_visualizacion}",
+                    f"Espacio: {proyecto.espacio.nombre}",
+                    f"Actividad: {record.actividad_base.nombre}"
+                ]
+            )
+            db.session.commit()
+            flash('La actividad se ha marcado como Realizada','success')
+        elif comentarios:
+            flash('Hay comentarios de cliente sin cerrar. Favor de revisar.','info')
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error al marcar la actividad como Realizada: {str(e)}", "danger")
+    return redirect(url_for('dynamic.table_view', table_name='actividades'))
+
+@actividades_bp.route("/cambios", methods=["GET","POST"])
+@login_required
+@roles_required()
+def cambios():
+    try:
+        id=request.args.get("id", "")
+        comentario=request.args.get("comentario", "")        
+        record=Actividades.query.get(id)
+        if record.estatus in ('Realizada'):
+            record.estatus="Con cambios"
+            new_record=ComentariosDeClientesDeActividades(
+                id_actividad=record.id,
+                comentario_cliente=comentario,
+                id_usuario=Usuarios.query.filter_by(nombre='Sistema').first()
+            )
+            proyecto=Proyectos.query.get(record.id_proyecto)
+            integrante=Integrantes.query.get(record.id_integrante)
+            # Enviar correo al cliente para aceptacion
+            send_html_email(
+                subject="Portal Minerva Atelier - Comentario realiado por cliente",
+                recipient_email=integrante.correo_electronico,
+                template="partials/system/email_template.html",
+                body_content=f"Se acaba de dar de alta un comentario por el cliente {proyecto.cliente.nombre_completo}. A continuación se muestran los detalles.",
+                details_list=[
+                    f"ID Proyecto: {proyecto.id_visualizacion}",
+                    f"Espacio: {proyecto.espacio.nombre}",
+                    f"Actividad: {record.actividad_base.nombre}",
+                    f"Comentario: {comentario}",
+
+                ]
+            )
+            db.session.add(new_record)
+            db.session.commit()    
+            return {"status": "ok"}
+    except Exception as e:
+        db.session.rollback()
+        return {"status": "nok", "error": e}
+
+
 @actividades_bp.route("/asignar", methods=["POST"])
 @login_required
 @csrf.exempt
@@ -184,5 +255,4 @@ def send_assignment_summary_emails(asignaciones_por_integrante):
                 details_list=details_list
             )
         except Exception as e:
-            print(e)
             raise Exception(f"Error enviando correo a {integrante.nombre_completo}: {e}")

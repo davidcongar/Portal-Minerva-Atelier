@@ -53,7 +53,6 @@ class Actividades(db.Model,BaseMixin,AuditMixin):
     notas = db.Column(db.Text)
 
     calificacion_cliente = db.Column(db.Integer)
-    notas_cliente = db.Column(db.Text)
     aceptacion_de_cliente = db.Column(db.String(100), default="Sin aceptar") 
 
     notas_cierre = db.Column(db.Text)
@@ -64,6 +63,16 @@ class Actividades(db.Model,BaseMixin,AuditMixin):
     proyecto = db.relationship('Proyectos', backref='actividades',lazy=True)
     integrante = db.relationship('Integrantes', backref='actividades',lazy=True)
     actividad_base = db.relationship('ActividadesBase', backref='actividades', lazy=True)
+
+class ComentariosDeClientesDeActividades(db.Model,BaseMixin,AuditMixin):
+
+    id_actividad = db.Column(db.UUID, db.ForeignKey("actividades.id"),nullable=False)
+
+    comentario_cliente = db.Column(db.Text)
+    notas_cierre = db.Column(db.Text)
+    estatus = db.Column(db.String(100),nullable=False, default="En proceso") 
+
+    actividad = db.relationship('Actividades', backref='comentarios_de_clientes_de_actividades',lazy=True)
 
 class PreguntasDeCalidadDeServicio(db.Model,BaseMixin,AuditMixin):
 

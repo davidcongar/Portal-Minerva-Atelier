@@ -7,12 +7,12 @@
 {% set percentage_format_columns = ['descuento_porcentaje'] %}
 {% set money_format_columns=['balance','importe_descuento','descuento','importe_pagado','subtotal','importe_total','importe','importe_restante','precio_unitario','iva','costos_adicionales'] %}
 
-{% set purple_badge_values = ['En revisión','Pendiente','Swipe','Sin iniciar'] %}
+{% set purple_badge_values = ['En revisión','Pendiente','Swipe','Sin iniciar','Con cambios'] %}
 {% set primary_badge_values = ['Recibida parcial','En proceso','Pagado parcial','En tránsito'] %}
 {% set success_badge_values = ['Aprobada','Aprobado','Activo','Confirmada','Perfect match'] %}
 {% set warning_badge_values = [] %}
 {% set danger_badge_values = [] %}
-{% set gray_badge_values = ['Cancelada','Recibida','Inactivo','Contestado','Finalizada','Cobrada','Realizada','Realizado','Pagado','Pagada'] %}
+{% set gray_badge_values = ['Cancelada','Recibida','Cerrado','Inactivo','Contestado','Finalizada','Cobrada','Realizada','Realizado','Pagado','Pagada'] %}
 
 {% set calendar_titles = {'agenda':['hora_inicio']} %}
 
@@ -41,6 +41,10 @@
 
 {% macro id_descuento(option) %}
     {{ option.id_visualizacion ~ ' - ' ~ option.codigo_de_descuento }}
+{% endmacro %}
+
+{% macro id_actividad(option) %}
+    {{ option.id_visualizacion ~ ' - ' ~ option.actividad_base.nombre }}
 {% endmacro %}
 
 <!--Dynamic two table variables-->
