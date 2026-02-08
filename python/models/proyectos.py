@@ -49,7 +49,6 @@ class Actividades(db.Model,BaseMixin,AuditMixin):
     fecha_estimada = db.Column(db.Date)
     fecha_fin = db.Column(db.Date)
 
-    prioridad = db.Column(db.String(20))
     horas = db.Column(db.Float, default=0.00)
     notas = db.Column(db.Text)
 

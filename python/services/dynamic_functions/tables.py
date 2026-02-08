@@ -259,8 +259,8 @@ def get_columns(table_name,section):
             'pdf': ['id_visualizacion','id_cliente_nombre_completo','id_integrante_nombre_completo','fecha','hora_inicio','hora_fin','notas','motivo_de_cancelacion','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'proyectos': {
-            'main_page': ['id_visualizacion','id_venta_id_visualizacion','id_servicio_nombre','id_espacio_nombre','id_integrante_nombre_completo','metros_cuadrados','fecha_inicio','fecha_fin','estatus'],
-            'modal': {'informacion_general':['id','id_visualizacion','id_venta_id_visualizacion','id_servicio_nombre','id_espacio_nombre','id_integrante_nombre_completo','metros_cuadrados','fecha_inicio','fecha_fin','estatus'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
+            'main_page': ['id_visualizacion','id_venta_id_visualizacion','id_cliente_nombre_completo','id_servicio_nombre','id_espacio_nombre','id_integrante_nombre_completo','metros_cuadrados','fecha_inicio','fecha_fin','estatus'],
+            'modal': {'informacion_general':['id','id_visualizacion','id_venta_id_visualizacion','id_cliente_nombre_completo','id_servicio_nombre','id_espacio_nombre','id_integrante_nombre_completo','metros_cuadrados','fecha_inicio','fecha_fin','estatus'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
             'pdf': ['id_visualizacion','id_venta_id_visualizacion','id_servicio_nombre','id_espacio_nombre','id_integrante_nombre_completo','metros_cuadrados','fecha_inicio','fecha_fin','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'actividades_base': {
@@ -385,7 +385,7 @@ def get_estatus_options(table_name):
         'compras': ['En revisión','Aprobada','Recibida parcial','Recibida','Cancelada'],
         'productos_en_compras': ['Pendiente','Recibido','Recibido parcial','Cancelado'],
         'recepciones_de_compras': ['En revisión','Aprobada','Finalizada','Cancelada'],
-        'actividades': ['Sin iniciar','En proceso','Realizada','Con cambios','Cerrada','Cancelada'],
+        'actividades': ['Sin iniciar','En proceso','Realizada','Con cambios','Finalizada','Cancelada'],
         'ajustes_de_inventario': ['En revisión','Aprobado','Finalizado','Cancelado'],
         'transferencias_de_inventario': ['En revisión','Aprobada','En tránsito','Finalizada','Cancelado'],
         'briefs_de_clientes': ['En proceso','Contestado','Cancelado'],
@@ -551,7 +551,7 @@ def get_date_fields():
 
 def get_checkbox(table_name):
     checkbox = {
-        'table_name':True,
+        'actividades':True,
     }
     checkbox=checkbox.get(table_name, False)
     return checkbox
@@ -582,7 +582,7 @@ def get_summary_data(table_name):
                         },
         'proyectos': {
                         'primary':['cliente.nombre_completo','servicio.nombre','espacio.nombre','fecha_inicio'],
-                        'data':{'información general':['id_integrante.nombre_completo']}
+                        'data':{'informacion_general':['id_visualizacion','venta.id_visualizacion','cliente.nombre_completo','servicio.nombre','espacio.nombre','integrante.nombre_completo','metros_cuadrados','fecha_inicio','fecha_fin']}
                         },
     }
     data=data.get(table_name,'')
@@ -638,7 +638,16 @@ def get_summary_kpis(table_name,id_parent_record):
                 'actividades_al_mes': '$100',
                 'timpo_promedio_por_actividad': '$100',
             },
-        },                   
+        },     
+        'proyectos': {
+            'actividades': {
+                'actividades_abiertas': Actividades.query.filter(Actividades.estatus.in_(['Sin iniciar', 'En proceso','Con cambios']),Proyectos.id==id_parent_record).count(),
+                'actividades_por_revisar': Actividades.query.filter(Actividades.estatus.in_(['Realizada']),Proyectos.id==id_parent_record).count()                
+            },
+            'generales': {
+                'timpo_promedio_por_actividad': '$100',
+            },
+        },                          
     }
     data=data.get(table_name,'')
     return data

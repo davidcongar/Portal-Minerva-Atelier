@@ -51,6 +51,8 @@ TITLE_FORMATS = {
     'envio':'envío',
     'maximos':'máximos',
     'minimos':'mínimos',
+    'aceptacion':'aceptación',
+
     'curp':'CURP',
     'rfc':'RFC',
     'rgv':'RGV',
@@ -95,6 +97,11 @@ TITLE_FORMATS = {
     'cliente.nombre_completo':'Cliente',
     'almacen_entrada.nombre':'Almacén entrada',
     'almacen_salida.nombre':'Almacén salida',
+    'venta.id_visualizacion':'ID Venta',
+    'servicio.nombre':'Cliente',
+    'espacio.nombre':'Espacio',
+    'integrante.nombre_completo':'Integrante',
+
 
 }
 BRIEFS_CREACION_CLIENTE = {'¿Hacemos match?'}
