@@ -56,45 +56,6 @@ def realizada(id):
         flash(f"Error al marcar la actividad como Realizada: {str(e)}", "danger")
     return redirect(url_for('dynamic.table_view', table_name='actividades'))
 
-@actividades_bp.route("/cambios", methods=["GET","POST"])
-@login_required
-@roles_required()
-def cambios():
-    try:
-        id=request.args.get("id", "")
-        comentario=request.args.get("comentario", "")        
-        record=Actividades.query.get(id)
-        if record.estatus in ('Realizada'):
-            record.estatus="Con cambios"
-            new_record=ComentariosDeClientesDeActividades(
-                id_actividad=record.id,
-                comentario_cliente=comentario,
-                id_usuario=Usuarios.query.filter_by(nombre='Sistema').first()
-            )
-            proyecto=Proyectos.query.get(record.id_proyecto)
-            integrante=Integrantes.query.get(record.id_integrante)
-            # Enviar correo al cliente para aceptacion
-            send_html_email(
-                subject="Portal Minerva Atelier - Comentario realiado por cliente",
-                recipient_email=integrante.correo_electronico,
-                template="partials/system/email_template.html",
-                body_content=f"Se acaba de dar de alta un comentario por el cliente {proyecto.cliente.nombre_completo}. A continuación se muestran los detalles.",
-                details_list=[
-                    f"ID Proyecto: {proyecto.id_visualizacion}",
-                    f"Espacio: {proyecto.espacio.nombre}",
-                    f"Actividad: {record.actividad_base.nombre}",
-                    f"Comentario: {comentario}",
-
-                ]
-            )
-            db.session.add(new_record)
-            db.session.commit()    
-            return {"status": "ok"}
-    except Exception as e:
-        db.session.rollback()
-        return {"status": "nok", "error": e}
-
-
 @actividades_bp.route("/asignar", methods=["POST"])
 @login_required
 @csrf.exempt
