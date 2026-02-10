@@ -120,11 +120,11 @@
                                         <div class="flex items-center justify-center rounded-l border-r-0 border-2 border-gray/10 bg-gray/[8%] dark:border-lightgray/20 dark:text-white dark:bg-lightgray/10 px-3.5">
                                             <span>$</span>
                                         </div>
-                                        <input type="number" step="any" id="{{ column }}" name="{{ column }}" class="form-input rounded-r rounded-none" {% if column in required_fields %} required {% endif %}/>
+                                        <input type="number" step="any" id="{{ column }}" name="{{ column }}" value="{{ (record[column] if record and record[column] is not none else '') if record else default_variable_values[column] }}" class="form-input rounded-r rounded-none" {% if column in required_fields %} required {% endif %}/>
                                     </label>                                
                                 {% elif column in vars.percentage_format_columns %}
                                    <label class="flex">
-                                        <input type="number" step="any" id="{{ column }}" name="{{ column }}" class="form-input rounded-l rounded-none" {% if column in required_fields %} required {% endif %}/>
+                                        <input type="number" step="any" id="{{ column }}" name="{{ column }}" value="{{ (record[column] if record and record[column] is not none else '') if record else default_variable_values[column] }}" class="form-input rounded-l rounded-none" {% if column in required_fields %} required {% endif %}/>
                                         <div class="flex items-center justify-center rounded-r border-l-0 border-2 border-gray/10 bg-gray/[8%] dark:border-lightgray/20 dark:text-white dark:bg-lightgray/10 px-3.5">
                                             <span>%</span>
                                         </div>                                           
