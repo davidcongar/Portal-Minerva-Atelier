@@ -167,8 +167,6 @@ from python.routes.transferencias_de_inventario import transferencias_de_inventa
 app.register_blueprint(transferencias_de_inventario_bp)
 from python.routes.pagos_administrativos import pagos_administrativos_bp
 app.register_blueprint(pagos_administrativos_bp)
-from python.routes.briefs_de_clientes import briefs_de_clientes_bp
-app.register_blueprint(briefs_de_clientes_bp)
 from python.routes.agenda import agenda_bp
 app.register_blueprint(agenda_bp)
 from python.routes.ventas import ventas_bp

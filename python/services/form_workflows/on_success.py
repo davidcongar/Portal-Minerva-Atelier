@@ -43,40 +43,6 @@ def ajustes_de_inventario(id):
         inventario_salida.cantidad=inventario_salida.cantidad-float(record.cantidad)
         inventario_salida.cantidad_en_transito=inventario_salida.cantidad_en_transito+float(record.cantidad)
 
-@handler_on_success('clientes')
-def clientes(id):
-    briefs = Briefs.query.filter(Briefs.nombre.in_(BRIEFS_CREACION_CLIENTE)).all()
-    for brief in briefs:
-        new_record=BriefsDeClientes(
-            id_visualizacion=get_id_visualizacion('briefs_de_clientes'),
-            id_cliente=id,
-            id_brief=brief.id
-        )
-        db.session.add(new_record)
-        db.session.flush()
-        preguntas=PreguntasDeBriefs.query.filter_by(id_brief=brief.id).all()
-        for pregunta in preguntas:
-            new_pregunta=RespuestasBriefsDeClientes(
-                id_brief_de_cliente=new_record.id,
-                id_pregunta_de_brief=pregunta.id
-            )
-            db.session.add(new_pregunta)
-
-@handler_on_success('servicios_en_ventas')
-def servicios_en_ventas(id):
-    record=ServiciosEnVentas.query.get(id)
-    precio = PreciosDeServicios.query.filter(
-        PreciosDeServicios.id_servicio == record.id_servicio,
-        PreciosDeServicios.id_espacio == record.id_espacio
-    ).first()
-    if precio:
-        record.precio_unitario = precio.precio_unitario
-        record.id_stripe_precio=precio.id_stripe_precio
-    record.subtotal=record.precio_unitario*record.cantidad
-    record.importe=record.precio_unitario*record.cantidad
-    venta=Ventas.query.get(record.id_venta)
-    actualizar_venta(venta)    
-
 @handler_on_success('precios_de_servicios')
 def precios_de_servicios(id):
     create_product(id)

@@ -12,7 +12,7 @@ from datetime import datetime
 import numpy as np
 import os
 
-working_directory='/Users/davidcontreras/Documents/Repositorios_SS/Portal-Minerva-Atelier/'
+working_directory='/Users/davidcontrerasgarza/Documents/Repositorios_SS/Portal-Minerva-Atelier/'
 os.chdir(working_directory)
 from app import *
 from python.models import *

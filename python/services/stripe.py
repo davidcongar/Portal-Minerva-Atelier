@@ -59,3 +59,27 @@ def create_coupon(id):
 
     descuento.id_stripe = coupon.id
     db.session.commit()
+
+def checkout_session(id):
+    venta=Ventas.query.get(id)
+    items=ServiciosEnVentas.query.filter_by(id_venta=id).all()
+    line_items=[]
+    for item in items:
+        line_items.append({
+            "price": item.id_stripe_precio,
+            "quantity": int(item.cantidad)
+        })
+    descuento=Descuentos.query.filter_by(estatus='Activo',codigo_de_descuento=venta.codigo_de_descuento).first()
+    descuentos=[]
+    if descuento:
+        descuentos=[{'coupon':descuento.id_stripe}]
+    checkout_session = stripe.checkout.Session.create(
+        line_items=line_items,
+        discounts=descuentos,
+        mode='payment',
+        success_url=f"{DOMAIN}/ventas/success?session_id={{CHECKOUT_SESSION_ID}}",
+        cancel_url=f"{DOMAIN}/ventas/cancelar",
+        payment_intent_data={'metadata':{'id_venta':id}},
+        metadata={"id_venta": id}
+    )
+    return checkout_session.url   

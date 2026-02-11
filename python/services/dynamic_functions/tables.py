@@ -48,6 +48,7 @@ def get_joins():
         'id_proyecto': (Proyectos, Proyectos.id, Proyectos.id_visualizacion),   
         'id_descuento': (Descuentos, Descuentos.id, Descuentos.codigo_de_descuento),   
         'id_actividad': (Actividades, Actividades.id, Actividades.id_visualizacion),   
+        'id_brief_de_cliente': (BriefsDeClientes, BriefsDeClientes.id, BriefsDeClientes.id_visualizacion),   
 
     }
     return joins
@@ -365,9 +366,9 @@ def get_columns(table_name,section):
             'pdf': ['id_visualizacion','id_cliente_nombre_completo','id_proyecto_id_visualizacion','fecha_cierre','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'respuestas_briefs_de_clientes': {
-            'main_page': ['id_visualizacion','id_brief_de_cliente_id_visualizacion','id_pregunta_de_brief_visualizacion','respuesta'],
-            'modal': {'informacion_general':['id','id_visualizacion','id_brief_de_cliente_id_visualizacion','id_pregunta_de_brief_visualizacion','respuesta'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
-            'pdf': ['id_visualizacion','id_brief_de_cliente_id_visualizacion','id_pregunta_de_brief_visualizacion','respuesta','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
+            'main_page': ['id_pregunta_de_brief_orden','id_pregunta_de_brief_pregunta','respuesta'],
+            'modal': {'informacion_general':['id','id_pregunta_de_brief_visualizacion','respuesta'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
+            'pdf': ['id_brief_de_cliente_id_visualizacion','id_pregunta_de_brief_visualizacion','respuesta','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         }
     }
     columns=columns.get(table_name).get(section)
@@ -381,7 +382,7 @@ def get_table_buttons():
 
 def get_estatus_options(table_name):
     options = {
-        'clientes': ['En proceso','Perfect match','Swipe','Activo','Inactivo','Perdido'],
+        'clientes': ['Perfect match','Swipe','Activo','Inactivo','Perdido'],
         'proyectos': ['En revisión','En proceso','Finalizado','Cancelado'],
         'pagos_administrativos': ['En revisión','Aprobado','Pagado'],
         'gastos': ['En revisión','Aprobado','Pagado parcial','Pagado','Cancelado'],
@@ -394,7 +395,7 @@ def get_estatus_options(table_name):
         'actividades': ['Sin iniciar','En proceso','Con cambios','Realizada','Finalizada','Cancelada'],
         'ajustes_de_inventario': ['En revisión','Aprobado','Finalizado','Cancelado'],
         'transferencias_de_inventario': ['En revisión','Aprobada','En tránsito','Finalizada','Cancelado'],
-        'briefs_de_clientes': ['En proceso','Contestado','Cancelado'],
+        'briefs_de_clientes': ['Sin contestar','Contestado','Cancelado'],
         'agenda': ['Pendiente','Confirmada','Finalizada','Cancelada'],
         'ventas': ['Pendiente','Cobrada','Cancelada'],
         'comentarios_de_clientes_de_actividades': ['En revisión','Cerrado'],
@@ -405,7 +406,7 @@ def get_estatus_options(table_name):
 
 def get_open_status(table_name):
     status={
-        'clientes': ['En proceso','Perfect match','Swipe','Activo'],
+        'clientes': ['Perfect match','Swipe','Activo'],
         'proyectos': ['En revisión','En proceso'],
         'pagos_administrativos': ['En revisión','Aprobado'],
         'gastos': ['En revisión','Aprobado','Pagado parcial'],
@@ -416,7 +417,7 @@ def get_open_status(table_name):
         'productos_en_compras': ['Pendiente','Recibido','Recibido parcial'],
         'ajustes_de_inventario': ['En revisión','Aprobado'],
         'transferencias_de_inventario': ['En revisión','Aprobada','En tránsito'],
-        'briefs_de_clientes': ['En proceso'],
+        'briefs_de_clientes': ['Sin contestar'],
         'agenda': ['Pendiente','Confirmada'],
         'ventas': ['Pendiente'],
         'actividades': ['Sin iniciar','En proceso','Realizada','Con cambios'],
@@ -499,6 +500,7 @@ def get_table_relationships(table_name):
         'clientes':['resumen','briefs_de_clientes','agenda','ventas','facturas','proyectos','envios','calidad_de_servicio_de_proyectos'],
         'briefs':['preguntas_de_briefs'],
         'preguntas_de_briefs':['respuestas_de_preguntas_de_briefs'],
+        'briefs_de_clientes':['respuestas_briefs_de_clientes'],
         'servicios':['precios_de_servicios','actividades_base'],
         'ventas':['servicios_en_ventas'],
         'proyectos':['resumen','actividades'],
@@ -657,7 +659,15 @@ def get_summary_kpis(table_name,id_parent_record):
             'generales': {
                 'timpo_promedio_por_actividad': '$100',
             },
-        },                          
+        },    
+        'clientes': {
+            'actividades': {
+                'briefs_sin_contestar': BriefsDeClientes.query.filter(BriefsDeClientes.estatus.in_(['Sin contestar']),BriefsDeClientes.id_cliente==id_parent_record).count(),
+            },
+            'generales': {
+                'timpo_promedio_por_actividad': '$100',
+            },
+        },                                 
     }
     data=data.get(table_name,'')
     return data

@@ -531,6 +531,7 @@ def delete(table_name):
         flash(f"Registro eliminado exitosamente en '{table_name.replace('_', ' ').capitalize()}'.", "success")
     except Exception as e:
         db.session.rollback()
+        print(e)
         flash(f"Error al eliminar el registro: {str(e)}", "danger")
 
     return redirect(url_for("dynamic.table_view", table_name=table_name))

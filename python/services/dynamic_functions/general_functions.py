@@ -4,6 +4,8 @@ from sqlalchemy import String, Text, or_,func,Integer, Float, Numeric
 from sqlalchemy.sql import case
 from flask import session,flash,request
 from datetime import date, datetime,timedelta
+from config import *
+from python.services.system.helper_functions import *
 
 #####
 # funciones auxiliares
@@ -81,8 +83,8 @@ def calcular_importe_pago(record):
         
 def actualizar_venta(record):
     record.subtotal=(db.session.query(func.sum(ServiciosEnVentas.subtotal)).filter(ServiciosEnVentas.id_venta == record.id).scalar()) or 0
+    descuento_total=0
     if record.codigo_de_descuento:
-        descuento_total=0
         descuento=Descuentos.query.filter_by(estatus='Activo',codigo_de_descuento=record.codigo_de_descuento).first()
         if descuento.tipo_de_descuento=='Importe':
             if descuento.id_servicio and descuento.id_espacio:

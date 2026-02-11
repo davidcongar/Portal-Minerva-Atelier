@@ -17,7 +17,7 @@ class Clientes(db.Model,BaseMixin,AuditMixin):
     direccion = db.Column(EncryptedColumn(255))
     codigo_postal = db.Column(EncryptedColumn(255))
     telefono = db.Column(EncryptedColumn(255))
-    correo_electronico = db.Column(EncryptedColumn(255))
+    correo_electronico = db.Column(db.String(255))
     contrasena = db.Column(db.String(255))
 
     def set_password(self, password):

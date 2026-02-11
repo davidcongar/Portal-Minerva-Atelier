@@ -22,38 +22,6 @@ stripe.api_key = os.getenv('STRIPE_API_KEY')
 
 ventas_bp = Blueprint("ventas", __name__,url_prefix="/ventas")
 
-@ventas_bp.route("/create-checkout-session/<id>", methods=["GET","POST"])
-def create_checkout_session(id):
-    try:
-        venta=Ventas.query.get(id)
-        if venta.estatus!='Cobrada':
-            items=ServiciosEnVentas.query.filter_by(id_venta=id).all()
-            line_items=[]
-            for item in items:
-                line_items.append({
-                    "price": item.id_stripe_precio,
-                    "quantity": int(item.cantidad)
-                })
-            descuento=Descuentos.query.filter_by(estatus='Activo',codigo_de_descuento=venta.codigo_de_descuento).first()
-            descuentos=[]
-            if descuento:
-                descuentos=[{'coupon':descuento.id_stripe}]
-            checkout_session = stripe.checkout.Session.create(
-                line_items=line_items,
-                discounts=descuentos,
-                mode='payment',
-                success_url=f"{DOMAIN}/ventas/success?session_id={{CHECKOUT_SESSION_ID}}",
-                cancel_url=f"{DOMAIN}/ventas/cancelar",
-                payment_intent_data={'metadata':{'id_venta':id}},
-                metadata={"id_venta": id}
-            )
-            return redirect(checkout_session.url, code=303)
-        else:
-            flash(f"La venta ya fue cobrada.", "info")
-    except Exception as e:
-        flash(f"Error al generar la compra: {str(e)}", "danger")
-    return redirect(url_for('dynamic.table_view', table_name='ventas'))
-
 @ventas_bp.route("/success")
 def success():
     try:
@@ -129,40 +97,6 @@ def success():
         db.session.rollback()
         flash(f"Error al cobrar la Venta: {str(e)}", "danger")        
     return redirect(url_for('dynamic.table_view', table_name='ventas'))
-
-'''
-@ventas_bp.route("/webhook", methods=["POST"])
-def stripe_webhook():
-
-    payload = request.data
-    sig_header = request.headers.get("Stripe-Signature")
-    endpoint_secret = "whsec_..."
-
-    try:
-        event = stripe.Webhook.construct_event(
-            payload, sig_header, endpoint_secret
-        )
-    except Exception as e:
-        return {"error": str(e)}, 400
-
-    if event["type"] == "checkout.session.completed":
-        session = event["data"]["object"]
-
-        venta_id = session["metadata"].get("venta_id")
-        payment_intent_id = session["payment_intent"]
-
-        print("Venta ID:", venta_id)
-        print("PaymentIntent:", payment_intent_id)
-
-        # 🔒 SAFELY UPDATE YOUR DB HERE
-        venta = Venta.query.get(venta_id)
-        venta.estado = "pagado"
-        venta.stripe_payment_intent = payment_intent_id
-        db.session.commit()
-
-    return {"status": "ok"}
-'''
-
 
 @ventas_bp.route("/cancelar/<id>", methods=["GET","POST"])
 @login_required
