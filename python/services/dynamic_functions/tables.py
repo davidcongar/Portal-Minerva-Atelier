@@ -388,7 +388,7 @@ def get_estatus_options(table_name):
         'gastos': ['En revisión','Aprobado','Pagado parcial','Pagado','Cancelado'],
         'transferencias_de_dinero': ['En revisión','Aprobada','Realizada','Cancelada'], 
         'ajustes_de_dinero': ['En revisión','Realizado','Cancelado'],
-        'facturas': ['En revisión','Aprobada','Facturada','Cobrada parcial','Cobrada','Cancelada'],
+        'facturas': ['En revisión','Aprobada','Facturada','Cancelada'],
         'compras': ['En revisión','Aprobada','Recibida parcial','Recibida','Cancelada'],
         'productos_en_compras': ['Pendiente','Recibido','Recibido parcial','Cancelado'],
         'recepciones_de_compras': ['En revisión','Aprobada','Finalizada','Cancelada'],
@@ -421,6 +421,7 @@ def get_open_status(table_name):
         'agenda': ['Pendiente','Confirmada'],
         'ventas': ['Pendiente'],
         'actividades': ['Sin iniciar','En proceso','Realizada','Con cambios'],
+        'facturas': ['En revisión','Aprobada'],
     }
     status=status.get(table_name,['Activo'])
     return status
@@ -503,7 +504,7 @@ def get_table_relationships(table_name):
         'briefs_de_clientes':['respuestas_briefs_de_clientes'],
         'servicios':['precios_de_servicios','actividades_base'],
         'ventas':['servicios_en_ventas'],
-        'proyectos':['resumen','actividades'],
+        'proyectos':['resumen','briefs_de_clientes','actividades'],
         'integrantes':['resumen','agenda','proyectos','actividades','sueldos_pagados_en_nomina'],
 
         'pagos_administrativos':['gastos_y_compras_en_pagos'],

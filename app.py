@@ -183,7 +183,6 @@ from python.routes.comentarios_de_clientes_de_actividades import comentarios_de_
 app.register_blueprint(comentarios_de_clientes_de_actividades_bp)
 
 from python.services.system.template_formats import *
-
 # Almacenar los nombres de las tablas en caché
 TABLES_CACHE = {}
 

@@ -66,7 +66,6 @@ def asignar():
         result = assign_activities(ids, db.session)
         db.session.commit()
         return jsonify({"success": True, "message": f"Se han asignado {result['assigned']} actividades."})
-
     except Exception as e:
         db.session.rollback()
         return jsonify({"danger": True, "message": f"Error al revisar: {str(e)}"}), 500
@@ -152,10 +151,7 @@ def assign_activities(ids, session):
             )
 
             if not eligible:
-                raise ValueError(
-                    f"No integrante can take more work in project {project_id} "
-                    "without exceeding 40h/week."
-                )
+                continue
 
             chosen = eligible[0]
 

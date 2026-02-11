@@ -64,7 +64,7 @@ def success():
             db.session.add(new_record)
             db.session.flush()
             # generar briefs
-            briefs = Briefs.query.filter(Briefs.nombre.in_(BRIEFS_GLOW_UP)).all()
+            briefs = Briefs.query.filter_by(id_servicio=item.id_servicio).all()
             for brief in briefs:
                 new_brief=BriefsDeClientes(
                     id_visualizacion=get_id_visualizacion('briefs_de_clientes'),
