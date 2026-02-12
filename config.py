@@ -90,6 +90,7 @@ TITLE_FORMATS = {
     'id_espacio_nombre':'Espacio',
     'id_actividad_base_nombre':'Actividad',
     'id_integrante_nombre':'Integrante',
+    'id_pago_de_nomina_id_visualizacion':'ID Pago',
 
     'proveedor.nombre':'Proveedor',
     'compras.proveedor.nombre':'Proveedor',
@@ -101,7 +102,8 @@ TITLE_FORMATS = {
     'servicio.nombre':'Cliente',
     'espacio.nombre':'Espacio',
     'integrante.nombre_completo':'Integrante',
-
+    'pago_de_nomina.fecha_inicio':'Fecha inicio',
+    'pago_de_nomina.fecha_fin':'Fecha fin',
 
 }
 BRIEFS_CREACION_CLIENTE = {'¿Hacemos match?'}

@@ -6,16 +6,6 @@ from python.services.dynamic_functions.general_functions import *
 
 def get_variables_table_view_input(table_name):
     columns = {
-        'briefs_de_clientes': {
-            'columns':['pregunta','respuesta'],
-            'table_title':'Preguntas de Brief',
-            'query_table':'respuestas_briefs_de_clientes',
-            'table_name':'respuestas_briefs_de_clientes',
-            'edit_fields':['respuesta'],
-            'required_fields':['respuesta'],
-            'details':['cliente.nombre_completo','brief.nombre'],
-            'url_confirm':'briefs_de_clientes.confirmar',
-        },
         'transferencias_de_inventario': {
             'columns':['producto','cantidad_enviada','cantidad_recibida','notas'],
             'table_title':'Productos en Transferencia',
@@ -25,7 +15,21 @@ def get_variables_table_view_input(table_name):
             'required_fields':['cantidad_recibida'],
             'details':['almacen_salida.nombre','almacen_entrada.nombre'],
             'url_confirm':'transferencias_de_inventario.finalizar',
-        },        
+            'delete_button':'no',
+            'add_button':'no'
+        },
+        'pagos_de_nomina': {
+            'columns':['integrante','sueldo_bruto','bono','sueldo_bruto_real','deduccion_imss','deduccion_isr','total_deducciones','ajuste','sueldo_neto','notas'],
+            'table_title':'Sueldos a pagar',
+            'query_table':'sueldos_a_pagar',
+            'table_name':'sueldos_pagados_en_nomina',
+            'edit_fields':['bono','deduccion_imss','deduccion_isr','ajuste','notas'],
+            'required_fields':['bono','deduccion_imss','deduccion_isr','ajuste'],
+            'details':['fecha_inicio','fecha_fin','importe_total'],
+            'url_confirm':'pagos_de_nomina.confirm',
+            'delete_button':'si',
+            'add_button':'si'
+        },             
     }
     columns=columns.get(table_name,'')
     return columns

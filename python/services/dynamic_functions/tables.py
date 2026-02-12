@@ -320,15 +320,20 @@ def get_columns(table_name,section):
             'modal': {'informacion_general':['id','id_visualizacion','id_puesto_nombre','nombre_completo','fecha_nacimiento','genero','estado_civil','fecha_contratacion','fecha_terminacion','estatus'],'contacto':['direccion','codigo_postal','telefono','correo_electronico'],'documentos':['numero_seguridad_social','rfc','curp'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
             'pdf': ['id_visualizacion','id_puesto_nombre','nombre_completo','fecha_nacimiento','genero','estado_civil','direccion','codigo_postal','telefono','correo_electronico','fecha_contratacion','fecha_terminacion','numero_seguridad_social','rfc','curp','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
+        'sueldos_de_integrantes': {
+            'main_page': ['id_visualizacion','id_integrante_nombre_completo','sueldo_bruto','total_deducciones','sueldo_neto','estatus'],
+            'modal': {'informacion_general':['id','id_visualizacion','id_integrante_nombre_completo','sueldo_bruto','deduccion_imss','deduccion_isr','total_deducciones','sueldo_neto','estatus'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
+            'pdf': ['id_visualizacion','id_integrante_nombre_completo','sueldo_bruto','deduccion_imss','deduccion_isr','total_deducciones','sueldo_neto','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
+        },        
         'pagos_de_nomina': {
-            'main_page': ['id_visualizacion','id_cuenta_de_banco_nombre','fecha','importe_total','estatus'],
-            'modal': {'informacion_general':['id','id_visualizacion','id_cuenta_de_banco_nombre','fecha','estatus'],'financiero':['importe_total'],'detalles':['notas'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
-            'pdf': ['id_visualizacion','id_cuenta_de_banco_nombre','fecha','importe_total','notas','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
+            'main_page': ['id_visualizacion','id_cuenta_de_banco_nombre','fecha_inicio','fecha_fin','fecha_de_pago','importe_total','estatus'],
+            'modal': {'informacion_general':['id','id_visualizacion','id_cuenta_de_banco_nombre','fecha_inicio','fecha_fin','fecha_de_pago','estatus'],'financiero':['importe_total'],'detalles':['notas'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
+            'pdf': ['id_visualizacion','id_cuenta_de_banco_nombre','fecha_inicio','fecha_fin','fecha_de_pago','importe_total','notas','estatus','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'sueldos_pagados_en_nomina': {
-            'main_page': ['id_visualizacion','id_pago_de_nomina_id_visualizacion','id_integrante_nombre','importe','importe_ajuste','importe_total'],
-            'modal': {'informacion_general':['id','id_visualizacion','id_pago_de_nomina_id_visualizacion','id_integrante_nombre'],'financiero':['importe','importe_ajuste','importe_total'],'detalles':['notas'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
-            'pdf': ['id_visualizacion','id_pago_de_nomina_id_visualizacion','id_integrante_nombre','importe','importe_ajuste','importe_total','notas','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
+            'main_page': ['id_visualizacion','id_pago_de_nomina_id_visualizacion','id_integrante_nombre_completo','sueldo_bruto','bono','sueldo_bruto_real','deduccion_imss','deduccion_isr','total_deducciones','ajuste','sueldo_neto'],
+            'modal': {'informacion_general':['id','id_visualizacion','id_pago_de_nomina_id_visualizacion','id_integrante_nombre_completo'],'financiero':['sueldo_bruto','bono','sueldo_bruto_real','deduccion_imss','deduccion_isr','total_deducciones','ajuste','sueldo_neto'],'detalles':['notas'],'sistema':['id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']},
+            'pdf': ['id_visualizacion','id_pago_de_nomina_id_visualizacion','id_integrante_nombre_completo''sueldo_bruto','bono','sueldo_bruto_real','deduccion_imss','deduccion_isr','total_deducciones','ajuste','sueldo_neto','notas','id_usuario_correo_electronico','fecha_de_creacion','fecha_de_actualizacion']
         },
         'sueldo_de_integrantes': {
             'main_page': ['id_visualizacion','id_integrante_nombre','sueldo','estatus'],
@@ -384,7 +389,7 @@ def get_estatus_options(table_name):
     options = {
         'clientes': ['Perfect match','Swipe','Activo','Inactivo','Perdido'],
         'proyectos': ['En revisión','En proceso','Finalizado','Cancelado'],
-        'pagos_administrativos': ['En revisión','Aprobado','Pagado'],
+        'pagos_administrativos': ['En revisión','Aprobado','Pagado','Cancelado'],
         'gastos': ['En revisión','Aprobado','Pagado parcial','Pagado','Cancelado'],
         'transferencias_de_dinero': ['En revisión','Aprobada','Realizada','Cancelada'], 
         'ajustes_de_dinero': ['En revisión','Realizado','Cancelado'],
@@ -399,7 +404,7 @@ def get_estatus_options(table_name):
         'agenda': ['Pendiente','Confirmada','Finalizada','Cancelada'],
         'ventas': ['Pendiente','Cobrada','Cancelada'],
         'comentarios_de_clientes_de_actividades': ['En revisión','Cerrado'],
-
+        'pagos_de_nomina': ['En revisión','Aprobado','Pagado','Cancelado'],
     }
     options=options.get(table_name, ['Activo', 'Inactivo'])
     return options
@@ -422,6 +427,7 @@ def get_open_status(table_name):
         'ventas': ['Pendiente'],
         'actividades': ['Sin iniciar','En proceso','Realizada','Con cambios'],
         'facturas': ['En revisión','Aprobada'],
+        'pagos_de_nomina': ['En revisión','Aprobado','Pagado'],
     }
     status=status.get(table_name,['Activo'])
     return status
@@ -451,6 +457,7 @@ def get_breadcrumbs(table_name):
         'transferencias_de_dinero':['Banca','banca'],
         'ajustes_de_dinero':['Banca','banca'],
         'pagos_de_nomina':['Banca','banca'],
+        'sueldos_pagados_en_nomina':['Banca','banca'],
 
         'compras':['Compras','compras'],
         'proveedores':['Compras','compras'],
@@ -512,6 +519,7 @@ def get_table_relationships(table_name):
         'recepciones_de_compras':['productos_en_recepciones_de_compras'],
         'descuentos':['clientes_descuentos'],
         'actividades':['comentarios_de_clientes_de_actividades'],
+        'pagos_de_nomina':['sueldos_pagados_en_nomina'],
 
     }
     relationships = relationships.get(table_name, [])

@@ -11,9 +11,9 @@ async function deleteRecord(tableName, modelSecondTable, mainId, recordId, csrfT
     .then(data => {
         if (data.message !== "" && data.status==='warning') {
             showAlert(data.message);
-            reload_tables();
+            reload_table();
         }else{
-            reload_tables();
+            reload_table();
         }
     })
     .catch(error => console.error("Error:", error));    

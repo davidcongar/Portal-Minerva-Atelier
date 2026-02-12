@@ -59,7 +59,6 @@ def cancelar(id):
 @compras_bp.route("/confirm/<id>", methods=["GET","POST"])
 @login_required
 @roles_required()
-@return_url_redirect
 def confirm(id):
     try:
         record=Compras.query.get(id)

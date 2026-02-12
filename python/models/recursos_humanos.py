@@ -36,12 +36,17 @@ class Integrantes(db.Model,BaseMixin,AuditMixin):
 class SueldosDeIntegrantes(db.Model,BaseMixin,AuditMixin):
 
     id_integrante = db.Column(db.UUID, db.ForeignKey("integrantes.id"), nullable=False)
-    sueldo = db.Column(db.Float, nullable=False)
+    sueldo_bruto = db.Column(db.Float, nullable=False)
+    deduccion_imss = db.Column(db.Float)
+    deduccion_isr = db.Column(db.Float)
+    total_deducciones = db.Column(db.Float)
+    sueldo_neto = db.Column(db.Float)
+
     estatus = db.Column(db.String(50), default="Activo")
 
     integrante = db.relationship("Integrantes", backref="sueldos_de_integrantes", lazy=True)
 
-    @validates('sueldo')
+    @validates('sueldo_bruto','sueldo_neto','deduccion_imss','deduccion_isr','total_deducciones')
     def validate_non_negative(self, key, value):
         if float(value) < 0:
             raise ValueError(f"{key.replace('_',' ').capitalize()} no puede ser negativo")

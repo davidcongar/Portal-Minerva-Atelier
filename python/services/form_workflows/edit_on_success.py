@@ -112,3 +112,12 @@ def comentarios_de_clientes_de_actividades(id,changed_fields):
     record=ComentariosDeClientesDeActividades.query.get(id)
     if record.notas_cierre:
         record.estatus='Cerrado'
+
+@handler_edit_on_success('sueldos_de_integrantes')
+def sueldos_de_integrantes(id,changed_fields):
+    record=SueldosDeIntegrantes.query.get(id)
+    isr,imss,deducciones,neto=calcular_nomina(record.sueldo_bruto)
+    record.deduccion_isr=isr
+    record.deduccion_imss=imss
+    record.total_deducciones=deducciones
+    record.sueldo_neto=neto   

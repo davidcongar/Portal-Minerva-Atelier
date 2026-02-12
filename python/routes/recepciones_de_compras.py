@@ -91,7 +91,6 @@ def finalizar(id):
 @recepciones_de_compras_bp.route("/confirm/<id>", methods=["GET","POST"])
 @login_required
 @roles_required()
-@return_url_redirect
 def confirm(id):
     try:
         record=RecepcionesDeCompras.query.get(id)

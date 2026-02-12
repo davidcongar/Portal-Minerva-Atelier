@@ -313,7 +313,7 @@ def form(table_name):
     foreign_options = get_foreign_options()
     estatus_options =  get_estatus_options(table_name)
     foreign_options["estatus"] = estatus_options
-    form_options=get_form_options(table_name)
+    form_options=get_form_options(table_name,id_parent_record)
     foreign_options = {**foreign_options, **form_options}
     # Add Many-to-Many relationships
     record_id = request.args.get("id")
@@ -531,7 +531,6 @@ def delete(table_name):
         flash(f"Registro eliminado exitosamente en '{table_name.replace('_', ' ').capitalize()}'.", "success")
     except Exception as e:
         db.session.rollback()
-        print(e)
         flash(f"Error al eliminar el registro: {str(e)}", "danger")
 
     return redirect(url_for("dynamic.table_view", table_name=table_name))
@@ -760,7 +759,7 @@ def double_table_view(table_name,id):
     edit_fields=variables.get('edit_fields')
     required_fields=variables.get('required_fields')
     foreign_options = get_foreign_options()
-    form_options=get_form_options(table_name)
+    form_options=get_form_options(table_name,record.id)
     foreign_options = {**foreign_options, **form_options}
     details = []   
     details = { detail:deep_getattr(record, detail) for detail in variables.get('details', [])}
@@ -774,6 +773,7 @@ def double_table_view(table_name,id):
     return render_template(
         "system/dynamic_two_table_view.html",
         table_name=table_name,
+        id_main_record=record.id,
         main_record=record,
         columns_first_table=columns_first_table,
         columns_second_table=columns_second_table,
@@ -786,6 +786,7 @@ def double_table_view(table_name,id):
         required_fields=required_fields,
         html='table',
         foreign_options=foreign_options,
+        title_formats=TITLE_FORMATS,
         **context
     )
 
@@ -909,9 +910,39 @@ def double_table_update(table_name,column,id,value=0):
         flash(f"Error al actualizar el valor: {str(e)}", "danger")
     return jsonify({"status": status, "message": message,"value":value_warning})
 
+@dynamic_bp.route("/double_table/reload_details/<string:main_table_name>/<id>", methods=["GET"])
+@login_required
+@roles_required()
+def double_table_reload_details(main_table_name, id):
+    model = get_model_by_name(main_table_name)
+    record = model.query.get(id)
+    variables = get_variables_double_table_view(main_table_name)
+    ordered_details = []
+    for detail in variables.get('details', []):
+        ordered_details.append({
+            "key": detail,
+            "value": deep_getattr(record, detail)
+        })
+    return jsonify({"details": ordered_details})
+
 ###############
 #  Table View Input
 ###################
+
+@dynamic_bp.route("/input_table/reload_details/<string:main_table_name>/<id>", methods=["GET"])
+@login_required
+@roles_required()
+def input_table_reload_details(main_table_name, id):
+    model = get_model_by_name(main_table_name)
+    record = model.query.get(id)
+    variables = get_variables_table_view_input(main_table_name)
+    ordered_details = []
+    for detail in variables.get('details', []):
+        ordered_details.append({
+            "key": detail,
+            "value": deep_getattr(record, detail)
+        })
+    return jsonify({"details": ordered_details})
 
 @dynamic_bp.route("/<string:main_table_name>/input_table/view/<id>")
 @login_required
@@ -925,22 +956,26 @@ def table_view_input(main_table_name,id):
     table_name = variables.get('table_name')
     edit_fields=variables.get('edit_fields')
     required_fields=variables.get('required_fields')
+    delete_button=variables.get('delete_button')
+    add_button=variables.get('add_button')
     foreign_options = get_foreign_options()
-    form_options=get_form_options(table_name)
+    form_options=get_form_options(table_name,record.id)
     foreign_options = {**foreign_options, **form_options}
     details = []   
     details = { detail:deep_getattr(record, detail) for detail in variables.get('details', [])}
-    
+        
     module,active_menu=get_breadcrumbs(table_name)
     context = {
                 "activeMenu": active_menu, 
                 "activeItem": main_table_name,
                 "breadcrumbs": [{"name":module,"url":""},{"name":table_name.replace('_', ' ').capitalize(),"url":""}]
             }
+    session['return_url']=request.url
     return render_template(
         "system/dynamic_table_input.html",
         table_name=table_name,
         main_table_name=main_table_name,
+        id_main_record=record.id,
         main_record=record,
         columns=columns,
         table_title=table_title,
@@ -949,6 +984,9 @@ def table_view_input(main_table_name,id):
         required_fields=required_fields,
         foreign_options=foreign_options,
         details=details,
+        delete_button=delete_button,
+        add_button=add_button,
+        title_formats=TITLE_FORMATS,
         **context
     )
 

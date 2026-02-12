@@ -20,7 +20,7 @@ def get_variables_double_table_view(table_name):
             'edit_fields':['cantidad_ordenada','descuento_porcentaje','subtotal','fecha_entrega_estimada'],
             'required_fields':[''],
             'url_confirm':'compras.confirm'                   
-        },    
+        },
         'recepciones_de_compras': {
             'columns_first_table':['producto','unidad_de_medida','cantidad_ordenada','cantidad_por_recibir'],
             'columns_second_table':['producto','unidad_de_medida','cantidad'],
@@ -34,7 +34,7 @@ def get_variables_double_table_view(table_name):
             'details':['id_visualizacion','compras.proveedor.nombre'],
             'required_fields':[''],
             'url_confirm':'recepciones_de_compras.confirm'  
-        },  
+        },
         'transferencias_de_inventario': {
             'columns_first_table':['almacen','producto','cantidad_disponible'],
             'columns_second_table':['producto','cantidad','cantidad_disponible'],
@@ -48,7 +48,7 @@ def get_variables_double_table_view(table_name):
             'edit_fields':['cantidad','id_posicion_de_sub_almacen_entrada'],
             'required_fields':[''],
             'url_confirm':'transferencias_de_inventario.confirm'  
-        },    
+        },
         'pagos_administrativos': {
             'columns_first_table':['id_','tipo','proveedor','notas', 'importe_total','importe_pagado','importe_restante'],
             'columns_second_table':['tipo','proveedor','importe','importe_restante','notas'],
@@ -62,7 +62,7 @@ def get_variables_double_table_view(table_name):
             'edit_fields':['notas','importe'],
             'required_fields':[''],
             'url_confirm':'pagos_administrativos.confirm'  
-        },                   
+        },
     }
     columns=columns.get(table_name,'')
     return columns
@@ -140,7 +140,17 @@ def on_update_double_table(table_name,id):
     elif table_name=='gastos_y_compras_en_pagos':
         record=GastosYComprasEnPagos.query.get(id)
         record=PagosAdministrativos.query.get(record.id_pago)
-        calcular_importe_pago(record) 
+        calcular_importe_pago(record)
+    elif table_name=='sueldos_pagados_en_nomina':
+        record=SueldosPagadosEnNomina.query.get(id)
+        record.sueldo_bruto_real=float(record.sueldo_bruto)+float(record.bono)
+        isr,imss,deducciones,neto=calcular_nomina(record.sueldo_bruto_real)
+        record.deducciones_isr=isr
+        record.deducciones_imss=imss
+        record.total_de_deducciones=deducciones
+        record.sueldo_neto=float(neto)+float(record.ajuste)
+        pago=PagosDeNomina.query.get(record.id_pago_de_nomina)
+        pago.importe_total=(db.session.query(func.sum(SueldosPagadosEnNomina.sueldo_neto)).filter(SueldosPagadosEnNomina.id_pago_de_nomina == pago.id).scalar() or 0)
 
 def on_delete_double_table(table_name,id):
     if table_name=='compras':

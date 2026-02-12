@@ -135,6 +135,5 @@ def cancelar(id):
 @pagos_administrativos_bp.route("/confirm/<id>", methods=["GET","POST"])
 @login_required
 @roles_required()
-@return_url_redirect
 def confirm(id):
     return redirect(url_for('dynamic.table_view', table_name='pagos_administrativos'))

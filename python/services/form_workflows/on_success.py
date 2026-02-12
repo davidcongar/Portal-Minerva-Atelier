@@ -57,3 +57,47 @@ def comentarios_de_clientes_de_actividades(id):
     record=ComentariosDeClientesDeActividades.query.get(id)
     actividad=Actividades.query.get(record.id_actividad)
     actividad.estatus='Con cambios'
+
+@handler_on_success('sueldos_de_integrantes')
+def sueldos_de_integrantes(id):
+    record=SueldosDeIntegrantes.query.get(id)
+    isr,imss,deducciones,neto=calcular_nomina(record.sueldo_bruto)
+    record.deduccion_isr=isr
+    record.deduccion_imss=imss
+    record.total_deducciones=deducciones
+    record.sueldo_neto=neto
+
+@handler_on_success('pagos_de_nomina')
+def pagos_de_nomina(id):
+    pago=PagosDeNomina.query.get(id)
+    sueldos=SueldosDeIntegrantes.query.filter_by(estatus='Activo').all()
+    for sueldo in sueldos:
+        new=SueldosPagadosEnNomina(
+            id_visualizacion=get_id_visualizacion('sueldos_pagados_en_nomina'),
+            id_pago_de_nomina=id,
+            id_integrante=sueldo.id_integrante,
+            sueldo_bruto=sueldo.sueldo_bruto,
+            sueldo_bruto_real=sueldo.sueldo_bruto,
+            deduccion_imss=sueldo.deduccion_imss,
+            deduccion_isr=sueldo.deduccion_isr,
+            total_deducciones=sueldo.total_deducciones,
+            sueldo_neto=sueldo.sueldo_neto,
+        )
+        db.session.add(new)
+    db.session.flush()
+    pago.importe_total=(db.session.query(func.sum(SueldosPagadosEnNomina.sueldo_neto)).filter(SueldosPagadosEnNomina.id_pago_de_nomina == id).scalar() or 0)
+
+@handler_on_success('sueldos_pagados_en_nomina')
+def sueldos_pagados_en_nomina(id):
+    record=SueldosPagadosEnNomina.query.get(id)
+    pago=PagosDeNomina.query.get(record.id_pago_de_nomina)
+    sueldo=SueldosDeIntegrantes.query.filter_by(estatus='Activo',id_integrante=record.id_integrante).first()
+    if sueldo:
+        record.sueldo_bruto=sueldo.sueldo_bruto
+        record.sueldo_bruto_real=sueldo.sueldo_bruto
+        record.deduccion_imss=sueldo.deduccion_imss
+        record.deduccion_isr=sueldo.deduccion_isr
+        record.total_deducciones=sueldo.total_deducciones
+        record.sueldo_neto=sueldo.sueldo_neto
+    db.session.flush()
+    pago.importe_total=(db.session.query(func.sum(SueldosPagadosEnNomina.sueldo_neto)).filter(SueldosPagadosEnNomina.id_pago_de_nomina == pago.id).scalar() or 0)

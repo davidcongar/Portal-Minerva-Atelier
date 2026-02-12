@@ -1,5 +1,5 @@
 from python.models.modelos import *
-from sqlalchemy import func
+from sqlalchemy import func,exists
 from python.services.system.helper_functions import *
 from flask import  jsonify
 from datetime import timedelta
@@ -33,6 +33,7 @@ def get_foreign_options():
         'id_venta':Ventas.query.filter_by(estatus='Pendiente'),
         'id_descuento':Descuentos.query.filter_by(estatus='Activo'),
         'id_actividad':Actividades.query.all(),
+        'id_pago_de_nomina':PagosDeNomina.query.all(),
 
         # --- Campos con opciones fijas ---
         'regimen_fiscal':['601 - General de Ley Personas Morales','603 - Personas Morales con Fines no Lucrativos','605 - Sueldos y Salarios e Ingresos Asimilados a Salarios','606 - Arrendamiento','607 - Régimen de Enajenación o Adquisición de Bienes','608 - Demás ingresos','610 - Residentes en el Extranjero sin Establecimiento Permanente en México','611 - Ingresos por Dividendos (socios y accionistas)','612 - Personas Físicas con Actividades Empresariales y Profesionales','614 - Ingresos por intereses','615 - Régimen de los ingresos por obtención de premios','616 - Sin obligaciones fiscales','620 - Sociedades Cooperativas de Producción que optan por diferir sus ingresos','621 - Incorporación Fiscal (ya derogado, solo histórico)','622 - Actividades Agrícolas, Ganaderas, Silvícolas y Pesqueras (Personas Morales)','623 - Opcional para Grupos de Sociedades','624 - Coordinados','625 - Régimen de las Actividades Empresariales con ingresos a través de Plataformas Tecnológicas','626 - Régimen Simplificado de Confianza (RESICO)',],
@@ -54,9 +55,9 @@ def get_foreign_options():
 
 
 # specific filters for forms
-def get_form_options(table_name):
+def get_form_options(table_name,id_parent_record):
     options = {
-        #'integr': {'id_producto': Productos.query.filter(Productos.estatus == 'Activo',Productos.categoria.has(CategoriasDeProductos.nombre.in_(['Producto terminado', 'Producto intermedio'])))},
+        'sueldos_pagados_en_nomina': {'id_integrante': Integrantes.query.filter(Integrantes.estatus == 'Activo').filter(~exists().where((SueldosPagadosEnNomina.id_integrante == Integrantes.id) &(SueldosPagadosEnNomina.id_pago_de_nomina == id_parent_record))).all()},
     }
     options=options.get(table_name,{})
     return options
@@ -95,6 +96,9 @@ def get_ignored_columns(table_name):
         'transferencias_de_inventario':{'fecha_de_recepcion'},   
         'descuentos':{'id_stripe'},   
         'comentarios_de_clientes_de_actividades':{'notas_cierre'},   
+        'pagos_de_nomina':{'importe_total','fecha_de_pago'},   
+        'sueldos_de_integrantes':{'deduccion_imss','deduccion_isr','total_deducciones','sueldo_neto'},   
+        'sueldos_pagados_en_nomina':{'sueldo_bruto','bono','sueldo_bruto_real','ajuste','notas','deduccion_imss','deduccion_isr','total_deducciones','sueldo_neto'}
 
     }
     columns=columns.get(table_name,columnas_generales) | columnas_generales
@@ -127,6 +131,8 @@ def get_ignored_columns_edit(table_name,estatus):
         'comentarios_de_clientes_de_actividades': {'default':{''},
                         'Cerrar':{'id_actividad','comentario_cliente','estatus'},                                                
                         },
+        'sueldos_de_integrantes':{'default':{'deduccion_imss','deduccion_isr','total_deducciones','sueldo_neto'}},   
+
     }
     table_dict = tables.get(table_name, columnas_generales)
     if not estatus or estatus not in table_dict:
@@ -182,6 +188,7 @@ def get_url_after_add(table_name):
         'compras': 'dynamic.double_table_view',
         'recepciones_de_compras': 'dynamic.double_table_view',
         'transferencias_de_inventario': 'dynamic.double_table_view',
+        'pagos_de_nomina': 'dynamic.table_view_input',
     }
     columns=columns.get(table_name,'dynamic.table_view')
     return columns
@@ -236,7 +243,7 @@ def get_parent_record(table_name,parent_table):
         'servicios_en_ventas':{'ventas':'id_venta'},
         'clientes_descuentos':{'descuentos':'id_descuento'},
         'comentarios_de_clientes_de_actividades':{'actividades':'id_actividad'},
-
+        'sueldos_pagados_en_nomina':{'pagos_de_nomina':'id_pago_de_nomina'},
     }
     parent_record=parent_record.get(table_name,{'':''}).get(parent_table,'')
     return parent_record

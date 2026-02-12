@@ -103,7 +103,9 @@ class PagosDeNomina(db.Model,BaseMixin,AuditMixin):
 
     id_cuenta_de_banco = db.Column(db.UUID, db.ForeignKey("cuentas_de_banco.id"), nullable=False)
 
-    fecha = db.Column(db.Date, nullable=True)
+    fecha_inicio = db.Column(db.Date, nullable=False)
+    fecha_fin = db.Column(db.Date, nullable=False)
+    fecha_de_pago = db.Column(db.Date)
     importe_total = db.Column(db.Float, nullable=False, default=0.00)
     notas = db.Column(db.Text) 
     estatus = db.Column(db.String(50), default="En revisión")
@@ -114,15 +116,20 @@ class SueldosPagadosEnNomina(db.Model,BaseMixin,AuditMixin):
 
     id_pago_de_nomina = db.Column(db.UUID, db.ForeignKey("pagos_de_nomina.id"), nullable=False)
     id_integrante = db.Column(db.UUID, db.ForeignKey("integrantes.id"), nullable=False)
-    importe = db.Column(db.Float, nullable=False)
-    importe_ajuste=db.Column(db.Float,nullable=False, default=0)
-    importe_total=db.Column(db.Float,nullable=False, default=0)
+    sueldo_bruto = db.Column(db.Float, default=0)
+    bono=db.Column(db.Float, default=0)
+    sueldo_bruto_real=db.Column(db.Float, default=0)
+    deduccion_imss = db.Column(db.Float, default=0)
+    deduccion_isr = db.Column(db.Float, default=0)
+    total_deducciones = db.Column(db.Float, default=0)
+    ajuste = db.Column(db.Float, default=0)
+    sueldo_neto = db.Column(db.Float, default=0)
     notas = db.Column(db.Text) 
 
     pago_de_nomina = db.relationship("PagosDeNomina", backref="sueldos_pagados_en_nomina", lazy=True)
     integrante = db.relationship("Integrantes", backref="sueldos_pagados_en_nomina", lazy=True)
 
-    @validates('importe')
+    @validates('sueldo_bruto','bono','sueldo_bruto_real','deduccion_imss','deduccion_isr','total_deducciones','sueldo_neto')
     def validate_non_negative(self, key, value):
         if float(value) < 0:
             raise ValueError(f"{key.replace('_',' ').capitalize()} no puede ser negativo")
