@@ -13,6 +13,7 @@ async function addRecord(tableName,modelFirstTable, modelSecondTable, mainId, re
 
         if (response.ok) {
             reload_tables();
+            reload_details(id_main_record);
         } else {
             showDanger("Error al eliminar el reigstro.");
         }
